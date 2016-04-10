@@ -1,0 +1,10 @@
+---
+
+- name: apt | install squid
+  apt: pkg=squid state=installed
+
+- set_fact:
+    squid_confdir: /etc/squid3
+    squid_svc: squid3
+    squid_spool: /var/spool/squid3
+

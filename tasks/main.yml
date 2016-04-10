@@ -1,0 +1,15 @@
+---
+
+- include: debian.yml
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: replace with private configure
+  template: src=squid.conf.j2
+        dest={{ squid_confdir }}/squid.conf
+        owner=root group=root mode=0644
+        backup=yes
+  notify: restart squid
+
