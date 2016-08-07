@@ -7,4 +7,10 @@
     squid_confdir: /etc/squid3
     squid_svc: squid3
     squid_spool: /var/spool/squid3
+- set_fact:
+    squid_confdir: /etc/squid
+    squid_svc: squid
+    squid_spool: /var/spool/squid
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
 

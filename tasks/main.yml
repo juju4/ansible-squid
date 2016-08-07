@@ -13,3 +13,6 @@
         backup=yes
   notify: restart squid
 
+- name: copy script for transparent proxy user
+  copy: src=transparent-user.sh dest=/usr/local/bin/transparent-user.sh mode=0755
+

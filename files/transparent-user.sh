@@ -6,9 +6,11 @@
 SQUID_PORT="3128"
 USER=deploy
 
-IF_EXT="eth0"
+#IF_EXT="eth0"
+#IF_EXT="lxdbr0"
 
-ipt_arg="-m owner --uid-owner $USER"
+[ "X$USER" != "X" ] && ipt_arg="-m owner --uid-owner $USER"
+[ "X$IF_EXT" != "X" ] && ipt_arg="$ipt_arg -o $IF_EXT"
 
 # process squid user normally
 iptables -t nat -m owner --uid-owner proxy -A OUTPUT -j ACCEPT
