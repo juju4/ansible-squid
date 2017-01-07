@@ -1,3 +1,11 @@
 ---
+
 - name: restart squid
   service: name="{{ squid_svc }}" state=restarted
+
+- name: restart dansguardian
+  service: name=dansguardian state=restarted
+
+- name: restart clamd
+  service: name=clamav-daemon state=restarted
+

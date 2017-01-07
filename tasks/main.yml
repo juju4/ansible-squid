@@ -1,18 +1,50 @@
 ---
 
+- name: Include version-specific variables for Ubuntu.
+  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+  when: ansible_distribution == 'Ubuntu'
+- name: Include version-specific variables for RedHat
+  include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
 - include: debian.yml
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - include: redhat.yml
   when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 
-- name: replace with private configure
+- name: update configuration
   template: src=squid.conf.j2
         dest={{ squid_confdir }}/squid.conf
         owner=root group=root mode=0644
         backup=yes
   notify: restart squid
 
+- name: ensure log dir exists
+  file: dest={{ squid_customlog_path | dirname }} state=directory mode=0755 owner={{ squid_user }}
+  when: squid_customlog_path is defined and squid_customlog_path != ''
+
+## http://wiki.squid-cache.org/Features/CustomErrors
+- name: remove squid signature from templates
+  replace: dest={{ item }} regexp='<p>Generated %T by %h \(%s\)</p>' replace='<p>Generated %T by %h (Squid Proxy)</p>'
+## Note: backup is generating mess if rerun as we are not differencing files from their backup...
+#  replace: dest={{ item }} regexp='<p>Generated %T by %h \(%s\)</p>' replace='<p>Generated %T by %h (Squid Proxy)</p>' backup=yes
+#  replace: dest={{ item }} regexp='Generated %T by %h \(%s\)' replace='Generated %T by %h (Squid Proxy)' backup=yes
+  with_fileglob:
+    - "{{ squid_errors_template }}/en/ERR_*"
+
 - name: copy script for transparent proxy user
   copy: src=transparent-user.sh dest=/usr/local/bin/transparent-user.sh mode=0755
+
+- include: dansguardian.yml
+  when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian'
+
+- include: squidguard.yml
+  when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard'
+
+- include: ads.yml
+  when: squid_filter_ads is defined and squid_filter_ads
+
+- name: enable and start squid service
+  service: name="{{ squid_svc }}" state=started enabled=yes
 

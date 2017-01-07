@@ -14,16 +14,46 @@ acl Safe_ports port 443         # https
 #acl Safe_ports port 70         # gopher
 acl Safe_ports port 1025-65535  # unregistered ports
 acl CONNECT method CONNECT
+{% if ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '6' %}
+## required on centos6
+acl localhost src 127.0.0.1/32
+{% endif %}
 
 http_access deny !Safe_ports
 
 # Deny CONNECT to other than secure SSL ports
 http_access deny CONNECT !SSL_ports
 
+cache_mgr {{ squid_cache_admin_email }}
+
+# Suppress Squid version string info in HTTP headers and HTML error pages. = not valid/bungled(3.5.12)
+#httpd_suppress_version_string
+# Limit the size of acceptable HTTP headers.
+request_header_max_size 64 KB
+ignore_unknown_nameservers on
+
+# Disable ICP and HTCP (communication with other caches)
+icp_port 0
+icp_access deny all
+htcp_port 0
+htcp_access deny all
+snmp_port 0
+snmp_access deny all
+
+# Tuning
+pipeline_prefetch on
+shutdown_lifetime 5 second
+
+# own templates? http://www.squid-cache.org/Doc/config/error_directory/
+#		 http://blog.squidblacklist.org/?p=707
+#error_directory /path/to
+
+{% if not (ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '6') %}
 # Only allow cachemgr access from localhost
 http_access allow localhost manager
 http_access deny manager
 
+{% endif %}
 # We strongly recommend the following be uncommented to protect innocent
 # web applications running on the proxy server who think the only
 # one who can access services on "localhost" is a local user
@@ -32,6 +62,14 @@ http_access deny manager
 #
 # INSERT YOUR OWN RULE(S) HERE TO ALLOW ACCESS FROM YOUR CLIENTS
 #
+
+{% if squid_filter_ads is defined and squid_filter_ads %}
+## disable ads ( http://pgl.yoyo.org/adservers/ )
+acl ads dstdom_regex "{{ squid_confdir }}/ad_block.txt"
+http_access deny ads
+#deny_info TCP_RESET ads
+
+{% endif %}
 
 # Example rule allowing access from your local networks.
 # Adapt localnet in the ACL section to list your (internal) IP networks
@@ -47,6 +85,11 @@ http_port 3128
 
 # Leave coredumps in the first cache dir
 coredump_dir {{ squid_spool }}
+
+{% if squid_log_querystrings is defined and squid_log_querystrings %}
+# Do you want to keep query strings? have privacy consequence.
+strip_query_terms off
+{% endif %}
 
 #
 # Add any of your own refresh_pattern entries above these.
@@ -78,9 +121,11 @@ request_header_access If-Modified-Since allow all
 request_header_access Last-Modified allow all
 request_header_access Location allow all
 request_header_access Pragma allow all
-request_header_access Accept allow all
+#request_header_access Accept allow all
+header_replace 	      Accept */*
 request_header_access Accept-Charset allow all
-request_header_access Accept-Encoding allow all
+#request_header_access Accept-Encoding allow all
+header_replace        Accept-Encoding         *
 request_header_access Accept-Language allow all
 request_header_access Content-Language allow all
 request_header_access Mime-Version allow all
@@ -89,7 +134,9 @@ request_header_access Title allow all
 request_header_access Connection allow all
 request_header_access Proxy-Connection allow all
 request_header_access User-Agent allow all
+#header_replace        User-Agent OurBrowser/1.0 (Some Name)
 request_header_access Cookie allow all
+request_header_access Server deny all
 request_header_access All deny all
 follow_x_forwarded_for deny all
 
@@ -138,4 +185,12 @@ refresh_all_ims on
 #always_direct allow local-servers
 #acl FTP proto FTP
 #always_direct allow FTP
+
+## Customize logging
+logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh
+access_log {{ squid_customlog_path }} customlogformat
+
+{% if squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard' %}
+url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf
+{% endif %}
 

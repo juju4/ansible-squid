@@ -1,0 +1,43 @@
+---
+
+## FIXME! Work in progress/incomplete compare to dansguardian
+
+- name: install squidguard package
+  package: name={{ item }} state=present
+  with_items:
+    - squidGuard
+    - wget
+
+- name: squidguard | fix configuration issues
+  replace:
+    dest: /etc/squid/squidGuard.conf
+    regexp: "{{ item.re }}"
+    replace: "{{ item.rep }}"
+  with_items:
+    - { re: '^dbhome .*', rep: 'dbhome /var/lib/squidGuard' }
+
+- name: squidguard | enable refresh cron task
+  replace:
+    dest: /etc/cron.daily/squidGuard
+    regexp: "{{ item.re }}"
+    replace: "{{ item.rep }}"
+  with_items:
+    - { re: '^ENABLED=.*', rep: 'ENABLED=1' }
+## teledanmark down, new list from http://www.squidguard.org/blacklists.html
+    - { re: 'http://ftp.teledanmark.no/pub/www/proxy/squidguard/contrib/blacklists.tar.gz', rep: 'http://squidguard.mesd.k12.or.us/blacklists.tgz' }
+
+- name: squidguard | initialize db
+#  command: "squidGuard -C all"
+  command: "sh /etc/cron.daily/squidGuard creates=/var/lib/squidGuard/blacklists/adult/domains"
+
+- name: check few directories
+  file: "dest={{ item }} state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
+  with_items:
+    - /var/lib/squidGuard/blacklists/porn
+    - /var/lib/squidGuard/blacklists/adult
+
+- name: ensure squidguard is started and enabled
+  service: name={{ item }} state=started enabled=yes
+  with_items:
+    - squidGuard
+

@@ -1,7 +1,11 @@
 [![Build Status](https://travis-ci.org/juju4/ansible-squid.svg?branch=master)](https://travis-ci.org/juju4/ansible-squid)
 # Squid ansible role
 
-A simple ansible role to setup Squid proxy
+Ansible role to setup a secure and clean Squid proxy with
+* Dansguardian for url filtering
+* clamav daemon for malware scanning
+* ads filtering
+On centos, for now, only have squidGuard (configuration as work in progress).
 
 ## Requirements & Dependencies
 
@@ -9,6 +13,7 @@ A simple ansible role to setup Squid proxy
 It was tested on the following versions:
  * 1.9
  * 2.0
+ * 2.2
 
 ### Operating systems
 

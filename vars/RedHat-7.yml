@@ -1,0 +1,14 @@
+---
+
+squid_confdir: /etc/squid
+squid_svc: squid
+squid_spool: /var/spool/squid
+squid_user: squid
+squid_errors_template: /usr/share/squid/errors/
+
+## no package for dansguardian, squidguard from epel
+squid_urlfiltering_tool: squidguard
+squid_urlfiltering_enable: false
+## FIXME! https://bugzilla.redhat.com/show_bug.cgi?id=1253662
+## squidGuard -C all
+#Segmentation fault (core dumped)

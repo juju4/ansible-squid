@@ -1,0 +1,10 @@
+---
+
+squid_confdir: /etc/squid
+squid_svc: squid
+squid_spool: /var/spool/squid
+squid_user: squid
+squid_errors_template: /usr/share/squid/errors/
+
+## no package for dansguardian
+squid_urlfiltering_tool: squidguard

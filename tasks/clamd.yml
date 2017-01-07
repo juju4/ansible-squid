@@ -1,0 +1,42 @@
+---
+
+- name: install clamav daemon package
+  package: name={{ item }} state=present
+  with_items:
+    - clamav-daemon
+
+## clamd and dansguardian need the same user to scan files
+- name: clamd | review settings
+  replace:
+    dest: /etc/clamav/clamd.conf
+    regexp: "{{ item.re }}"
+    replace: "{{ item.rep }}"
+    backup: yes
+  with_items:
+    - { re: "^User .*", rep: "User {{ squid_user }}" }
+    - { re: "^LocalSocketGroup .*", rep: "LocalSocketGroup {{ squid_user }}" }
+  notify:
+    - restart clamd
+
+- name: clamd | check few permissions
+  file: "dest={{ item.d }} state={{ item.s }} mode={{ item.m }} owner={{ squid_user }}"
+  with_items:
+    - { d: /var/log/clamav, s: directory, m: '0755' }
+    - { d: /var/log/clamav/clamav.log, s: file, m: '0640' }
+
+- name: check if existing signatures db
+  stat: path=/var/lib/clamav/main.cvd
+  register: db
+- block:
+    - name: stop freshclam service during update
+      service: name=clamav-freshclam state=stopped
+    - name: ensure signatures are present before starting clamav
+      command: "freshclam creates=/var/lib/clamav/main.cvd"
+  when: not db.stat.exists
+
+- name: ensure clamav is started and enabled
+  service: name={{ item }} state=started enabled=yes
+  with_items:
+    - clamav-daemon
+    - clamav-freshclam
+

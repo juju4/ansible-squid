@@ -1,13 +1,8 @@
 ---
 
-- name: yum | install squid
-  yum: pkg=squid state=installed
-
-- set_fact:
-    squid_confdir: /etc/squid
-    squid_svc: squid
-    squid_spool: /var/spool/squid
-
-- name: enable and start squid service
-  service: name="{{ squid_svc }}" state=started enabled=yes
+- name: yum | install squid and dependencies
+  yum: pkg={{ item }} state=present
+  with_items:
+    - squid
+    - crontabs
 

@@ -5,5 +5,5 @@
 #  vars:
 #    - a:
   roles:
-    - squid
+    - juju4.squid
 
