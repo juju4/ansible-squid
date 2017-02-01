@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/juju4/ansible-squid.svg?branch=master)](https://travis-ci.org/juju4/ansible-squid)
+[![Build Status - Master](https://travis-ci.org/juju4/ansible-squid.svg?branch=master)](https://travis-ci.org/juju4/ansible-squid)
+[![Build Status - Devel](https://travis-ci.org/juju4/ansible-squid.svg?branch=devel)](https://travis-ci.org/juju4/ansible-squid/branches)
 # Squid ansible role
 
 Ansible role to setup a secure and clean Squid proxy with
@@ -27,7 +28,7 @@ For example
 ```
 - host: all
   roles:
-    - squid
+    - juju4.squid
 ```
 
 ## Variables
@@ -40,13 +41,13 @@ This role has a travis basic test (for github), more advanced with kitchen and a
 
 Once you ensured all necessary roles are present, You can test with:
 ```
-$ cd /path/to/roles/squid
+$ cd /path/to/roles/juju4.squid
 $ kitchen verify
 $ kitchen login
 ```
 or
 ```
-$ cd /path/to/roles/squid/test/vagrant
+$ cd /path/to/roles/juju4.squid/test/vagrant
 $ vagrant up
 $ vagrant ssh
 ```
