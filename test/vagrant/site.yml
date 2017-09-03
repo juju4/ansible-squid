@@ -2,5 +2,5 @@
 
 - hosts: all
   roles:
-    - squid
+    - juju4.squid
 
