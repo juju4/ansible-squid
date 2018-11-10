@@ -193,5 +193,23 @@ access_log {{ squid_customlog_path }} customlogformat
 
 {% if squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard' %}
 url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf
+
+{% endif %}
+{% if squid_splash_enable is defined and squid_splash_enable %}
+# https://wiki.squid-cache.org/ConfigExamples/Portal/Splash
+# https://thejimmahknows.com/squid-proxy-splash-page-2/
+# https://github.com/tombatossals/squid_guifi_splash
+# -t <idle_timeout>
+# -T <fixed_timeout>
+external_acl_type splash_page ttl=60 concurrency=100 %SRC /usr/local/sbin/squid/ext_session_acl -t 7200 -b /var/lib/squid/session.db
+
+acl existing_users external splash_page
+
+deny_info 511:/etc/squid/splash.html existing_users
+
+http_access deny !existing_users
+
 {% endif %}
 
+# https://www.edv-huber.com/index.php/problemloesungen/22-squid-proxy-server-filter-urls-by-virustotal-com
+# https://blog.rootshell.be/2014/12/15/automatic-mime-parts-scanning-with-virustotal/
