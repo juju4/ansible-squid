@@ -12,3 +12,7 @@ squid_urlfiltering_enable: false
 ## FIXME! https://bugzilla.redhat.com/show_bug.cgi?id=1253662
 ## squidGuard -C all
 #Segmentation fault (core dumped)
+
+ssl_user: root
+ssl_dir: /etc/pki/tls/certs
+ssl_privatedir: /etc/pki/tls/private

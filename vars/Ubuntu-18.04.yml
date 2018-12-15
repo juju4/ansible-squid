@@ -5,3 +5,7 @@ squid_svc: squid
 squid_spool: /var/spool/squid
 squid_user: proxy
 squid_errors_template: /usr/share/squid/errors/
+
+ssl_user: ssl-cert
+ssl_dir: /etc/ssl
+ssl_privatedir: /etc/ssl/private

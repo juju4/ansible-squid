@@ -55,6 +55,7 @@ $ vagrant ssh
 
 ## Troubleshooting & Known issues
 
+* HTTPS support for squid depends on compilation option. Centos7 has it but not Ubuntu (bionic)
 
 ## License
 

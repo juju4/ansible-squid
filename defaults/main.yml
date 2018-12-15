@@ -10,6 +10,11 @@ squid_customlog_path: /var/log/squid/access_custom.log
 
 squid_filter_ads: true
 
+# require distribution where squid compiled with ssl (ok centos, nok ubuntu)
+squid_https: false
+squid_certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible for squid'
+squid_certduration: 1095
+
 ## only packaged in ubuntu xenial, debian jessie, epel: squidguard, dansguardian
 ##	centos6: no dansguardian, only squidGuard
 ## https://blog.rootshell.be/2011/01/18/url-filtering-with-squid/

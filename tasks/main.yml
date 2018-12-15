@@ -13,6 +13,9 @@
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
 
+- include_tasks: https.yml
+  when: squid_https
+
 - name: update configuration
   template:
     src: squid.conf.j2
@@ -20,6 +23,7 @@
     owner: root
     group: root
     mode: '0644'
+    validate: squid -k parse -f %s
     backup: yes
   notify: restart squid
 
@@ -40,7 +44,7 @@
 ## Note: backup is generating mess if rerun as we are not differencing files from their backup...
 #    backup=yes
   with_fileglob:
-    - "{{ squid_errors_template }}/en/ERR_*"
+    - "{{ squid_errors_template }}en/ERR_*"
 
 - name: copy script for transparent proxy user
   copy: src=transparent-user.sh dest=/usr/local/bin/transparent-user.sh mode=0755
