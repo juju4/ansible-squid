@@ -1,0 +1,33 @@
+---
+
+- include_tasks: travis.yml
+
+- name: apt | self-signed certificate packages dependencies
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - ssl-cert
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Generate SSL self-signed certificate
+  command: >
+    openssl req -x509 -nodes -sha256 -days {{ squid_certduration }} -newkey rsa:2048
+        -subj "{{ squid_certinfo }}/CN={{ certificate_cn }}"
+        -keyout {{ ssl_privatedir }}/{{ ansible_fqdn }}.key
+        -out {{ ssl_dir }}/{{ ansible_fqdn }}.crt
+  args:
+    creates: "{{ ssl_dir }}/{{ ansible_fqdn }}.crt"
+
+- name: Validate private key file permissions
+  file:
+    path: "{{ ssl_privatedir }}/{{ ansible_fqdn }}.key"
+    owner: "root"
+    group: "{{ ssl_user }}"
+    mode: '0440'
+
+- name: Ensure CA file available in der format
+  command: >
+    openssl x509 -in {{ ssl_dir }}/{{ ansible_fqdn }}.crt
+        -outform DER
+        -out {{ ssl_dir }}/{{ ansible_fqdn }}.der
+  args:
+    creates: "{{ ssl_dir }}/{{ ansible_fqdn }}.der"
