@@ -5,13 +5,15 @@ VAGRANTFILE_API_VERSION = "2"
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-    config.vm.box = "ubuntu/trusty64"
-    #config.vm.box = "centos/7"
+    #config.vm.box = "ubuntu/bionic64"
+    #config.vm.provision :shell, inline: "apt-get install -y python"
+    #config.vm.box = "ubuntu/trusty64"
+    config.vm.box = "centos/7"
 
     config.vm.provision :ansible do |ansible|
        ansible.compatibility_mode = "2.0"
        ansible.playbook = "site.yml"
-       #ansible.verbose = "vvvv"
+       ansible.verbose = "vv"
        #ansible.host_key_checking = false
        #ansible.limit = 'all'
        ansible.become = true
@@ -29,5 +31,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     config.vm.network "forwarded_port", guest: 3128, host: 8128
+    config.vm.network "forwarded_port", guest: 3129, host: 8129
 end
 
