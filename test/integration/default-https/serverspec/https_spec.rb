@@ -11,7 +11,7 @@ describe command("curl -v -x http://localhost:#{proxy_port} https://www.google.c
   its(:exit_status) { should eq 0 }
 end
 
-describe command("curl -v -x http://localhost:#{proxy_port} https://www.cnn.com") do
+describe command("curl -kvL -x http://localhost:#{proxy_port} https://www.cnn.com") do
   its(:stdout) { should match /<!DOCTYPE html><html class="no-js"><head>/ }
   its(:stderr) { should match /HTTP\/1.1 200 OK/ }
   its(:exit_status) { should eq 0 }

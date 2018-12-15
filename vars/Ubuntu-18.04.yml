@@ -9,3 +9,8 @@ squid_errors_template: /usr/share/squid/errors/
 ssl_user: ssl-cert
 ssl_dir: /etc/ssl
 ssl_privatedir: /etc/ssl/private
+
+clamd_pkgs:
+  - clamav-daemon
+  - apparmor
+  - apparmor-utils

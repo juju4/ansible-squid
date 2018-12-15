@@ -2,10 +2,9 @@
 ## FIXME! Work in progress/incomplete compare to dansguardian
 
 - name: install squidguard package
-  package: name={{ item }} state=present
-  with_items:
-    - squidGuard
-    - wget
+  package:
+    name: "{{ squidguard_pkgs }}"
+    state: present
   register: pkg_result
   until: pkg_result is success
 
@@ -31,7 +30,9 @@
 
 - name: squidguard | initialize db
 #  command: "squidGuard -C all"
-  command: "sh /etc/cron.daily/squidGuard creates=/var/lib/squidGuard/blacklists/adult/domains"
+  command: sh /etc/cron.daily/squidGuard
+  args:
+    creates: /var/lib/squidGuard/blacklists/adult/domains
 
 - name: check few directories
   file: "dest={{ item }} state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"

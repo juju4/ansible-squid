@@ -4,6 +4,7 @@
   command: squid -v
   register: squidv
   failed_when: "'with-openssl' not in squidv.stdout and '--enable-ssl-crtd ' not in squidv.stdout"
+  changed_when: false
 
 - include_tasks: certificate-selfsigned.yml
 

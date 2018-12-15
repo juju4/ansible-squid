@@ -3,9 +3,11 @@
 - include_tasks: travis.yml
 
 - name: apt | self-signed certificate packages dependencies
-  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - ssl-cert
+  apt:
+    name: ssl-cert
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Generate SSL self-signed certificate

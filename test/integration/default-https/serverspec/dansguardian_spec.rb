@@ -3,7 +3,7 @@ require 'serverspec'
 # Required by serverspec
 set :backend, :exec
 
-proxy_port = 3128
+proxy_port = 8080
 
 describe package('dansguardian'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   it { should be_installed }
@@ -18,7 +18,7 @@ describe file('/usr/sbin/dansguardian'), :if => os[:family] == 'ubuntu' || os[:f
   it { should be_executable }
 end
 
-describe port(#{proxy_port}), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
+describe port(proxy_port), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   it { should be_listening }
 end
 
@@ -36,9 +36,6 @@ describe command("curl -v -x http://localhost:#{proxy_port} http://www.badboys.c
   its(:exit_status) { should eq 0 }
 end
 
-describe file('/var/run/clamav/clamd.ctl'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
-  it { should be_socket }
-end
 describe command("curl -v -x http://localhost:#{proxy_port} http://www.eicar.org/download/eicar.com.txt"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   its(:stdout) { should match /<title>DansGuardian - Access Denied<\/title>/ }
   its(:stdout) { should match /<b>Virus or bad content detected. Eicar-Test-Signature<\/b>/ }

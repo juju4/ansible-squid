@@ -60,3 +60,10 @@
 
 - name: enable and start squid service
   service: name="{{ squid_svc }}" state=started enabled=yes
+
+- meta: flush_handlers
+
+- name: Ensure clamd available before ending
+  wait_for:
+    path: /tmp/clamd.ctl
+  when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian'

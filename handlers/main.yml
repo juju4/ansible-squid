@@ -8,3 +8,6 @@
 
 - name: restart clamd
   service: name=clamav-daemon state=restarted
+
+- name: remove clamd apparmor profile
+  command: apparmor_parser -R /etc/apparmor.d/usr.sbin.clamd
