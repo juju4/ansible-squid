@@ -9,6 +9,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     #config.vm.box = "centos/7"
 
     config.vm.provision :ansible do |ansible|
+       ansible.compatibility_mode = "2.0"
        ansible.playbook = "site.yml"
        #ansible.verbose = "vvvv"
        #ansible.host_key_checking = false
