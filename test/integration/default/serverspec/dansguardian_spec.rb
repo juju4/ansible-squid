@@ -18,7 +18,7 @@ describe file('/usr/sbin/dansguardian'), :if => os[:family] == 'ubuntu' || os[:f
   it { should be_executable }
 end
 
-describe port(#{proxy_port}), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
+describe port(proxy_port), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   it { should be_listening }
 end
 
