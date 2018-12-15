@@ -2,3 +2,5 @@
 
 - name: apt | install squid
   apt: pkg=squid state=installed
+  register: pkg_result
+  until: pkg_result | success

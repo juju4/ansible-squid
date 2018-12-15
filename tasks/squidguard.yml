@@ -6,6 +6,8 @@
   with_items:
     - squidGuard
     - wget
+  register: pkg_result
+  until: pkg_result | success
 
 - name: squidguard | fix configuration issues
   replace:
