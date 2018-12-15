@@ -1,5 +1,4 @@
 ---
-
 # review /etc/dansguardian/lists/ for content filtering rules
 # if whitelisting mode: http://askubuntu.com/questions/569102/how-to-use-dansguardian-as-a-whitelist
 
@@ -28,7 +27,9 @@
     - { re: "^nologger = .*", rep: "nologger = on" }
     - { re: "#loglocation = .*", rep: "loglocation = '/var/log/dansguardian/access.log'" }
     - { re: "^language = '.*'", rep: "language = '{{ squid_dansguardian_language }}'" }
-    - { re: "^#contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'", rep: "contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'" }
+    - { re: "^#contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'",
+        rep: "contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'"
+      }
   notify:
     - restart dansguardian
 
@@ -39,4 +40,3 @@
   service: name={{ item }} state=started enabled=yes
   with_items:
     - dansguardian
-

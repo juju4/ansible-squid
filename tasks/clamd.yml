@@ -1,9 +1,9 @@
 ---
 
 - name: install clamav daemon package
-  package: name={{ item }} state=present
-  with_items:
-    - clamav-daemon
+  package:
+    name: "clamav-daemon"
+    state: present
 
 ## clamd and dansguardian need the same user to scan files
 - name: clamd | review settings
@@ -39,4 +39,3 @@
   with_items:
     - clamav-daemon
     - clamav-freshclam
-

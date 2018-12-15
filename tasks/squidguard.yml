@@ -1,5 +1,4 @@
 ---
-
 ## FIXME! Work in progress/incomplete compare to dansguardian
 
 - name: install squidguard package
@@ -24,7 +23,9 @@
   with_items:
     - { re: '^ENABLED=.*', rep: 'ENABLED=1' }
 ## teledanmark down, new list from http://www.squidguard.org/blacklists.html
-    - { re: 'http://ftp.teledanmark.no/pub/www/proxy/squidguard/contrib/blacklists.tar.gz', rep: 'http://squidguard.mesd.k12.or.us/blacklists.tgz' }
+    - { re: 'http://ftp.teledanmark.no/pub/www/proxy/squidguard/contrib/blacklists.tar.gz',
+        rep: 'http://squidguard.mesd.k12.or.us/blacklists.tgz'
+      }
 
 - name: squidguard | initialize db
 #  command: "squidGuard -C all"
@@ -40,4 +41,3 @@
   service: name={{ item }} state=started enabled=yes
   with_items:
     - squidGuard
-

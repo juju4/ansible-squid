@@ -5,4 +5,3 @@ squid_svc: squid3
 squid_spool: /var/spool/squid3
 squid_user: proxy
 squid_errors_template: /usr/share/squid3/errors/
-

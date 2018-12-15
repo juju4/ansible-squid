@@ -2,4 +2,3 @@
 
 - name: apt | install squid
   apt: pkg=squid state=installed
-
