@@ -5,7 +5,7 @@
     name: "clamav-daemon"
     state: present
   register: pkg_result
-  until: pkg_result | success
+  until: pkg_result is success
 
 ## clamd and dansguardian need the same user to scan files
 - name: clamd | review settings

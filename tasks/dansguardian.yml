@@ -7,7 +7,7 @@
   with_items:
     - dansguardian
   register: pkg_result
-  until: pkg_result | success
+  until: pkg_result is success
 
 - include: clamd.yml
 

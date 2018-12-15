@@ -6,4 +6,4 @@
     - squid
     - crontabs
   register: pkg_result
-  until: pkg_result | success
+  until: pkg_result is success

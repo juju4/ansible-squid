@@ -7,7 +7,7 @@
     - squidGuard
     - wget
   register: pkg_result
-  until: pkg_result | success
+  until: pkg_result is success
 
 - name: squidguard | fix configuration issues
   replace:
