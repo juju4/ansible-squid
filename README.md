@@ -3,10 +3,13 @@
 # Squid ansible role
 
 Ansible role to setup a secure and clean Squid proxy with
-* Dansguardian for url filtering
-* clamav daemon for malware scanning
-* ads filtering
+* Dansguardian for url filtering (port 8080)
+* clamav daemon for malware scanning (through dansguardian)
+* ads filtering (through dansguardian)
+* squid after (port 3128)
+
 On centos, for now, only have squidGuard (configuration as work in progress).
+HTTPS supported only on centos as Ubuntu squid is missing compilation flags.
 
 ## Requirements & Dependencies
 
@@ -54,6 +57,9 @@ $ vagrant ssh
 ```
 
 ## Troubleshooting & Known issues
+
+* squidguard EPEL bug
+https://bugzilla.redhat.com/show_bug.cgi?id=1253662
 
 * HTTPS support for squid depends on compilation option. Centos7 has it but not Ubuntu (bionic)
 
