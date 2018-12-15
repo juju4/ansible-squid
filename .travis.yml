@@ -21,9 +21,9 @@ env:
   - distribution: centos
     version: 7
     suite: default-https
-  - distribution: ubuntu
-    version: 18.04
-    suite: default-https
+#  - distribution: ubuntu
+#    version: 18.04
+#    suite: default-https
 
 before_install:
   - env
