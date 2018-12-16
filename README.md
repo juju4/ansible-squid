@@ -62,6 +62,7 @@ $ vagrant ssh
 https://bugzilla.redhat.com/show_bug.cgi?id=1253662
 
 * HTTPS support for squid depends on compilation option. Centos7 has it but not Ubuntu (bionic)
+Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=898307
 
 ## License
 
