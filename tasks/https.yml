@@ -4,7 +4,7 @@
   command: squid -v
   register: squidv
   failed_when: >
-    ('with-openssl' not in squidv.stdout or '--enable-ssl-crtd ' not in squidv.stdout) and
+    ('with-openssl' not in squidv.stdout and '--enable-ssl-crtd ' not in squidv.stdout) and
     '--with-gnutls' not in squidv.stdout
   changed_when: false
 
