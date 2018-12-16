@@ -1,0 +1,10 @@
+---
+
+- name: Ensure /var/lib/squid exists
+  file:
+    dest: /var/lib/squid
+    state: directory
+    mode: '0700'
+    owner: "{{ squid_user }}"
+    seuser: system_u
+    setype: squid_cache_t

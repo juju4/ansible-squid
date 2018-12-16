@@ -39,3 +39,6 @@ suites:
   - name: default-https
     run_list:
     attributes:
+  - name: default-splash
+    run_list:
+    attributes:

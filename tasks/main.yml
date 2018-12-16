@@ -16,6 +16,9 @@
 - include_tasks: https.yml
   when: squid_https
 
+- include_tasks: splash.yml
+  when: squid_splash_enable
+
 - name: update configuration
   template:
     src: squid.conf.j2

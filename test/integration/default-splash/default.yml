@@ -1,0 +1,7 @@
+---
+
+- hosts: all
+  vars:
+    - squid_splash_enable: true
+  roles:
+    - juju4.squid
