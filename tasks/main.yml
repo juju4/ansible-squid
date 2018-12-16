@@ -61,6 +61,12 @@
 - name: enable and start squid service
   service: name="{{ squid_svc }}" state=started enabled=yes
 
+- include: cgroups.yml
+  when: squid_cgroups_restriction_enable
+
+- include: systemd.yml
+  when: squid_systemd_restriction_enable
+
 - meta: flush_handlers
 
 - name: Ensure clamd available before ending

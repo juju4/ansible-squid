@@ -32,3 +32,6 @@ squid_dansguardian_loglevel: 3
 squid_report_pkgs:
   - calamaris
   - sarg
+
+squid_cgroups_restriction_enable: true
+squid_systemd_restriction_enable: false
