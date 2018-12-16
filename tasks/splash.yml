@@ -8,3 +8,5 @@
     owner: "{{ squid_user }}"
     seuser: system_u
     setype: squid_cache_t
+
+- include_tasks: splash-lighthttpd.yml

@@ -48,6 +48,7 @@ Once you ensured all necessary roles are present, You can test with:
 $ cd /path/to/roles/juju4.squid
 $ kitchen verify
 $ kitchen login
+$ KITCHEN_YAML=".kitchen.vagrant.yml" kitchen verify
 ```
 or
 ```
@@ -62,6 +63,13 @@ $ vagrant ssh
 https://bugzilla.redhat.com/show_bug.cgi?id=1253662
 
 * HTTPS support for squid depends on compilation option. Centos7 has it but not Ubuntu (bionic)
+
+* Splash page is work in progress. Only Cento7 currently and squid error
+```
+The splash_page helpers are crashing too rapidly, need help!
+```
+https://stackoverflow.com/questions/47030569/how-to-configure-a-splash-page-for-squid
+https://www.linuxquestions.org/questions/linux-server-73/squid-fatal-the-basic-authenticator-helpers-are-crashing-too-rapidly-need-help-855806/
 
 ## License
 

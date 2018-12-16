@@ -1,0 +1,78 @@
+---
+# FIXME! php hardening
+# server.tag edit for server signature
+
+- name: Ensure lighthttpd is present - splash portal
+  package:
+    name: "{{ splash_pkgs }}"
+    state: present
+  register: pkg_result
+  until: pkg_result is success
+
+- name: Ensure php-fpm run on lighttpd user
+  replace:
+    dest: /etc/php-fpm.d/www.conf
+    regexp: "{{ item.re }}"
+    replace: "{{ item.r }}"
+    backup: yes
+  with_items:
+    - { re: '^user = .*', r: 'user = lighttpd' }
+    - { re: '^group = .*', r: 'group = lighttpd' }
+  notify:
+    - restart php-fpm
+
+- name: Ensure lighttpd document directory exists
+  file:
+    dest: /var/www/lighttpd
+    state: directory
+    mode: '0755'
+    owner: root
+
+- name: Configure splash page
+  template:
+    src: "{{ squid_splash_template }}"
+    dest: /var/www/lighttpd/splash.php
+    mode: '0644'
+    owner: root
+    backup: yes
+
+- name: Ensure cgi.fix_pathinfo is set for php
+  lineinfile:
+    dest: /etc/php.ini
+    regexp: '^cgi.fix_pathinfo=.*'
+    line: 'cgi.fix_pathinfo=1'
+    backup: yes
+  notify:
+    - restart php-fpm
+
+- name: Ensure php is enabled in lighttpd fastcgi
+  blockinfile:
+    path: /etc/lighttpd/conf.d/fastcgi.conf
+    insertafter: ^## PHP Example
+    block: |
+      fastcgi.server += ( ".php" =>
+            ((
+                    "host" => "127.0.0.1",
+                    "port" => "9000",
+                    "broken-scriptfilename" => "enable"
+            ))
+      )
+    backup: yes
+  notify:
+    - restart lighttpd
+
+- name: Ensure fastcgi module enabled in lighttpd
+  lineinfile:
+    dest: /etc/lighttpd/modules.conf
+    regexp: '^include "conf.d/fastcgi.conf"'
+    line: 'include "conf.d/fastcgi.conf"'
+    backup: yes
+  notify:
+    - restart lighttpd
+
+- name: Ensure splash services are started and enabled
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items: "{{ splash_services }}"

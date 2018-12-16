@@ -11,3 +11,13 @@
 
 - name: remove clamd apparmor profile
   command: apparmor_parser -R /etc/apparmor.d/usr.sbin.clamd
+
+- name: restart lighttpd
+  service:
+    name: lighttpd
+    state: restarted
+
+- name: restart php-fpm
+  service:
+    name: php-fpm
+    state: restarted

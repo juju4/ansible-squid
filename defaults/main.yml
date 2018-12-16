@@ -15,6 +15,10 @@ squid_https: false
 squid_certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible for squid'
 squid_certduration: 1095
 
+squid_splash_enable: false
+squid_splash_template: splash.php.j2
+squid_splash_url: http://localhost/splash.php
+
 ## only packaged in ubuntu xenial, debian jessie, epel: squidguard, dansguardian
 ##	centos6: no dansguardian, only squidGuard
 ## https://blog.rootshell.be/2011/01/18/url-filtering-with-squid/
