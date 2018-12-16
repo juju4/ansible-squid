@@ -86,6 +86,8 @@ http_access deny all
 http_port 3128
 {% else %}
 http_port 3128
+{# Only redhat with openssl support, latest debian/ubuntu with gnutls but mising cert generators #}
+{% if ansible_os_family == "RedHat" %}
 # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
 http_port 3129 ssl-bump \
   key={{ ssl_privatedir }}/{{ ansible_fqdn }}.key \
@@ -102,6 +104,20 @@ ssl_bump peek step1
 ssl_bump bump all
 
 #sslproxy_cafile /usr/local/openssl/cabundle.file
+
+sslproxy_options NO_SSLv2,NO_SSLv3,SINGLE_DH_USE
+
+sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS
+
+{% elif ansible_os_family == "Debian" %}
+#squid-4 only
+
+#sslcrtd_program /usr/local/squid/libexec/security_file_certgen -s /var/lib/ssl_db -M 4MB
+#tls_outgoing_options cafile=/usr/local/openssl/cabundle.file
+
+#tls_outgoing_options options=NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
+
+{% endif %}
 
 # troubleshooting
 sslproxy_cert_error allow all
