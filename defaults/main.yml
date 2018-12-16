@@ -27,3 +27,8 @@ squid_dansguardian_proxyip: 127.0.0.1
 squid_dansguardian_language: 'ukenglish'
 ## 0 = none  1 = just denied  2 = all text based  3 = all requests
 squid_dansguardian_loglevel: 3
+
+# http://www.squid-cache.org/Misc/log-analysis.html
+squid_report_pkgs:
+  - calamaris
+  - sarg
