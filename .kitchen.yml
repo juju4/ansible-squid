@@ -24,6 +24,7 @@ platforms:
 #  - name: ubuntu-16.04
 #  - name: ubuntu-14.04
 #  - name: ubuntu-12.04
+  - name: ubuntu-18.10
   - name: centos-7
 #  - name: centos-6
 ## Ansible 2.2+/cryptography: https://github.com/ansible/ansible/issues/276
@@ -39,6 +40,8 @@ suites:
   - name: default-https
     run_list:
     attributes:
+    includes:
+      - centos-7
   - name: default-splash
     run_list:
     attributes:

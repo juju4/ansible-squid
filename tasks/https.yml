@@ -3,7 +3,9 @@
 - name: Ensure squid compiled with ssl
   command: squid -v
   register: squidv
-  failed_when: "'with-openssl' not in squidv.stdout and '--enable-ssl-crtd ' not in squidv.stdout"
+  failed_when: >
+    ('with-openssl' not in squidv.stdout and '--enable-ssl-crtd ' not in squidv.stdout) and
+    '--with-gnutls' not in squidv.stdout
   changed_when: false
 
 - include_tasks: certificate-selfsigned.yml
@@ -13,13 +15,15 @@
     dest: /var/lib/squid
     state: directory
     mode: '0700'
-    owner: squid
+    owner: "{{ squid_user }}"
     seuser: system_u
     setype: squid_cache_t
 
+#squid-4: /usr/local/squid/libexec/security_file_certgen
 - name: Initialize SSL database
   command: /usr/lib64/squid/ssl_crtd -c -s /var/lib/squid/ssl_db
   args:
     creates: /var/lib/squid/ssl_db/index.txt
   become: yes
-  become_user: squid
+  become_user: "{{ squid_user }}"
+  when: ansible_os_family == "RedHat"

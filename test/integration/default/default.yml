@@ -5,6 +5,8 @@
     - set_fact:
         squid_urlfiltering_enable: false
         squid_urlfiltering_tool: squidguard
+        squid_report_pkgs:
+          - calamaris
       when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
   roles:
     - juju4.squid
