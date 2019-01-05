@@ -8,6 +8,9 @@ squid_log_querystrings: true
 squid_cache_admin_email: squidadmin@localhost.local
 squid_customlog_path: /var/log/squid/access_custom.log
 
+# source IP and subnets allowed to connect (outside of private networks)
+squid_allowed_clients: []
+
 squid_filter_ads: true
 
 # require distribution where squid compiled with ssl (ok centos, nok ubuntu)
