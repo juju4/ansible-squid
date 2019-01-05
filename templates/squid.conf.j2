@@ -80,7 +80,9 @@ http_access deny ads
 # from where browsing should be allowed
 http_access allow localnet
 http_access allow localhost
+{% if squid_allowed_clients != [] %}
 http_access allow allowed_clients
+{% endif %}
 
 # And finally deny all other access to this proxy
 http_access deny all
@@ -113,13 +115,13 @@ sslproxy_options NO_SSLv2,NO_SSLv3,SINGLE_DH_USE
 
 sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS
 
-{% elif ansible_os_family == "Debian" %}
+{% elif ansible_distribution == "Ubuntu" and squid_https %}
 #squid-4 only
 
-#sslcrtd_program /usr/local/squid/libexec/security_file_certgen -s /var/lib/ssl_db -M 4MB
+sslcrtd_program /usr/local/squid/libexec/security_file_certgen -s /var/lib/ssl_db -M 4MB
 #tls_outgoing_options cafile=/usr/local/openssl/cabundle.file
 
-#tls_outgoing_options options=NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
+tls_outgoing_options options=NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
 
 {% endif %}
 

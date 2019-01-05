@@ -1,0 +1,72 @@
+---
+# compile with openssl to support https
+# https://docs.diladele.com/howtos/build_squid_4_on_ubuntu/index.html
+
+- name: Ubuntu | Enable universe repository
+  apt_repository:
+    repo: "{{ item }}"
+  loop:
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }} universe"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }}-updates universe"
+    - "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }}-security universe"
+
+- name: Squid openssl | install build tools
+  apt:
+    pkg: "{{ squidbuild_pkgs + squidhttps_pkgs }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  register: pkg_result
+  until: pkg_result is success
+
+- name: Ensure squid build dir exists
+  file:
+    dest: "{{ squidbuild_dir }}"
+    state: directory
+    mode: '0700'
+
+- name: Get diladele patches
+  get_url:
+    url: "{{ item }}"
+    dest: "{{ squidbuild_dir }}/{{ item | basename }}"
+    mode: '0600'
+  with_items:
+    - https://raw.githubusercontent.com/diladele/squid-ubuntu/master/src/ubuntu18/scripts.squid4/rules.patch
+    - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_PKG }}.dsc"
+    - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_VER }}.orig.tar.gz"
+    - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_PKG }}.debian.tar.xz"
+
+- name: Squid openssl | unpack source
+  command: "dpkg-source -x squid_{{ SQUID_PKG }}.dsc"
+  args:
+    chdir: "{{ squidbuild_dir }}"
+    creates: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}/debian/rules"
+
+- name: Squid openssl | patch rules
+  patch:
+    src: "{{ squidbuild_dir }}/rules.patch"
+    dest: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}/debian/rules"
+
+- name: Squid openssl | build package - be patient...
+  #command: dpkg-buildpackage -rfakeroot -b
+  #command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
+  ## without signing else set up a gpg key before
+  command: dpkg-buildpackage -rfakeroot -b -uc -us
+  args:
+    chdir: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}"
+    creates: "{{ squidbuild_dir }}/squid_{{ SQUID_PKG }}_amd64.deb"
+  async: 3600
+  poll: 60
+
+- name: Squid openssl | install locally build package
+  apt:
+    deb: "{{ item }}"
+  with_items:
+    - "{{ squidbuild_dir }}/squid-common_{{ SQUID_PKG }}_all.deb"
+    - "{{ squidbuild_dir }}/squid_{{ SQUID_PKG }}_amd64.deb"
+    - "{{ squidbuild_dir }}/squidclient_{{ SQUID_PKG }}_amd64.deb"
+
+- name: Squid openssl | prevent packages from being upgraded automatically
+  dpkg_selections:
+    name: squid
+    selection: hold
