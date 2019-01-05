@@ -56,7 +56,16 @@
     chdir: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}"
     creates: "{{ squidbuild_dir }}/squid_{{ SQUID_PKG }}_amd64.deb"
   async: 3600
-  poll: 60
+  poll: 0
+  register: dpkgbuild
+
+- name: Squid openssl | check on async task for pkg building
+  async_status:
+    jid: "{{ dpkgbuild.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished or dpkgbuild.finished
+  retries: 30
+  delay: 60
 
 - name: Squid openssl | install locally build package
   apt:
