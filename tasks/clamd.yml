@@ -1,9 +1,11 @@
 ---
 
 - name: install clamav daemon package
-  package: name={{ item }} state=present
-  with_items:
-    - clamav-daemon
+  package:
+    name: "{{ clamd_pkgs }}"
+    state: present
+  register: pkg_result
+  until: pkg_result is success
 
 ## clamd and dansguardian need the same user to scan files
 - name: clamd | review settings
@@ -15,6 +17,8 @@
   with_items:
     - { re: "^User .*", rep: "User {{ squid_user }}" }
     - { re: "^LocalSocketGroup .*", rep: "LocalSocketGroup {{ squid_user }}" }
+# FIXME! apparmor seems to block /var/run/clamav/clamd.ctl
+    - { re: "^LocalSocket .*", rep: "LocalSocket /tmp/clamd.ctl" }
   notify:
     - restart clamd
 
@@ -34,9 +38,20 @@
       command: "freshclam creates=/var/lib/clamav/main.cvd"
   when: not db.stat.exists
 
+# https://bugs.launchpad.net/ubuntu/+source/clamav/+bug/1784193
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884707
+#- name: Ubuntu | Switch off apparmor for clamd
+#  file:
+#    src: /etc/apparmor.d/usr.sbin.clamd
+#    dest: /etc/apparmor.d/disable/usr.sbin.clamd
+#    state: link
+#  notify:
+#    - remove clamd apparmor profile
+#
+#- meta: flush_handlers
+
 - name: ensure clamav is started and enabled
   service: name={{ item }} state=started enabled=yes
   with_items:
     - clamav-daemon
     - clamav-freshclam
-

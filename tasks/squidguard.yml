@@ -1,12 +1,12 @@
 ---
-
 ## FIXME! Work in progress/incomplete compare to dansguardian
 
 - name: install squidguard package
-  package: name={{ item }} state=present
-  with_items:
-    - squidGuard
-    - wget
+  package:
+    name: "{{ squidguard_pkgs }}"
+    state: present
+  register: pkg_result
+  until: pkg_result is success
 
 - name: squidguard | fix configuration issues
   replace:
@@ -24,11 +24,15 @@
   with_items:
     - { re: '^ENABLED=.*', rep: 'ENABLED=1' }
 ## teledanmark down, new list from http://www.squidguard.org/blacklists.html
-    - { re: 'http://ftp.teledanmark.no/pub/www/proxy/squidguard/contrib/blacklists.tar.gz', rep: 'http://squidguard.mesd.k12.or.us/blacklists.tgz' }
+    - { re: 'http://ftp.teledanmark.no/pub/www/proxy/squidguard/contrib/blacklists.tar.gz',
+        rep: 'http://squidguard.mesd.k12.or.us/blacklists.tgz'
+      }
 
 - name: squidguard | initialize db
 #  command: "squidGuard -C all"
-  command: "sh /etc/cron.daily/squidGuard creates=/var/lib/squidGuard/blacklists/adult/domains"
+  command: sh /etc/cron.daily/squidGuard
+  args:
+    creates: /var/lib/squidGuard/blacklists/adult/domains
 
 - name: check few directories
   file: "dest={{ item }} state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
@@ -40,4 +44,3 @@
   service: name={{ item }} state=started enabled=yes
   with_items:
     - squidGuard
-

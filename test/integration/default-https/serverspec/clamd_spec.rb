@@ -33,6 +33,3 @@ describe file('/tmp/clamd.ctl'), :if => os[:family] == 'ubuntu' || os[:family] =
   it { should be_socket }
 end
 
-describe file('/var/log/clamav/clamav.log'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
-  its(:content) { should_not match /ERROR:/ }
-end

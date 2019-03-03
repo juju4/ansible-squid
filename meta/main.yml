@@ -4,11 +4,6 @@ galaxy_info:
   description: setup Squid proxy
   license: BSD
   min_ansible_version: 1.9
-  #
-  # Below are all platforms currently available. Just uncomment
-  # the ones that apply to your role. If you don't see your
-  # platform on this list, let us know and we'll get it added!
-  #
   platforms:
   - name: EL
     versions:
@@ -18,14 +13,9 @@ galaxy_info:
     - trusty
     - xenial
     - bionic
-  #
-  # Below are all categories currently available. Just as with
-  # the platforms above, uncomment those that apply to your role.
-  #
   galaxy_tags:
   - system
   - security
 #dependencies: []
 dependencies:
-  - juju4.redhat-epel
-
+  - juju4.redhat_epel

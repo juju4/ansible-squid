@@ -1,8 +1,9 @@
-# {{ ansible_managed }}
+{{ ansible_managed | comment }}
+
 # Example rule allowing access from your local networks.
 # Adapt to list your (internal) IP networks from where browsing
 # should be allowed
-#acl localnet src 10.0.0.0/8    # RFC1918 possible internal network
+acl localnet src 10.0.0.0/8    # RFC1918 possible internal network
 #acl localnet src 172.16.0.0/12 # RFC1918 possible internal network
 acl localnet src 192.168.0.0/16 # RFC1918 possible internal network
 #acl localnet src fc00::/7       # RFC 4193 local private network range
@@ -19,6 +20,9 @@ acl CONNECT method CONNECT
 ## required on centos6
 acl localhost src 127.0.0.1/32
 {% endif %}
+{% for client in squid_allowed_clients %}
+acl allowed_clients src {{ client }}
+{% endfor %}
 
 http_access deny !Safe_ports
 
@@ -42,7 +46,7 @@ snmp_port 0
 snmp_access deny all
 
 # Tuning
-pipeline_prefetch on
+pipeline_prefetch 1
 shutdown_lifetime 5 second
 
 # own templates? http://www.squid-cache.org/Doc/config/error_directory/
@@ -77,12 +81,59 @@ http_access deny ads
 # from where browsing should be allowed
 http_access allow localnet
 http_access allow localhost
+{% if squid_allowed_clients != [] %}
+http_access allow allowed_clients
+{% endif %}
 
 # And finally deny all other access to this proxy
 http_access deny all
 
 # Squid normally listens to port 3128
+{% if not squid_https %}
 http_port 3128
+{% else %}
+http_port 3128
+{# Only redhat with openssl support, latest debian/ubuntu with gnutls but mising cert generators #}
+{% if ansible_os_family == "RedHat" %}
+# https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
+http_port 3129 ssl-bump \
+  key={{ ssl_privatedir }}/{{ ansible_fqdn }}.key \
+  cert={{ ssl_dir }}/{{ ansible_fqdn }}.crt \
+  generate-host-certificates=on dynamic_cert_mem_cache_size=4MB
+
+sslcrtd_program /usr/lib64/squid/ssl_crtd \
+  -s /var/lib/squid/ssl_db -M 4MB
+sslcrtd_children 8 startup=1 idle=1
+
+acl step1 at_step SslBump1
+
+ssl_bump peek step1
+ssl_bump bump all
+
+#sslproxy_cafile /usr/local/openssl/cabundle.file
+
+sslproxy_options NO_SSLv2,NO_SSLv3,SINGLE_DH_USE
+
+sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS
+
+{% elif ansible_distribution == "Ubuntu" and squid_https %}
+#squid-4 only
+
+sslcrtd_program /usr/local/squid/libexec/security_file_certgen -s /var/lib/ssl_db -M 4MB
+#tls_outgoing_options cafile=/usr/local/openssl/cabundle.file
+
+tls_outgoing_options options=NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
+
+{% endif %}
+
+# troubleshooting
+sslproxy_cert_error allow all
+sslproxy_flags DONT_VERIFY_PEER
+
+# http://www.squid-cache.org/Doc/config/https_port/
+# https://wiki.squid-cache.org/Features/HTTPS
+#https_port 3129 tls-min-version=1.2
+{% endif %}
 
 # Leave coredumps in the first cache dir
 coredump_dir {{ squid_spool }}
@@ -104,6 +155,7 @@ refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
 refresh_pattern .               0       20%     4320
 
 # ANONYMOUS/Privacy PROXY
+# (but Via off will generate Warning at each start...)
 via off
 forwarded_for off
 request_header_access Allow allow all
@@ -171,8 +223,10 @@ refresh_pattern Translation-fr\.bzip2$ 0       20%     4320 refresh-ims
 refresh_pattern Translation-fr\.bz2$   0       20%     4320 refresh-ims
 refresh_pattern Translation-fr\.gz$    0       20%     4320 refresh-ims
 refresh_pattern Translation-fr\.lzma$  0       20%     4320 refresh-ims
-refresh_pattern -i .rpm$ 	129600 	100%	129600 refresh-ims override-expire
-refresh_pattern -i .iso$ 	129600 	100% 	129600 refresh-ims override-expire
+#refresh_pattern -i .rpm$ 	129600 	100%	129600 refresh-ims override-expire
+#refresh_pattern -i .iso$ 	129600 	100% 	129600 refresh-ims override-expire
+refresh_pattern -i .rpm$ 	129600 	100%	129600 refresh-ims
+refresh_pattern -i .iso$ 	129600 	100% 	129600 refresh-ims
 refresh_pattern .               0       20%     4320
 
 # handle meta-release and changelogs.ubuntu.com special
@@ -213,3 +267,6 @@ http_access deny !existing_users
 
 # https://www.edv-huber.com/index.php/problemloesungen/22-squid-proxy-server-filter-urls-by-virustotal-com
 # https://blog.rootshell.be/2014/12/15/automatic-mime-parts-scanning-with-virustotal/
+
+# debug
+#debug_options ALL,1 33,2 28,9

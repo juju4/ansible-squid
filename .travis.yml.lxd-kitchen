@@ -14,19 +14,13 @@ env:
     version: 18.04
     suite: default
   - distribution: ubuntu
-    version: 18.10
+    version: 16.04
     suite: default
-#  - distribution: ubuntu
-#    version: 16.04
-#    suite: default
 #  - distribution: alpine
 #    version: 3.8
-  - distribution: centos
-    version: 7
-    suite: default-https
   - distribution: ubuntu
     version: 18.04
-    suite: default-https
+    suite: full
 
 before_install:
   - env

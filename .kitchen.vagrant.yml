@@ -19,10 +19,16 @@ platforms:
   - name: ubuntu-18.04
   - name: ubuntu-16.04
   - name: ubuntu-14.04
+  - name: ubuntu-18.10
   - name: centos/7
 
 suites:
   - name: default
     run_list:
     attributes:
-
+  - name: default-https
+    run_list:
+    attributes:
+    includes:
+      - centos/7
+      - ubuntu-18.04

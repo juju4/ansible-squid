@@ -1,23 +1,33 @@
 ---
-
-## https://calomel.org/squid_adservers.html
-
+# https://calomel.org/squid_adservers.html
 # see template/squid.conf.j2
 
 - name: Ensure directory exists
-  file: "dest={{ item }} mode=0755 state=directory"
+  file:
+    dest: "{{ item }}"
+    mode: '0755'
+    state: directory
   with_items:
     - "{{ scriptsdir }}"
 
 - name: add ad servers newlist script
-  template: src=ad_servers_newlist.sh.j2 dest="{{ scriptsdir }}/ad_servers_newlist.sh" mode=0755
+  template:
+    src: ad_servers_newlist.sh.j2
+    dest: "{{ scriptsdir }}/ad_servers_newlist.sh"
+    mode: '0755'
 
 - name: add refresh cron task to refresh ads servers list
-  cron: name="ads servers list refresh" minute=45 hour=2 day="*/3"
-    user="root" job="{{ scriptsdir }}/ad_servers_newlist.sh > /dev/null"
-    cron_file=ansible_adslist_refresh
+  cron:
+    name: "ads servers list refresh"
+    minute: 45
+    hour: 2
+    day: "*/3"
+    user: "root"
+    job: "{{ scriptsdir }}/ad_servers_newlist.sh > /dev/null"
+    cron_file: ansible_adslist_refresh
 
 - name: ensure ads servers list exists
-  command: "sh -x {{ scriptsdir }}/ad_servers_newlist.sh creates={{ squid_confdir }}/ad_block.txt"
+  command: "sh -x {{ scriptsdir }}/ad_servers_newlist.sh"
+  args:
+    creates: "{{ squid_confdir }}/ad_block.txt"
   notify: restart squid
-

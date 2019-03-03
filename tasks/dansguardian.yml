@@ -1,12 +1,13 @@
 ---
-
 # review /etc/dansguardian/lists/ for content filtering rules
 # if whitelisting mode: http://askubuntu.com/questions/569102/how-to-use-dansguardian-as-a-whitelist
 
 - name: install dansguardian package
-  package: name={{ item }} state=present
-  with_items:
-    - dansguardian
+  package:
+    name: dansguardian
+    state: present
+  register: pkg_result
+  until: pkg_result is success
 
 - include: clamd.yml
 
@@ -28,7 +29,20 @@
     - { re: "^nologger = .*", rep: "nologger = on" }
     - { re: "#loglocation = .*", rep: "loglocation = '/var/log/dansguardian/access.log'" }
     - { re: "^language = '.*'", rep: "language = '{{ squid_dansguardian_language }}'" }
-    - { re: "^#contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'", rep: "contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'" }
+    - { re: "^#contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'",
+        rep: "contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'"
+      }
+  notify:
+    - restart dansguardian
+
+- name: dansguardian | review clamdscan settings
+  replace:
+    dest: /etc/dansguardian/contentscanners/clamdscan.conf
+    regexp: "{{ item.re }}"
+    replace: "{{ item.rep }}"
+    backup: yes
+  with_items:
+    - { re: "^clamdudsfile = .*", rep: "clamdudsfile = /tmp/clamd.ctl" }
   notify:
     - restart dansguardian
 
@@ -36,7 +50,7 @@
   file: "dest=/var/log/dansguardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
 
 - name: ensure dansguardian is started and enabled
-  service: name={{ item }} state=started enabled=yes
-  with_items:
-    - dansguardian
-
+  service:
+    name: dansguardian
+    state: started
+    enabled: yes

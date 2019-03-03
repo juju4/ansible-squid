@@ -9,9 +9,9 @@ provisioner:
   name: ansible_playbook
   roles_path: ../
   hosts: test-kitchen
-#  ansible_verbose: true
-  ansible_verbose: false
-  ansible_verbosity: 3
+  ansible_verbose: true
+#  ansible_verbose: false
+  ansible_verbosity: 2
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
 #  require_chef_omnibus: false
   require_ansible_omnibus: true
@@ -21,19 +21,25 @@ provisioner:
 
 platforms:
   - name: ubuntu-18.04
-  - name: ubuntu-16.04
-  - name: ubuntu-14.04
+#  - name: ubuntu-16.04
+#  - name: ubuntu-14.04
 #  - name: ubuntu-12.04
+  - name: ubuntu-18.10
   - name: centos-7
-  - name: centos-6
+#  - name: centos-6
 ## Ansible 2.2+/cryptography: https://github.com/ansible/ansible/issues/276
-    provisioner:
+#    provisioner:
 ## Desired version, only affects apt-get installs
-      ansible_version: 2.1.2.0
+#      ansible_version: 2.1.2.0
 #  - name: alpine-3.4
 
 suites:
   - name: default
     run_list:
     attributes:
-
+  - name: default-https
+    run_list:
+    attributes:
+    includes:
+      - centos-7
+      - ubuntu-18.04

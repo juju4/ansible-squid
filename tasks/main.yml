@@ -5,33 +5,49 @@
   when: ansible_distribution == 'Ubuntu'
 - name: Include version-specific variables for RedHat
   include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - include: debian.yml
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' and not squid_https
+
+- include: debian-https.yml
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' and squid_https
 
 - include: redhat.yml
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
+
+- include_tasks: https.yml
+  when: squid_https
 
 - name: update configuration
-  template: src=squid.conf.j2
-        dest={{ squid_confdir }}/squid.conf
-        owner=root group=root mode=0644
-        backup=yes
+  template:
+    src: squid.conf.j2
+    dest: "{{ squid_confdir }}/squid.conf"
+    owner: root
+    group: root
+    mode: '0644'
+#    validate: squid -k parse -f %s
+    backup: yes
   notify: restart squid
 
 - name: ensure log dir exists
-  file: dest={{ squid_customlog_path | dirname }} state=directory mode=0755 owner={{ squid_user }}
-  when: squid_customlog_path is defined and squid_customlog_path != ''
+  file:
+    dest: "{{ squid_customlog_path | dirname }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ squid_user }}"
+  when: squid_customlog_path is defined and squid_customlog_path
 
 ## http://wiki.squid-cache.org/Features/CustomErrors
 - name: remove squid signature from templates
-  replace: dest={{ item }} regexp='<p>Generated %T by %h \(%s\)</p>' replace='<p>Generated %T by %h (Squid Proxy)</p>'
+  replace:
+    dest: "{{ item }}"
+    regexp: '<p>Generated %T by %h \(%s\)</p>'
+    replace: '<p>Generated %T by %h (Squid Proxy)</p>'
 ## Note: backup is generating mess if rerun as we are not differencing files from their backup...
-#  replace: dest={{ item }} regexp='<p>Generated %T by %h \(%s\)</p>' replace='<p>Generated %T by %h (Squid Proxy)</p>' backup=yes
-#  replace: dest={{ item }} regexp='Generated %T by %h \(%s\)' replace='Generated %T by %h (Squid Proxy)' backup=yes
+#    backup=yes
   with_fileglob:
-    - "{{ squid_errors_template }}/en/ERR_*"
+    - "{{ squid_errors_template }}en/ERR_*"
 
 - name: copy script for transparent proxy user
   copy: src=transparent-user.sh dest=/usr/local/bin/transparent-user.sh mode=0755
@@ -48,3 +64,15 @@
 - name: enable and start squid service
   service: name="{{ squid_svc }}" state=started enabled=yes
 
+- include: cgroups.yml
+  when: squid_cgroups_restriction_enable
+
+- include: systemd.yml
+  when: squid_systemd_restriction_enable
+
+- meta: flush_handlers
+
+- name: Ensure clamd available before ending
+  wait_for:
+    path: /tmp/clamd.ctl
+  when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian'

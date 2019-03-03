@@ -8,7 +8,15 @@ squid_log_querystrings: true
 squid_cache_admin_email: squidadmin@localhost.local
 squid_customlog_path: /var/log/squid/access_custom.log
 
+# source IP and subnets allowed to connect (outside of private networks)
+squid_allowed_clients: []
+
 squid_filter_ads: true
+
+# require distribution where squid compiled with ssl (ok centos, nok ubuntu)
+squid_https: false
+squid_certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible for squid'
+squid_certduration: 1095
 
 ## only packaged in ubuntu xenial, debian jessie, epel: squidguard, dansguardian
 ##	centos6: no dansguardian, only squidGuard
@@ -23,3 +31,10 @@ squid_dansguardian_language: 'ukenglish'
 ## 0 = none  1 = just denied  2 = all text based  3 = all requests
 squid_dansguardian_loglevel: 3
 
+# http://www.squid-cache.org/Misc/log-analysis.html
+squid_report_pkgs:
+  - calamaris
+  - sarg
+
+squid_cgroups_restriction_enable: true
+squid_systemd_restriction_enable: false
