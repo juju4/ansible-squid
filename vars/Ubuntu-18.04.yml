@@ -42,5 +42,5 @@ squidbuild_pkgs:
   - libecap3-dev
 squidhttps_pkgs:
   - squid-langpack
-SQUID_VER: 4.4
-SQUID_PKG: 4.4-1
+SQUID_VER: 4.6
+SQUID_PKG: 4.6-1
