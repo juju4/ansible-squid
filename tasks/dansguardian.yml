@@ -10,6 +10,7 @@
   until: pkg_result is success
 
 - include: clamd.yml
+  when: squid_dansguardian_clamd
 
 - name: dansguardian | review settings
   replace:
@@ -35,6 +36,20 @@
   notify:
     - restart dansguardian
 
+- name: dansguardian | review settings for clamscan
+  replace:
+    dest: /etc/dansguardian/dansguardian.conf
+    regexp: "{{ item.re }}"
+    replace: "{{ item.rep }}"
+    backup: yes
+  with_items:
+    - { re: "^#contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'",
+        rep: "contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'"
+      }
+  notify:
+    - restart dansguardian
+  when: squid_dansguardian_clamd
+
 - name: dansguardian | review clamdscan settings
   replace:
     dest: /etc/dansguardian/contentscanners/clamdscan.conf
@@ -45,6 +60,7 @@
     - { re: "^clamdudsfile = .*", rep: "clamdudsfile = /tmp/clamd.ctl" }
   notify:
     - restart dansguardian
+  when: squid_dansguardian_clamd
 
 - name: check few permissions
   file: "dest=/var/log/dansguardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
