@@ -30,9 +30,6 @@
     - { re: "^nologger = .*", rep: "nologger = on" }
     - { re: "#loglocation = .*", rep: "loglocation = '/var/log/dansguardian/access.log'" }
     - { re: "^language = '.*'", rep: "language = '{{ squid_dansguardian_language }}'" }
-    - { re: "^#contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'",
-        rep: "contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'"
-      }
   notify:
     - restart dansguardian
 
@@ -64,6 +61,19 @@
 
 - name: check few permissions
   file: "dest=/var/log/dansguardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
+
+- name: check log file exists
+  stat:
+    path: /var/log/dansguardian.log
+  register: danl
+
+- name: touch log file
+  file:
+    path: /var/log/dansguardian.log
+    state: touch
+    owner: "{{ squid_user }}"
+    mode: '0600'
+  when: not danl.stat.exists
 
 - name: ensure dansguardian is started and enabled
   service:
