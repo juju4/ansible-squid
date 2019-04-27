@@ -1,25 +1,17 @@
 ---
-# FIXME! still /etc/init.d/squid on Ubuntu 18.04...
 
-- name: Hardened options for squid systemd
-  blockinfile:
-    # or /etc/systemd/system/squidd.service.d/override.conf
-    path: /usr/lib/systemd/system/squidd.service
-    insertafter: ^KillSignal=SIGTERM
-    block: |
-      NoNewPrivileges=yes
-      PrivateTmp=true
-      PrivateDevices=true
-      ProtectHome=true
-      InaccessiblePaths=~/proc /run/systemd
-      ProtectSystem=full
-      ProtectKernelTunables=true
-      RestrictRealtime=true
-      RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-      SystemCallFilter=~@debug @mount @cpu-emulation @obsolete @privileged
-      MemoryDenyWriteExecute=true
-      PrivateMounts=true
-    backup: yes
+- name: Ensure override folder exists
+  file:
+    dest: /etc/systemd/system/squid.service.d
+    state: directory
+    mode: '0755'
+
+# if issue, check /var/log/audit/audit.log
+- name: Review squid systemd options - RestartSec, Seccomp...
+  template:
+    src: systemd-override.conf.j2
+    dest: /etc/systemd/system/squid.service.d/override.conf
+    mode: '0644'
   notify:
     - reload systemd
     - restart squid
