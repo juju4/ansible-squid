@@ -75,6 +75,8 @@
     mode: '0600'
   when: not danl.stat.exists
 
+- include: dansguardian-template.yml
+
 - name: ensure dansguardian is started and enabled
   service:
     name: dansguardian
