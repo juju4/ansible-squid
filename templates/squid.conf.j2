@@ -16,10 +16,7 @@ acl Safe_ports port 443         # https
 #acl Safe_ports port 70         # gopher
 acl Safe_ports port 1025-65535  # unregistered ports
 acl CONNECT method CONNECT
-{% if ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '6' %}
-## required on centos6
 acl localhost src 127.0.0.1/32
-{% endif %}
 {% for client in squid_allowed_clients %}
 acl allowed_clients src {{ client }}
 {% endfor %}
@@ -157,7 +154,8 @@ refresh_pattern .               0       20%     4320
 # ANONYMOUS/Privacy PROXY
 # (but Via off will generate Warning at each start...)
 via off
-forwarded_for off
+# http://www.squid-cache.org/Doc/config/forwarded_for/
+forwarded_for delete
 request_header_access Allow allow all
 request_header_access Authorization allow all
 request_header_access WWW-Authenticate allow all
@@ -191,7 +189,16 @@ request_header_access User-Agent allow all
 request_header_access Cookie allow all
 request_header_access Server deny all
 request_header_access All deny all
+{% if squid_urlfiltering_tool == 'dansguardian' %}
+{# http://squid.sourceforge.net/follow_xff/ #}
+{# https://gist.github.com/alvarow/fa409edc70aeb4cf89bbc83c1c78f392 #}
+follow_x_forwarded_for allow localhost
+acl_uses_indirect_client on
+delay_pool_uses_indirect_client on
+log_uses_indirect_client on
+{% else %}
 follow_x_forwarded_for deny all
+{% endif %}
 
 # Cache (mostly for deb/rpm)
 ## maximum_object_size should be before cache_dir
@@ -242,8 +249,11 @@ refresh_all_ims on
 #always_direct allow FTP
 
 ## Customize logging
+## http://www.squid-cache.org/Doc/config/logformat/
 logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh
 access_log {{ squid_customlog_path }} customlogformat
+# human-readable time?
+#logformat squid %tg.%03tu %6tr %>a %Ss/%03Hs %
 
 {% if squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard' %}
 url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf
