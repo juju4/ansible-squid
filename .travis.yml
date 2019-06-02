@@ -56,7 +56,7 @@ before_install:
   - sudo service lxd restart
 
   - sudo pip install ansible
-  - gem install kitchen --version "=2.1.0"
+  - gem install test-kitchen --version "=2.1.0"
   - gem install kitchen-ansible
   - gem install kitchen-sync
   - gem install kitchen-lxd_cli
