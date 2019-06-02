@@ -9,8 +9,8 @@ provisioner:
   name: ansible_playbook
   roles_path: ../
   hosts: test-kitchen
-  ansible_verbose: true
-#  ansible_verbose: false
+#  ansible_verbose: true
+  ansible_verbose: false
   ansible_verbosity: 1
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
 #  require_chef_omnibus: false
