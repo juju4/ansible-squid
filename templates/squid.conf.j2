@@ -16,7 +16,9 @@ acl Safe_ports port 443         # https
 #acl Safe_ports port 70         # gopher
 acl Safe_ports port 1025-65535  # unregistered ports
 acl CONNECT method CONNECT
+{% if not (ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7') %}
 acl localhost src 127.0.0.1/32
+{% endif %}
 {% for client in squid_allowed_clients %}
 acl allowed_clients src {{ client }}
 {% endfor %}
@@ -90,7 +92,11 @@ http_access allow allowed_clients
 # https://github.com/tombatossals/squid_guifi_splash
 # -t <idle_timeout>
 # -T <fixed_timeout>
+{% if ansible_os_family == "RedHat" %}
+external_acl_type splash_page ttl=60 concurrency=100 %SRC /usr/lib64/squid/ext_session_acl -t 7200 -b /var/lib/squid/session.db
+{% else %}
 external_acl_type splash_page ttl=60 concurrency=100 %SRC /usr/lib/squid/ext_session_acl -t 7200 -b /var/lib/squid/session.db
+{% endif %}
 
 acl existing_users external splash_page
 
