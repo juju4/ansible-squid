@@ -68,10 +68,10 @@
   service: name="{{ squid_svc }}" state=started enabled=yes
 
 - include: cgroups.yml
-  when: squid_cgroups_restriction_enable
+  when: squid_cgroups_restriction_enable|bool
 
 - include: systemd.yml
-  when: squid_systemd_restriction_enable
+  when: squid_systemd_restriction_enable|bool
 
 - meta: flush_handlers
 
