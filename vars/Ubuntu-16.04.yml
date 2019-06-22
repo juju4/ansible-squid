@@ -15,5 +15,5 @@ clamd_pkgs:
 
 squid_testing_pkgs:
   - curl
-  - db-utils
+  - db-util
   - netcat

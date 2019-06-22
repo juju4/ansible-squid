@@ -9,5 +9,5 @@ squid_user: root
 
 squid_testing_pkgs:
   - curl
-  - db-utils
+  - db-util
   - netcat
