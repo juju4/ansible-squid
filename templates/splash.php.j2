@@ -1,6 +1,6 @@
 <?php
 
-if ($_POST['submit'] and !empty($_POST['url']) and parse_url($_POST['url']) and !empty($_POST['email']) and filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+if (!empty($_POST['url']) and parse_url($_POST['url']) and !empty($_POST['email']) and filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
 
 	header("Location: ".$_POST['url']);
 	die();
