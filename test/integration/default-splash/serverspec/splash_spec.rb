@@ -24,7 +24,8 @@ proxy_port = 3128
 
 describe command("curl -v -x http://localhost:#{proxy_port} http://www.google.com") do
   its(:stdout) { should match /<title>Proxy Splash page<\/title>/ }
-  its(:stderr) { should match /HTTP\/1.1 200 OK/ }
+  its(:stderr) { should match /HTTP\/1.1 302 Found/ }
+  its(:stderr) { should match /Location: http:\/\/127.0.0.1\/splash.php?url=http%3A%2F%2Fwww.google.com%2F/ }
   its(:exit_status) { should eq 0 }
 end
 
@@ -41,6 +42,7 @@ describe command('echo "GET http://www.google.com HTTP/1.0" | nc -v 127.0.0.1 80
 # dynamic splash page
   its(:stdout) { should match /HTTP\/1.1 302 Found/ }
   its(:stdout) { should match /Location: http:\/\/127.0.0.1\/splash.php?url=http%3A%2F%2Fwww.google.com%2F/ }
+  its(:stderr) { should match /HTTP\/1.1 302 Found/ }
   its(:exit_status) { should eq 0 }
 end
 
