@@ -46,24 +46,32 @@ describe command('db_dump /var/lib/squid/session.db') do
   its(:exit_status) { should eq 0 }
 end
 
-describe command('echo "GET http://www.google.com HTTP/1.0" | nc -v 127.0.0.1 8080') do
+describe command("echo \"GET http://www.google.com HTTP/1.0\" | nc -v 127.0.0.1 #{proxy_port}") do
 # static
 #  its(:stdout) { should match /HTTP\/1.1 511 Network Authentication Required/ }
 #  its(:stdout) { should match /X-Squid-Error: 511:\/etc\/squid\/splash.html 0/ }
 # dynamic splash page
 #  its(:stdout) { should match /HTTP\/1.1 302 Found/ }
 #  its(:stdout) { should match /Location: http:\/\/localhost\/splash.php?url=http%3A%2F%2Fwww.google.com%2F/ }
-  its(:stderr) { should match /Connection to 127.0.0.1 8080 port \[tcp\/http-alt\] succeeded!/ }
+  its(:stderr) { should match /Connection to 127.0.0.1 #{proxy_port} port \[tcp\/http-alt\] succeeded!/ }
   its(:exit_status) { should eq 0 }
 end
 
 # 1st call
-describe command('echo 10.0.0.1 concurrency=100 | /usr/lib/squid/ext_session_acl -t 15 -b /var/lib/squid/session.db') do
+describe command('echo 10.0.0.1 concurrency=100 | /usr/lib/squid/ext_session_acl -t 15 -b /var/lib/squid/session.db'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
+  its(:stdout) { should match /10.0.0.1 ERR message="Welcome"/ }
+  its(:exit_status) { should eq 0 }
+end
+describe command('echo 10.0.0.1 concurrency=100 | /usr/lib64/squid/ext_session_acl -t 15 -b /var/lib/squid/session.db'), :if => os[:family] == 'redhat' do
   its(:stdout) { should match /10.0.0.1 ERR message="Welcome"/ }
   its(:exit_status) { should eq 0 }
 end
 # 2nd call
-describe command('echo 10.0.0.1 concurrency=100 | /usr/lib/squid/ext_session_acl -t 15 -b /var/lib/squid/session.db') do
+describe command('echo 10.0.0.1 concurrency=100 | /usr/lib/squid/ext_session_acl -t 15 -b /var/lib/squid/session.db'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
+  its(:stdout) { should match /10.0.0.1 OK/ }
+  its(:exit_status) { should eq 0 }
+end
+describe command('echo 10.0.0.1 concurrency=100 | /usr/lib64/squid/ext_session_acl -t 15 -b /var/lib/squid/session.db'), :if => os[:family] == 'redhat' do
   its(:stdout) { should match /10.0.0.1 OK/ }
   its(:exit_status) { should eq 0 }
 end
@@ -75,10 +83,26 @@ describe file('/var/lib/squid/session.db'), :if => os[:family] == 'ubuntu' || os
   it { should be_mode 600 }
 end
 
+describe file('/var/lib/squid/session.db'), :if => os[:family] == 'redhat' do
+  it { should be_file }
+  it { should be_owned_by 'squid' }
+  it { should be_grouped_into 'squid' }
+  it { should be_mode 600 }
+end
+
 describe file('/var/log/squid/cache.log'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   it { should be_file }
   it { should be_owned_by 'proxy' }
   it { should be_grouped_into 'proxy' }
+  it { should be_mode 640 }
+  its(:content) { should_not match /| WARNING: splash_page #Hlpr.* exited/ }
+  its(:content) { should_not match /FATAL: The splash_page helpers are crashing too rapidly, need help!/ }
+end
+
+describe file('/var/log/squid/cache.log'), :if => os[:family] == 'redhat' do
+  it { should be_file }
+  it { should be_owned_by 'squid' }
+  it { should be_grouped_into 'squid' }
   it { should be_mode 640 }
   its(:content) { should_not match /| WARNING: splash_page #Hlpr.* exited/ }
   its(:content) { should_not match /FATAL: The splash_page helpers are crashing too rapidly, need help!/ }
