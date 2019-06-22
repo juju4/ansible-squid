@@ -11,8 +11,8 @@
     dest: /var/lib/squid
     state: directory
     mode: '0755'
-    owner: proxy
-    group: proxy
+    owner: "{{ squid_user }}"
+    group: "{{ squid_user }}"
 
 - name: Check if squid session file
   stat:
@@ -24,6 +24,6 @@
     dest: /var/lib/squid/session.db
     state: touch
     mode: '0600'
-    owner: proxy
-    group: proxy
+    owner: "{{ squid_user }}"
+    group: "{{ squid_user }}"
   when: not sessiondb.stat.exists
