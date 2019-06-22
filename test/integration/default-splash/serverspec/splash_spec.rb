@@ -59,7 +59,7 @@ describe file('/var/lib/squid/session.db'), :if => os[:family] == 'ubuntu' || os
   it { should be_file }
   it { should be_owned_by 'proxy' }
   it { should be_grouped_into 'proxy' }
-  it { should be_mode 644 }
+  it { should be_mode 600 }
 end
 
 describe file('/var/log/squid/cache.log'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
