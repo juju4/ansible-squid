@@ -32,3 +32,9 @@ suites:
     includes:
       - centos/7
       - ubuntu-18.04
+  - name: default-splash
+    run_list:
+    attributes:
+    includes:
+      - centos/7
+      - ubuntu-18.04

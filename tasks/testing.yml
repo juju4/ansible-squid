@@ -1,0 +1,8 @@
+---
+
+- name: install testing tools
+  package:
+    name: "{{ squid_testing_pkgs }}"
+    state: present
+  register: pkg_result
+  until: pkg_result is success

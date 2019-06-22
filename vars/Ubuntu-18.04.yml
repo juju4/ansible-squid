@@ -44,3 +44,8 @@ squidhttps_pkgs:
   - squid-langpack
 SQUID_VER: 4.6
 SQUID_PKG: 4.6-1
+
+squid_testing_pkgs:
+  - curl
+  - db-utils
+  - netcat

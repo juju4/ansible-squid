@@ -1,0 +1,7 @@
+---
+
+- name: Install splash page
+  file:
+    src: "{{ squid_splash_template }}"
+    dst: "/var/www/html/{{ squid_splash_template | regex_replace('\.j2$', '') }}"
+    mode: '0644'

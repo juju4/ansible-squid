@@ -16,3 +16,8 @@ clamd_pkgs:
   - clamav-daemon
   - apparmor
   - apparmor-utils
+
+squid_testing_pkgs:
+  - curl
+  - db-utils
+  - netcat

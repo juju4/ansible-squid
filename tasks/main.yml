@@ -61,6 +61,9 @@
 - include: ads.yml
   when: squid_filter_ads is defined and squid_filter_ads
 
+- include: splash.yml
+  when: squid_splash_enable|bool
+
 - name: enable and start squid service
   service: name="{{ squid_svc }}" state=started enabled=yes
 

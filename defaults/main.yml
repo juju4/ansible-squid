@@ -13,6 +13,10 @@ squid_allowed_clients: []
 
 squid_filter_ads: true
 
+squid_splash_enable: false
+squid_splash_template: splash.php.j2
+squid_splash_url: http://localhost/splash.php
+
 # require distribution where squid compiled with ssl (ok centos, nok ubuntu)
 squid_https: false
 squid_certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible for squid'

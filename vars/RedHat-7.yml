@@ -18,3 +18,8 @@ squidguard_pkgs:
 ssl_user: root
 ssl_dir: /etc/pki/tls/certs
 ssl_privatedir: /etc/pki/tls/private
+
+squid_testing_pkgs:
+  - curl
+  - libdb-utils
+  - nmap-ncat

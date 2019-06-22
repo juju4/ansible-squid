@@ -8,3 +8,8 @@ squid_errors_template: /usr/share/squid/errors/
 
 ## no package for dansguardian
 squid_urlfiltering_tool: squidguard
+
+squid_testing_pkgs:
+  - curl
+  - libdb-utils
+  - nmap-ncat
