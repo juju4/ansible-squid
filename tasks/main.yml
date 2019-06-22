@@ -73,6 +73,9 @@
 - include: systemd.yml
   when: squid_systemd_restriction_enable|bool
 
+- include: testing.yml
+  when: squid_testing|bool
+
 - meta: flush_handlers
 
 - name: Ensure clamd available before ending
