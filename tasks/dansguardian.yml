@@ -10,7 +10,7 @@
   until: pkg_result is success
 
 - include: clamd.yml
-  when: squid_dansguardian_clamd
+  when: squid_dansguardian_clamd|bool
 
 - name: dansguardian | review settings
   replace:
@@ -47,7 +47,7 @@
       }
   notify:
     - restart dansguardian
-  when: squid_dansguardian_clamd
+  when: squid_dansguardian_clamd|bool
 
 - name: dansguardian | review clamdscan settings
   replace:
@@ -59,7 +59,7 @@
     - { re: "^clamdudsfile = .*", rep: "clamdudsfile = /tmp/clamd.ctl" }
   notify:
     - restart dansguardian
-  when: squid_dansguardian_clamd
+  when: squid_dansguardian_clamd|bool
 
 - name: check few permissions
   file: "dest=/var/log/dansguardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
