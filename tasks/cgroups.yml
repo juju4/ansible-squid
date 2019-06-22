@@ -8,3 +8,6 @@
       CPUShares={{ squid_cgroups_cpushares | default('1024') }}
   args:
     creates: /etc/systemd/system/osqueryd.slice.d/50-CPUQuota.conf
+  notify:
+    - reload systemd
+    - restart squid
