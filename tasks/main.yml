@@ -17,7 +17,7 @@
   when: ansible_os_family == "RedHat"
 
 - include_tasks: https.yml
-  when: squid_https
+  when: squid_https|bool
 
 - name: update configuration
   template:
