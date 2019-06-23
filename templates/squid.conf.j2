@@ -31,7 +31,7 @@ http_access deny CONNECT !SSL_ports
 cache_mgr {{ squid_cache_admin_email }}
 
 # Suppress Squid version string info in HTTP headers and HTML error pages. = not valid/bungled(3.5.12)
-#httpd_suppress_version_string
+#httpd_suppress_version_string off
 # Limit the size of acceptable HTTP headers.
 request_header_max_size 64 KB
 ignore_unknown_nameservers on
