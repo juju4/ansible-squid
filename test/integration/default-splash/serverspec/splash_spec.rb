@@ -24,7 +24,7 @@ proxy_port = 3128
 
 describe command("curl -v -x http://localhost:#{proxy_port} http://www.google.com") do
   its(:stderr) { should match /HTTP\/1.1 302 Found/ }
-  its(:stderr) { should contain 'Location: http://localhost/splash.php?url=http%3A%2F%2Fwww.google.com%2F' }
+  its(:stderr) { should match /Location: http:\/\/localhost\/splash.php?url=http%3A%2F%2Fwww.google.com%2F/ }
   its(:exit_status) { should eq 0 }
 end
 
@@ -33,7 +33,7 @@ describe command("curl -vL -x http://localhost:#{proxy_port} http://www.google.c
   its(:stdout) { should_not match /Invalid URL/ }
   its(:stderr) { should match /HTTP\/1.1 302 Found/ }
   its(:stderr) { should_not match /400 Bad Request/ }
-  its(:stderr) { should contain 'Location: http://localhost/splash.php?url=http%3A%2F%2Fwww.google.com%2F' }
+  its(:stderr) { should match /Location: http:\/\/localhost\/splash.php?url=http%3A%2F%2Fwww.google.com%2F/ }
   # redirection loop...
   its(:stderr) { should_not match /Location: http:\/\/localhost\/splash.php?url=http%3A%2F%2Flocalhost%2Fsplash.php%3Furl%3Dhttp%253A%252F%252Fwww.google.com%252F/ }
   its(:exit_status) { should eq 0 }
