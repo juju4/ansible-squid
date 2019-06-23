@@ -99,7 +99,7 @@ describe file('/var/log/squid/cache.log'), :if => os[:family] == 'ubuntu' || os[
   it { should be_owned_by 'proxy' }
   it { should be_grouped_into 'proxy' }
   it { should be_mode 640 }
-  its(:content) { should_not match /| WARNING: splash_page #Hlpr.* exited/ }
+  its(:content) { should_not match /\| WARNING: splash_page #Hlpr.* exited/ }
   its(:content) { should_not match /FATAL: The splash_page helpers are crashing too rapidly, need help!/ }
 end
 
@@ -108,6 +108,6 @@ describe file('/var/log/squid/cache.log'), :if => os[:family] == 'redhat' do
   it { should be_owned_by 'squid' }
   it { should be_grouped_into 'squid' }
   it { should be_mode 640 }
-  its(:content) { should_not match /| WARNING: splash_page #Hlpr.* exited/ }
+  its(:content) { should_not match /\| WARNING: splash_page #Hlpr.* exited/ }
   its(:content) { should_not match /FATAL: The splash_page helpers are crashing too rapidly, need help!/ }
 end
