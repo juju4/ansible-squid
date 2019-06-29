@@ -288,4 +288,9 @@ url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf
 # https://blog.rootshell.be/2014/12/15/automatic-mime-parts-scanning-with-virustotal/
 
 # debug
+# https://wiki.squid-cache.org/KnowledgeBase/DebugSections
+{% if squid_testing %}
+debug_options ALL,1 33,2 28,9 82,9
+{% else %}
 #debug_options ALL,1 33,2 28,9
+{% endif %}
