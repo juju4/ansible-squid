@@ -101,7 +101,7 @@ external_acl_type splash_page ttl=60 concurrency=100 %SRC /usr/lib/squid/ext_ses
 acl existing_users external splash_page
 
 #deny_info 511:/etc/squid/splash.html existing_users
-deny_info {{ squid_splash_url }}?url=%s existing_users
+deny_info {{ squid_splash_url }}?url=%u existing_users
 
 http_access deny !existing_users
 
