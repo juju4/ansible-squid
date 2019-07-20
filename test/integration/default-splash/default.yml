@@ -4,6 +4,7 @@
   vars:
     squid_splash_enable: true
     squid_testing: true
+    squid_splash_timeout: 15
   pre_tasks:
     - set_fact:
         squid_urlfiltering_enable: false

@@ -93,9 +93,9 @@ http_access allow allowed_clients
 # -t <idle_timeout>
 # -T <fixed_timeout>
 {% if ansible_os_family == "RedHat" %}
-external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib64/squid/ext_session_acl -t 7200 -b /var/lib/squid/session.db
+external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib64/squid/ext_session_acl -t {{ squid_splash_timeout }} -b /var/lib/squid/session.db
 {% else %}
-external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib/squid/ext_session_acl -t 7200 -b /var/lib/squid/session.db
+external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib/squid/ext_session_acl -t {{ squid_splash_timeout }} -b /var/lib/squid/session.db
 {% endif %}
 
 acl existing_users external splash_page
