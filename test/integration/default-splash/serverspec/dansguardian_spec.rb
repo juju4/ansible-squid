@@ -41,4 +41,3 @@ describe command("curl -v -x http://localhost:#{proxy_port} http://www.eicar.org
   its(:stdout) { should match /<b>Virus or bad content detected. Eicar-Test-Signature<\/b>/ }
   its(:exit_status) { should eq 0 }
 end
-

@@ -8,13 +8,16 @@
   when: ansible_os_family == "RedHat"
 
 - include: debian.yml
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' and not squid_https
+
+- include: debian-https.yml
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' and squid_https
 
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
 
 - include_tasks: https.yml
-  when: squid_https
+  when: squid_https|bool
 
 - include_tasks: splash.yml
   when: squid_splash_enable
@@ -61,8 +64,20 @@
 - include: ads.yml
   when: squid_filter_ads is defined and squid_filter_ads
 
+- include: splash.yml
+  when: squid_splash_enable|bool
+
 - name: enable and start squid service
   service: name="{{ squid_svc }}" state=started enabled=yes
+
+- include: cgroups.yml
+  when: squid_cgroups_restriction_enable|bool
+
+- include: systemd.yml
+  when: squid_systemd_restriction_enable|bool
+
+- include: testing.yml
+  when: squid_testing|bool
 
 - meta: flush_handlers
 

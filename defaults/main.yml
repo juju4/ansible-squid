@@ -8,7 +8,17 @@ squid_log_querystrings: true
 squid_cache_admin_email: squidadmin@localhost.local
 squid_customlog_path: /var/log/squid/access_custom.log
 
+# source IP and subnets allowed to connect (outside of private networks)
+squid_allowed_clients: []
+
 squid_filter_ads: true
+
+squid_splash_enable: false
+squid_splash_template: splash.php.j2
+squid_splash_url: http://localhost/splash.php
+squid_splash_timeout: 7200
+
+squid_testing: false
 
 # require distribution where squid compiled with ssl (ok centos, nok ubuntu)
 squid_https: false
@@ -31,8 +41,14 @@ squid_dansguardian_proxyip: 127.0.0.1
 squid_dansguardian_language: 'ukenglish'
 ## 0 = none  1 = just denied  2 = all text based  3 = all requests
 squid_dansguardian_loglevel: 3
+squid_dansguardian_clamd: true
+squid_dansguardian_template:
+  - { re: 'YOUR ORG NAME', rep: 'Company Example.com' }
 
 # http://www.squid-cache.org/Misc/log-analysis.html
 squid_report_pkgs:
   - calamaris
   - sarg
+
+squid_cgroups_restriction_enable: true
+squid_systemd_restriction_enable: false

@@ -29,7 +29,7 @@ describe file('/etc/clamav/freshclam.conf'), :if => os[:family] == 'ubuntu' || o
   it { should be_readable }
 end
 
-describe file('/var/run/clamav/clamd.ctl'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
+describe file('/tmp/clamd.ctl'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   it { should be_socket }
 end
 

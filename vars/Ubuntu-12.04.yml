@@ -6,3 +6,8 @@ squid_confdir: /etc/squid3
 squid_svc: squid3
 squid_spool: /var/spool/squid3
 squid_user: root
+
+squid_testing_pkgs:
+  - curl
+  - db-util
+  - netcat

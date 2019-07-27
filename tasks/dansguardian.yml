@@ -10,6 +10,7 @@
   until: pkg_result is success
 
 - include: clamd.yml
+  when: squid_dansguardian_clamd|bool
 
 - name: dansguardian | review settings
   replace:
@@ -26,14 +27,27 @@
     - { re: "^accessdeniedaddress = .*", rep: "accessdeniedaddress = '{{ squid_dansguardian_deniedaddress }}'" }
     - { re: "^loglevel = .*", rep: "loglevel = {{ squid_dansguardian_loglevel }}" }
     - { re: "^loguseragent = .*", rep: "loguseragent = on" }
-    - { re: "^nologger = .*", rep: "nologger = on" }
+#    - { re: "^nologger = .*", rep: "nologger = on" }
     - { re: "#loglocation = .*", rep: "loglocation = '/var/log/dansguardian/access.log'" }
     - { re: "^language = '.*'", rep: "language = '{{ squid_dansguardian_language }}'" }
+    - { re: "^forwardedfor = '.*'", rep: "forwardedfor = on" }
+#    - { re: "^usexforwardedfor = '.*'", rep: "usexforwardedfor = on" }
+  notify:
+    - restart dansguardian
+
+- name: dansguardian | review settings for clamscan
+  replace:
+    dest: /etc/dansguardian/dansguardian.conf
+    regexp: "{{ item.re }}"
+    replace: "{{ item.rep }}"
+    backup: yes
+  with_items:
     - { re: "^#contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'",
         rep: "contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'"
       }
   notify:
     - restart dansguardian
+  when: squid_dansguardian_clamd|bool
 
 - name: dansguardian | review clamdscan settings
   replace:
@@ -45,9 +59,25 @@
     - { re: "^clamdudsfile = .*", rep: "clamdudsfile = /tmp/clamd.ctl" }
   notify:
     - restart dansguardian
+  when: squid_dansguardian_clamd|bool
 
 - name: check few permissions
   file: "dest=/var/log/dansguardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
+
+- name: check log file exists
+  stat:
+    path: /var/log/dansguardian.log
+  register: danl
+
+- name: touch log file
+  file:
+    path: /var/log/dansguardian.log
+    state: touch
+    owner: "{{ squid_user }}"
+    mode: '0600'
+  when: not danl.stat.exists
+
+- include: dansguardian-template.yml
 
 - name: ensure dansguardian is started and enabled
   service:

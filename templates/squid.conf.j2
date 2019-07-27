@@ -1,4 +1,5 @@
-# {{ ansible_managed }}
+{{ ansible_managed | comment }}
+
 # Example rule allowing access from your local networks.
 # Adapt to list your (internal) IP networks from where browsing
 # should be allowed
@@ -15,10 +16,12 @@ acl Safe_ports port 443         # https
 #acl Safe_ports port 70         # gopher
 acl Safe_ports port 1025-65535  # unregistered ports
 acl CONNECT method CONNECT
-{% if ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '6' %}
-## required on centos6
+{% if not (ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7') %}
 acl localhost src 127.0.0.1/32
 {% endif %}
+{% for client in squid_allowed_clients %}
+acl allowed_clients src {{ client }}
+{% endfor %}
 
 http_access deny !Safe_ports
 
@@ -28,7 +31,7 @@ http_access deny CONNECT !SSL_ports
 cache_mgr {{ squid_cache_admin_email }}
 
 # Suppress Squid version string info in HTTP headers and HTML error pages. = not valid/bungled(3.5.12)
-#httpd_suppress_version_string
+#httpd_suppress_version_string off
 # Limit the size of acceptable HTTP headers.
 request_header_max_size 64 KB
 ignore_unknown_nameservers on
@@ -76,8 +79,33 @@ http_access deny ads
 # Adapt localnet in the ACL section to list your (internal) IP networks
 # from where browsing should be allowed
 http_access allow localnet
+{% if not squid_testing %}
 http_access allow localhost
+{% endif %}
+{% if squid_allowed_clients != [] %}
+http_access allow allowed_clients
+{% endif %}
 
+{% if squid_splash_enable is defined and squid_splash_enable %}
+# https://wiki.squid-cache.org/ConfigExamples/Portal/Splash
+# https://thejimmahknows.com/squid-proxy-splash-page-2/
+# https://github.com/tombatossals/squid_guifi_splash
+# -t <idle_timeout>
+# -T <fixed_timeout>
+{% if ansible_os_family == "RedHat" %}
+external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib64/squid/ext_session_acl -t {{ squid_splash_timeout }} -b /var/lib/squid/session.db
+{% else %}
+external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib/squid/ext_session_acl -t {{ squid_splash_timeout }} -b /var/lib/squid/session.db
+{% endif %}
+
+acl existing_users external splash_page
+
+#deny_info 511:/etc/squid/splash.html existing_users
+deny_info {{ squid_splash_url }}?url=%u existing_users
+
+http_access deny !existing_users
+
+{% endif %}
 # And finally deny all other access to this proxy
 http_access deny all
 
@@ -109,13 +137,13 @@ sslproxy_options NO_SSLv2,NO_SSLv3,SINGLE_DH_USE
 
 sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS
 
-{% elif ansible_os_family == "Debian" %}
+{% elif ansible_distribution == "Ubuntu" and squid_https %}
 #squid-4 only
 
-#sslcrtd_program /usr/local/squid/libexec/security_file_certgen -s /var/lib/ssl_db -M 4MB
+sslcrtd_program /usr/local/squid/libexec/security_file_certgen -s /var/lib/ssl_db -M 4MB
 #tls_outgoing_options cafile=/usr/local/openssl/cabundle.file
 
-#tls_outgoing_options options=NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
+tls_outgoing_options options=NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
 
 {% endif %}
 
@@ -150,7 +178,8 @@ refresh_pattern .               0       20%     4320
 # ANONYMOUS/Privacy PROXY
 # (but Via off will generate Warning at each start...)
 via off
-forwarded_for off
+# http://www.squid-cache.org/Doc/config/forwarded_for/
+forwarded_for delete
 request_header_access Allow allow all
 request_header_access Authorization allow all
 request_header_access WWW-Authenticate allow all
@@ -184,7 +213,16 @@ request_header_access User-Agent allow all
 request_header_access Cookie allow all
 request_header_access Server deny all
 request_header_access All deny all
+{% if squid_urlfiltering_tool == 'dansguardian' %}
+{# http://squid.sourceforge.net/follow_xff/ #}
+{# https://gist.github.com/alvarow/fa409edc70aeb4cf89bbc83c1c78f392 #}
+follow_x_forwarded_for allow localhost
+acl_uses_indirect_client on
+delay_pool_uses_indirect_client on
+log_uses_indirect_client on
+{% else %}
 follow_x_forwarded_for deny all
+{% endif %}
 
 # Cache (mostly for deb/rpm)
 ## maximum_object_size should be before cache_dir
@@ -235,27 +273,14 @@ refresh_all_ims on
 #always_direct allow FTP
 
 ## Customize logging
+## http://www.squid-cache.org/Doc/config/logformat/
 logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh
 access_log {{ squid_customlog_path }} customlogformat
+# human-readable time?
+#logformat squid %tg.%03tu %6tr %>a %Ss/%03Hs %
 
 {% if squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard' %}
 url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf
-
-{% endif %}
-{% if squid_splash_enable is defined and squid_splash_enable %}
-# https://wiki.squid-cache.org/ConfigExamples/Portal/Splash
-# https://thejimmahknows.com/squid-proxy-splash-page-2/
-# https://github.com/tombatossals/squid_guifi_splash
-# -t <idle_timeout>
-# -T <fixed_timeout>
-external_acl_type splash_page ttl=60 concurrency=100 %SRC /usr/lib/squid/ext_session_acl -t 7200 -b /var/lib/squid/session.db
-
-acl existing_users external splash_page
-
-#deny_info 511:/etc/squid/splash.html existing_users
-deny_info {{ squid_splash_url }}?url=%s guest_sessions
-
-http_access deny !existing_users
 
 {% endif %}
 
@@ -263,4 +288,9 @@ http_access deny !existing_users
 # https://blog.rootshell.be/2014/12/15/automatic-mime-parts-scanning-with-virustotal/
 
 # debug
+# https://wiki.squid-cache.org/KnowledgeBase/DebugSections
+{% if squid_testing %}
+debug_options ALL,1 33,2 28,9 82,9
+{% else %}
 #debug_options ALL,1 33,2 28,9
+{% endif %}

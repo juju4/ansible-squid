@@ -1,0 +1,13 @@
+---
+
+- name: Enforce cgroups limits
+  command: >
+    systemctl set-property squid.service
+      CPUQuota={{ squid_cgroups_cpuquota | default('70%') }}
+      MemoryLimit={{ squid_cgroups_memorylimit | default('4G') }}
+      CPUShares={{ squid_cgroups_cpushares | default('1024') }}
+  args:
+    creates: /etc/systemd/system/osqueryd.slice.d/50-CPUQuota.conf
+  notify:
+    - reload systemd
+    - restart squid

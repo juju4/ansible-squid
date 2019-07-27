@@ -19,11 +19,7 @@ ssl_user: root
 ssl_dir: /etc/pki/tls/certs
 ssl_privatedir: /etc/pki/tls/private
 
-splash_pkgs:
-  - lighttpd
-  - php-fpm
-  - lighttpd-fastcgi
-
-splash_services:
-  - lighttpd
-  - php-fpm
+squid_testing_pkgs:
+  - curl
+  - libdb-utils
+  - nmap-ncat

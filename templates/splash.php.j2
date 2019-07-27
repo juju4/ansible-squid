@@ -1,4 +1,13 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?php
+
+if (!empty($_POST['url']) and parse_url($_POST['url']) and !empty($_POST['email']) and filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+
+	header("Location: ".$_POST['url']);
+	die();
+
+} else {
+
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
@@ -6,16 +15,195 @@
   </head>
   <body>
     <h1>Welcome on proxy splash page</h1>
+
     This is the first time someone connects to this page. So, we ask you to think if following page/domain is really the thing that you want to browse and confirm it by filling your email and submitting.<br />
     This will whitelist domain for whole company until next whitelist reset or that an issue is identified.
+<br /><br />
+<?php
+/*
+TODO/FIXME!
+ - geoip usage
+ - error if no domaintools whois info.
+ - newly created domains warning
+   https://whoisds.com/newly-registered-domains
+ - website screenshot with selenium
+https://www.seleniumhq.org/docs/04_webdriver_advanced.jsp#taking-a-screenshot
+https://github.com/giorgiosironi/phpunit-selenium/blob/8e4cf0271d82a44324e3dfebf0ea84c467b39317/Tests/Selenium2TestCaseTest.php
+ - https://aws.amazon.com/awis/
 
-    URL: <?php echo htmlentities($_GET['url']); ?><br />
-    Domain: registered by ... on ...
-    Geography: Country (AS...)
+INSTALL
+# git clone https://github.com/DomainTools/api-php.git
+# cp api-php/api.ini.default api-php/api.ini
+* required php settings
+(file_get_contents for iptoasn)
+allow_url_fopen = True
+(cli) disable following option in snuffleupagus:
+sp.readonly_exec.enable();
+*/
+ 	$enable_domaintools = false;
+	$enable_iptoasn = true;
 
-    Email
-    Submit
+        error_reporting(E_ALL | E_STRICT);
+#        ini_set('display_errors', 'Off');
 
+        if (!empty($_GET['url'])) {
+            $url = $_GET['url'];
+        } else if (!empty($argv[1])) {
+            $url = $argv[1];
+        } else {
+            $url = "No url provided";
+        }
+        $c = parse_url($url);
+        $domain = $c['host'];
+
+?>
+    <strong>URL: <?php echo htmlentities($url); ?></strong><br />
+<br />
+<?php
+	if ($enable_domaintools === true) {
+?>
+<h2>Domain information</h2>
+<?php
+
+        $creationlimit = 3;
+
+        # https://github.com/DomainTools/api-php
+        # configure api.ini with username and key
+        #require_once 'my/path/to/DomaintoolsAPI.class.php';
+        require_once 'api-php/DomaintoolsAPI.class.php';
+        $request = new DomaintoolsAPI();
+
+        try {
+            $request->from("whois")
+                ->withType("json")
+                ->domain($domain);
+
+            $res = $request->execute();
+
+            #print_r($res);
+            $json = json_decode((string)$res);
+            #print_r($json->{'response'});
+
+?>
+<code>
+<?php
+        if (!empty($json->{'response'}->{'registrant'})) {
+?>
+        Domain registrant: <?php print_r($json->{'response'}->{'registrant'}); ?><br />
+<?php
+        } else {
+?>
+        Domain registrant: <strong>No information available</strong><br />
+<?php
+        }
+?>
+<?php
+        if (!empty($json->{'response'}->{'registration'}->{'created'})) {
+            # https://isc.sans.edu/forums/diary/Tracking+Newly+Registered+Domains/23127/
+            $daycreated = strtotime($json->{'response'}->{'registration'}->{'created'});
+            if ((time()-(60*60*24*$creationlimit)) >= ($daycreated)) {
+?>
+        Domain registration created: <?php print_r($json->{'response'}->{'registration'}->{'created'}); ?><br />
+<?php
+            } else {
+?>
+        Domain registration created: <strong><?php print_r($json->{'response'}->{'registration'}->{'created'}); ?> - Very recently created domain!</strong><br />
+<?php
+            }
+        } else {
+?>
+        Domain registration created: <strong>No information available</strong><br />
+<?php
+        }
+?>
+        Domain registration updated: <?php print_r($json->{'response'}->{'registration'}->{'updated'}); ?><br />
+<?php
+        if ($json->{'response'}->{'registration'}->{'registrar'}) {
+?>
+        Domain registrar: <?php print_r($json->{'response'}->{'registration'}->{'registrar'}); ?><br />
+<?php
+        }
+?>
+</code><?php
+
+        } catch (\Error $ex) {
+?>
+<code>
+        <strong>Warning! Could not retrieve information for this domain.</strong>
+</code><?php
+
+            var_dump($ex);
+
+        }
+	} # enable_domaintools
+
+/*
+        # https://secure.php.net/manual/en/ref.geoip.php
+        if (@geoip_db_avail(GEOIP_COUNTRY_EDITION)) {
+            $country = geoip_country_code_by_name($c['host']);
+            $asn = geoip_asnum_by_name($c['host']);
+            $source = geoip_database_info(GEOIP_COUNTRY_EDITION);
+        } else {
+            $country = 'Unknown';
+            $asn = 'Unknown';
+        }
+*/
+
+	if ($enable_iptoasn === true) {
+
+        $ipaddr = gethostbyname((string)$domain);
+        # https://iptoasn.com/
+        # https://www.team-cymru.com/IP-ASN-mapping.html
+        if ($ipaddr) {
+            #print_r($ipaddr);
+            $res2 = file_get_contents('https://api.iptoasn.com/v1/as/ip/'.(string)$ipaddr);
+            #print_r($res2);
+            $json2 = json_decode((string)$res2);
+            #print_r($json2);
+
+            $country = $json2->{'as_country_code'};
+	    $asn = $json2->{'as_number'};
+	    $desc = $json2->{'as_description'};
+            $source = 'iptoasn.com'
+
+?>
+
+<br />
+    <h2>Network information</h2><br />
+<code>
+<?php
+            #if (!empty($source)) {
+            if (!empty($json2)) {
+?>
+    Geography/Country: <?php echo $country; ?> (ASN: <?php echo $asn; ?> - '<?php echo $desc; ?>')<br />
+    Source: <?php echo $source; ?><br />
+<?php
+            } else {
+?>
+    Geography: Unknown
+<?php
+            }
+?>
+</code>
+<?php
+        }
+	} # enable_iptoasn
+
+?>
+<br /><br />
+ <form action="/splash.php" method="POST">
+  Email: <input type="email" name="email">
+  <input type="hidden" name="url" value="<?php echo $url; ?>"><br />
+  <input type="submit" value="Submit"><br />
+ </form> 
+<br /><br />
     If you have question, feel free reach to reach contact...
+<br />
+<?php // phpinfo(); ?>
   </body>
 </html>
+<?php
+
+}
+
+?>
