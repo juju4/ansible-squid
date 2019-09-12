@@ -24,6 +24,7 @@ squidbuild_pkgs:
   - fakeroot
   - debhelper
   - dh-autoreconf
+  - dh-apparmor
   - cdbs
   - libcppunit-dev
   - libsasl2-dev
