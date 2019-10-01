@@ -14,7 +14,7 @@ describe command("curl -v -x http://localhost:#{proxy_port} https://www.google.c
   its(:stdout) { should match /<title>Google<\/title>/ }
   its(:stderr) { should match /HTTP\/1.1 200 Connection established/ }
   its(:stderr) { should match /CONNECT phase completed!/ }
-  its(:stderr) { should match /SSL connection using unknown \/ TLS_AES_256_GCM_SHA384/ }
+  its(:stderr) { should match /SSL connection using TLSv1.3 \/ TLS_AES_256_GCM_SHA384/ }
   its(:stderr) { should match /Using HTTP2, server supports multi-use/ }
   its(:stderr) { should match /Connection state changed \(HTTP\/2 confirmed\)/ }
   its(:stderr) { should match /GET \/ HTTP\/2/ }
