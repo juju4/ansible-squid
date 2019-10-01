@@ -24,6 +24,7 @@ squidbuild_pkgs:
   - fakeroot
   - debhelper
   - dh-autoreconf
+  - dh-apparmor
   - cdbs
   - libcppunit-dev
   - libsasl2-dev
@@ -42,8 +43,10 @@ squidbuild_pkgs:
   - libecap3-dev
 squidhttps_pkgs:
   - squid-langpack
-SQUID_VER: 4.6
-SQUID_PKG: 4.6-1
+
+# http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
+SQUID_VER: 4.8
+SQUID_PKG: 4.8-1
 
 squid_testing_pkgs:
   - curl
