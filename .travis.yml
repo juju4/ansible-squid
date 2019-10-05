@@ -27,12 +27,12 @@ env:
   - distribution: ubuntu
     version: 18.04
     suite: default-https
-  - distribution: centos
-    version: 7
-    suite: default-splash
-  - distribution: ubuntu
-    version: 18.04
-    suite: default-splash
+#  - distribution: centos
+#    version: 7
+#    suite: default-splash
+#  - distribution: ubuntu
+#    version: 18.04
+#    suite: default-splash
 
 before_install:
   - env
