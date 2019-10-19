@@ -81,4 +81,4 @@
 - name: Ensure clamd available before ending
   wait_for:
     path: /tmp/clamd.ctl
-  when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian'
+  when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian' and squid_dansguardian_clamd
