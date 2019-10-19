@@ -21,7 +21,7 @@
 
 - name: update configuration
   template:
-    src: squid.conf.j2
+    src: "{{ squidconf_template }}"
     dest: "{{ squid_confdir }}/squid.conf"
     owner: root
     group: root
