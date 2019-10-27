@@ -65,6 +65,7 @@ http_access deny manager
 
 #
 # INSERT YOUR OWN RULE(S) HERE TO ALLOW ACCESS FROM YOUR CLIENTS
+# https://wiki.squid-cache.org/SquidFaq/SquidAcl
 #
 
 {% if squid_filter_ads is defined and squid_filter_ads %}
@@ -85,6 +86,21 @@ http_access allow localhost
 {% if squid_allowed_clients != [] %}
 http_access allow allowed_clients
 {% endif %}
+
+acl bad_tlds dstdomain .gdn .work .ltd .ooo .date .shop .racing .world .loan .tokyo .country .stream .gdn .mom .xin .kin .men .loan .download .racing
+http_access deny bad_tlds
+
+acl useragent_chrome browser Chrome
+acl useragent_firefox browser Firefox
+acl useragent_msie browser MSIE
+acl useragent_opera browser Opera
+acl useragent_trident browser Trident
+acl useragent_chrome_old browser Chrome/[1-6]?
+http_access deny useragent_msie
+http_access deny useragent_chrome_old
+
+# acl for logs to exclude from logging if too noisy and not useful (and possibly blocked)
+#acl excludetrace dstdomain play.google.com
 
 {% if squid_splash_enable is defined and squid_splash_enable %}
 # https://wiki.squid-cache.org/ConfigExamples/Portal/Splash
@@ -212,6 +228,7 @@ request_header_access User-Agent allow all
 #header_replace        User-Agent OurBrowser/1.0 (Some Name)
 request_header_access Cookie allow all
 request_header_access Server deny all
+request_header_access X-Forwarded-For deny all
 request_header_access All deny all
 {% if squid_urlfiltering_tool == 'dansguardian' %}
 {# http://squid.sourceforge.net/follow_xff/ #}
@@ -272,6 +289,9 @@ refresh_all_ims on
 #acl FTP proto FTP
 #always_direct allow FTP
 
+#access_log none excludetrace
+
+access_log /var/log/squid/access.log squid
 ## Customize logging
 ## http://www.squid-cache.org/Doc/config/logformat/
 logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh
