@@ -19,7 +19,15 @@
     seuser: system_u
     setype: squid_cache_t
 
-#squid-4: /usr/local/squid/libexec/security_file_certgen
+- name: Configure Proxy exclusion for SSL inspection
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/squid/{{ item }}"
+    mode: '0644'
+  with_items:
+    - "{{ squid_noproxy_domains_template }}"
+    - "{{ squid_noproxy_ips_template }}"
+
 - name: RedHat | Initialize SSL database
   command: /usr/lib64/squid/ssl_crtd -c -s /var/lib/squid/ssl_db
   args:

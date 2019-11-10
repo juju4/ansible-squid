@@ -87,6 +87,13 @@ http_access allow localhost
 http_access allow allowed_clients
 {% endif %}
 
+#\.exe(\?.*)?$
+#\.msi(\?.*)?$
+#\.msu(\?.*)?$
+#\.torrent(\?.*)?$
+#acl blockExtensions urlpath_regex -i "/etc/squid/blockExtensions.acl"
+#http_access deny blockExtensions
+
 acl bad_tlds dstdomain .gdn .work .ltd .ooo .date .shop .racing .world .loan .tokyo .country .stream .gdn .mom .xin .kin .men .loan .download .racing
 http_access deny bad_tlds
 
@@ -101,6 +108,7 @@ http_access deny useragent_chrome_old
 
 # acl for logs to exclude from logging if too noisy and not useful (and possibly blocked)
 #acl excludetrace dstdomain play.google.com
+#acl excludetrace_mozilla dstdomain detectportal.firefox.com content-signature-2.cdn.mozilla.net push.services.mozilla.com firefox.settings.services.mozilla.com ocsp.comodoca.com
 
 {% if squid_splash_enable is defined and squid_splash_enable %}
 # https://wiki.squid-cache.org/ConfigExamples/Portal/Splash
@@ -130,38 +138,60 @@ http_access deny all
 http_port 3128
 {% else %}
 http_port 3128
-{# Only redhat with openssl support, latest debian/ubuntu with gnutls but mising cert generators #}
+# Transparent, https://wiki.squid-cache.org/ConfigExamples/Intercept/LinuxRedirect
+# https://wiki.squid-cache.org/KnowledgeBase/HostHeaderForgery
+http_port 3127 intercept
+{# Only redhat with openssl support, latest debian/ubuntu with gnutls but missing cert generators #}
 {% if ansible_os_family == "RedHat" %}
 # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
 http_port 3129 ssl-bump \
-  key={{ ssl_privatedir }}/{{ ansible_fqdn }}.key \
   cert={{ ssl_dir }}/{{ ansible_fqdn }}.crt \
+  key={{ ssl_privatedir }}/{{ ansible_fqdn }}.key \
   generate-host-certificates=on dynamic_cert_mem_cache_size=4MB
 
 sslcrtd_program /usr/lib64/squid/ssl_crtd \
   -s /var/lib/squid/ssl_db -M 4MB
 sslcrtd_children 8 startup=1 idle=1
 
-acl step1 at_step SslBump1
-
-ssl_bump peek step1
-ssl_bump bump all
-
 #sslproxy_cafile /usr/local/openssl/cabundle.file
 
+# https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit#Hardening
 sslproxy_options NO_SSLv2,NO_SSLv3,SINGLE_DH_USE
 
 sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS
 
 {% elif ansible_distribution == "Ubuntu" and squid_https %}
-#squid-4 only
-
-sslcrtd_program /usr/local/squid/libexec/security_file_certgen -s /var/lib/ssl_db -M 4MB
+#
+# squid-4 only
+#
+sslcrtd_program /usr/lib/squid/security_file_certgen -s /var/lib/squid/ssl_db -M 4MB
 #tls_outgoing_options cafile=/usr/local/openssl/cabundle.file
 
 tls_outgoing_options options=NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
 
 {% endif %}
+
+# https://wiki.squid-cache.org/Features/SslPeekAndSplice
+acl step1 at_step SslBump1
+acl step2 at_step SslBump2
+acl step3 at_step SslBump3
+
+acl ssl_exclude_domains ssl::server_name "/etc/squid/no-proxy-domains.conf"
+acl ssl_exclude_ips     dst              "/etc/squid/no-proxy-ips.conf"
+
+ssl_bump splice localhost
+ssl_bump peek step1 all
+ssl_bump splice ssl_exclude_domains
+ssl_bump splice ssl_exclude_ips
+ssl_bump stare step2 all
+ssl_bump bump all
+
+# or SSL-Bump + exceptions
+# acl DiscoverSNIHost at_step SslBump1
+# acl NoSSLIntercept ssl::server_name_regex "/etc/squid/no-proxy.txt"
+# ssl_bump peek DiscoverSNIHost
+# ssl_bump splice NoSSLIntercept
+# ssl_bump bump all
 
 # troubleshooting
 sslproxy_cert_error allow all
@@ -289,13 +319,26 @@ refresh_all_ims on
 #acl FTP proto FTP
 #always_direct allow FTP
 
+# WARNING: excludetrace_xxx ACL is used in context without an HTTP request. Assuming mismatch.
+# http://squid-web-proxy-cache.1019090.n4.nabble.com/ACL-is-used-in-context-without-an-HTTP-response-Assuming-mismatch-td4677540.html
 #access_log none excludetrace
 
+{% if ansible_distribution == 'Ubuntu' and squid_https %}
+#
+# squid 4
+#
+access_log stdio:/var/log/squid/access.log squid
+## Customize logging
+## http://www.squid-cache.org/Doc/config/logformat/
+logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh
+access_log stdio:{{ squid_customlog_path }} customlogformat
+{% else }
 access_log /var/log/squid/access.log squid
 ## Customize logging
 ## http://www.squid-cache.org/Doc/config/logformat/
 logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh
 access_log {{ squid_customlog_path }} customlogformat
+{% endif %}
 # human-readable time?
 #logformat squid %tg.%03tu %6tr %>a %Ss/%03Hs %
 
