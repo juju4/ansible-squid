@@ -19,8 +19,8 @@
 - name: add refresh cron task to refresh ads servers list
   cron:
     name: "ads servers list refresh"
-    minute: 45
-    hour: 2
+    minute: "45"
+    hour: "2"
     day: "*/3"
     user: "root"
     job: "{{ scriptsdir }}/ad_servers_newlist.sh > /dev/null"
