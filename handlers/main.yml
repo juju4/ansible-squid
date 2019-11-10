@@ -12,6 +12,9 @@
 - name: remove clamd apparmor profile
   command: apparmor_parser -R /etc/apparmor.d/usr.sbin.clamd
 
+- name: restart rsyslog
+  service: name=rsyslog state=restarted
+
 - name: reload systemd
   systemd:
     daemon_reload: yes
