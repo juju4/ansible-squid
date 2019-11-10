@@ -20,10 +20,18 @@
     setype: squid_cache_t
 
 #squid-4: /usr/local/squid/libexec/security_file_certgen
-- name: Initialize SSL database
+- name: RedHat | Initialize SSL database
   command: /usr/lib64/squid/ssl_crtd -c -s /var/lib/squid/ssl_db
   args:
     creates: /var/lib/squid/ssl_db/index.txt
   become: yes
   become_user: "{{ squid_user }}"
   when: ansible_os_family == "RedHat"
+
+- name: Debian | Initialize SSL database
+  command: /usr/lib/squid/security_file_certgen -c -s /var/lib/squid/ssl_db -M 4MB
+  args:
+    creates: /var/lib/squid/ssl_db/index.txt
+  become: yes
+  become_user: "{{ squid_user }}"
+  when: ansible_os_family == "Debian"
