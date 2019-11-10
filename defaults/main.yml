@@ -6,6 +6,8 @@ squidconf_template: squid.conf.j2
 # Do you want to keep query strings? have privacy consequence.
 squid_log_querystrings: true
 
+squid_syslog_target: /var/log/squid/squid.log
+
 squid_cache_admin_email: squidadmin@localhost.local
 squid_customlog_path: /var/log/squid/access_custom.log
 

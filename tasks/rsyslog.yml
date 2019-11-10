@@ -1,0 +1,30 @@
+---
+
+- name: Ensure rsyslog is present
+  package:
+    name: rsyslog
+    state: present
+  register: pkg_result
+  until: pkg_result is success
+
+- name: get rsyslog version
+  command: "rsyslogd -v | awk -F'[ ,]' '/rsyslogd/ { print $2 }'"
+  environment:
+    PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  changed_when: false
+  register: rsyslog_v
+
+- name: Ensure base directory exists
+  file:
+    dest: "{{ squid_syslog_target | dirname }}"
+    state: directory
+    mode: '0755'
+
+- name: setup rsyslog to send squid logs to a specific target
+  template:
+    src: rsyslog-squid.conf.j2
+    dest: /etc/rsyslog.d/30-squid.conf
+    mode: '0644'
+    backup: yes
+  notify:
+    - restart rsyslog

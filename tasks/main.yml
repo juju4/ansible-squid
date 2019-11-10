@@ -67,6 +67,8 @@
 - name: enable and start squid service
   service: name="{{ squid_svc }}" state=started enabled=yes
 
+- include: rsyslog.yml
+
 - include: cgroups.yml
   when: squid_cgroups_restriction_enable|bool
 
