@@ -2,6 +2,11 @@
 ## manage install when some directories are immutable
 ## requires target_dir, state=pre/post
 
+- name: Check if system configured with immutable handled - juju4.harden
+  stat:
+    path: /etc/apt/apt.conf.d/99security
+  register: imm
+
 - block:
 ## Ansible 2.3+ for get_attributes
     - name: check target_dir {{ target_dir }} attributes
@@ -17,12 +22,12 @@
       command: "chattr -i '{{ target_dir }}'"
       ignore_errors: true
       when: dir.stdout.find('-i-') != -1
-  when: state == 'pre'
+  when: state == 'pre' and imm.stat.exists
 
 - name: Reestablish immutable attribute
   command: "chattr +i '{{ target_dir }}'"
 #  file:
 #    dest: "{{ target_dir }}"
 #    attributes: '----i-----I--e--'
-  when: state == 'post'
+  when: state == 'post' and imm.stat.exists
   ignore_errors: true
