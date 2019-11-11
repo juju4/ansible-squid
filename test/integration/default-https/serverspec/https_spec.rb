@@ -39,7 +39,10 @@ end
 
 describe command("curl -v -x http://localhost:#{proxy_port} --cacert /etc/ssl/`hostname -s`.crt https://www.google.com"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   its(:stdout) { should match /<title>Google<\/title>/ }
-  its(:stderr) { should match /HTTP\/1.1 200 OK/ }
+  its(:stderr) { should match /CONNECT www.google.com:443 HTTP\/1.1/ }
+  its(:stderr) { should match /HTTP\/1.1 200 Connection established/ }
+  its(:stderr) { should match /CONNECT phase completed!/ }
+  its(:stderr) { should_not match /error setting certificate verify locations:/ }
   its(:exit_status) { should eq 0 }
 end
 describe command("curl -vk -x http://localhost:#{proxy_port} --cacert /etc/ssl/`hostname -s`.crt https://expired.badssl.com/"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
