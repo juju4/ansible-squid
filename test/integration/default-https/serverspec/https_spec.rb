@@ -77,7 +77,7 @@ describe command("curl -vk -x http://localhost:#{proxy_port} --cacert /etc/ssl/c
   its(:stderr) { should match /CONNECT expired.badssl.com:443 HTTP\/1.1/ }
   its(:stderr) { should match /HTTP\/1.1 200 Connection established/ }
 #  its(:stderr) { should match /CONNECT phase completed!/ }
-  its(:stderr) { should match /issuer: C=GB; ST=Greater Manchester; L=Salford; O=COMODO CA Limited; CN=COMODO RSA Domain Validation Secure Server CA/ }
+  its(:stderr) { should match /issuer: CN=COMODO RSA Domain Validation Secure Server CA,O=COMODO CA Limited,L=Salford,ST=Greater Manchester,C=GB/ }
   its(:stderr) { should match /GET \/ HTTP\/1.1/ }
   its(:stderr) { should_not match /error setting certificate verify locations:/ }
 #  its(:stderr) { should match /successfully set certificate verify locations:/ }
