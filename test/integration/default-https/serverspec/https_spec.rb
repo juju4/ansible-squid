@@ -46,6 +46,7 @@ describe command("curl -v -x http://localhost:#{proxy_port} --cacert /etc/ssl/*.
   its(:stderr) { should match /HTTP\/1.1 200 OK/ }
   its(:stderr) { should match /GET \/ HTTP\/1.1/ }
   its(:stderr) { should_not match /error setting certificate verify locations:/ }
+  its(:stderr) { should match /successfully set certificate verify locations:/ }
   its(:exit_status) { should eq 0 }
 end
 describe command("curl -vk -x http://localhost:#{proxy_port} --cacert /etc/ssl/*.crt https://expired.badssl.com/"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
@@ -55,7 +56,13 @@ describe command("curl -vk -x http://localhost:#{proxy_port} --cacert /etc/ssl/*
   its(:stderr) { should match /issuer: C=GB; ST=Greater Manchester; L=Salford; O=COMODO CA Limited; CN=COMODO RSA Domain Validation Secure Server CA/ }
   its(:stderr) { should match /GET \/ HTTP\/1.1/ }
   its(:stderr) { should_not match /error setting certificate verify locations:/ }
+  its(:stderr) { should match /successfully set certificate verify locations:/ }
   its(:stdout) { should match /<title>expired.badssl.com<\/title>/ }
   its(:stderr) { should match /HTTP\/1.1 200 OK/ }
   its(:exit_status) { should eq 0 }
+end
+
+describe file('/var/log/squid/access.log') do
+  its(:content) { should match /CONNECT www.google.com:443 HTTP\/1.1/ }
+  its(:content) { should match /CONNECT expired.badssl.com:443 HTTP\/1.1/ }
 end
