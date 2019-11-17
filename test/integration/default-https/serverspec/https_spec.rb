@@ -63,6 +63,6 @@ describe command("curl -vk -x http://localhost:#{proxy_port} --cacert /etc/ssl/*
 end
 
 describe file('/var/log/squid/access.log') do
-  its(:content) { should match /CONNECT www.google.com:443 HTTP\/1.1/ }
-  its(:content) { should match /CONNECT expired.badssl.com:443 HTTP\/1.1/ }
+  its(:content) { should match /CONNECT www.google.com:443 / }
+  its(:content) { should match /CONNECT expired.badssl.com:443 / }
 end
