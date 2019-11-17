@@ -120,12 +120,8 @@ after_script:
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'systemctl -l --no-pager status'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'journalctl -xe --no-pager | tail -5000'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'grep SECCOMP /var/log/audit/audit.log'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'file /etc/ssl/`hostname`.crt'"
   - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'curl -v -x http://localhost:3128 --cacert /etc/ssl/*.crt https://www.google.com'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'ln -s /etc/ssl/default-https-*.crt /etc/ssl/proxy.crt'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'curl -v -x http://localhost:3128 --cacert /etc/ssl/proxy.crt https://www.google.com'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'curl -v -x http://localhost:3128 --cacert /etc/ssl/`hostname`.crt https://www.google.com'"
-  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'curl -vk -x http://localhost:3128 --cacert /etc/ssl/`hostname`.crt https://expired.badssl.com/'"
+  - sudo -E su $USER -c "env PATH=$PATH kitchen exec ${suite}-${distribution}-${version//./} -c 'curl -vk -x http://localhost:3128 --cacert /etc/ssl/*.crt https://expired.badssl.com/'"
   - sudo grep SECCOMP /var/log/audit/audit.log
   # Clean up
   - sudo -E su $USER -c "env PATH=$PATH kitchen destroy ${suite}-${distribution}-${version//./}"
