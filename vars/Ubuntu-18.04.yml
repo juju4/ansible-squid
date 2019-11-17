@@ -41,6 +41,7 @@ squidbuild_pkgs:
   - libdbi-perl
   - libecap3
   - libecap3-dev
+  - debian-keyring
 squidhttps_pkgs:
   - squid-langpack
 

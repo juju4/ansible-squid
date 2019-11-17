@@ -41,6 +41,7 @@
       - https://raw.githubusercontent.com/diladele/squid-ubuntu/master/src/ubuntu18/scripts.squid4/rules.patch
       - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_PKG }}.dsc"
       - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_VER }}.orig.tar.gz"
+      - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_VER }}.orig.tar.gz.asc"
       - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_PKG }}.debian.tar.xz"
     register: dl_result
     until: dl_result is success
