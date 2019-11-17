@@ -43,8 +43,8 @@ describe command("curl -v -x http://localhost:#{proxy_port} --cacert /etc/ssl/ce
   its(:stderr) { should match /CONNECT www.google.com:443 HTTP\/1.1/ }
   its(:stderr) { should match /HTTP\/1.1 200 Connection established/ }
   its(:stderr) { should match /CONNECT phase completed!/ }
-  its(:stderr) { should match /HTTP\/1.1 200 OK/ }
-  its(:stderr) { should match /GET \/ HTTP\/1.1/ }
+  its(:stderr) { should match /HTTP\/.* 200/ }
+  its(:stderr) { should match /GET \/ HTTP\/.*/ }
   its(:stderr) { should_not match /error setting certificate verify locations:/ }
   its(:stderr) { should match /successfully set certificate verify locations:/ }
   its(:exit_status) { should eq 0 }
