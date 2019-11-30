@@ -9,6 +9,6 @@ umask 022
 curl -sS -L --compressed "http://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&showintro=0&mimetype=plaintext" > {{ squid_confdir }}/ad_block.txt 
 
 ## refresh squid
-[ X`pgrep squid` != X ] && {{ squid_svc }} -k reconfigure
+[ X`pgrep -c squid` != X0 ] && {{ squid_svc }} -k reconfigure
 true
 
