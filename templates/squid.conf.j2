@@ -148,7 +148,7 @@ http_port 3128
 # https://wiki.squid-cache.org/KnowledgeBase/HostHeaderForgery
 http_port 3127 intercept
 {# Only redhat with openssl support, latest debian/ubuntu with gnutls but missing cert generators #}
-{% if ansible_os_family == "RedHat" %}
+{% if ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8 %}
 # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
 http_port 3129 ssl-bump \
   cert={{ ssl_dir }}/{{ ansible_fqdn }}.crt \
@@ -170,7 +170,7 @@ sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+EC
 sslproxy_cert_error allow all
 sslproxy_flags DONT_VERIFY_PEER
 
-{% elif ansible_distribution == "Ubuntu" and squid_https %}
+{% elif (ansible_distribution == "Ubuntu" and squid_https) or (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8) %}
 #
 # squid-4 only
 #
@@ -329,10 +329,7 @@ refresh_all_ims on
 # http://squid-web-proxy-cache.1019090.n4.nabble.com/ACL-is-used-in-context-without-an-HTTP-response-Assuming-mismatch-td4677540.html
 #access_log none excludetrace
 
-{% if ansible_distribution == 'Ubuntu' and squid_https %}
-#
-# squid 4
-#
+{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8) %}
 access_log stdio:/var/log/squid/access.log squid
 ## Customize logging
 ## http://www.squid-cache.org/Doc/config/logformat/

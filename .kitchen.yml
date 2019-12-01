@@ -25,6 +25,7 @@ platforms:
 #  - name: ubuntu-14.04
 #  - name: ubuntu-12.04
   - name: ubuntu-18.10
+  - name: centos-8
   - name: centos-7
 #  - name: centos-6
 ## Ansible 2.2+/cryptography: https://github.com/ansible/ansible/issues/276
