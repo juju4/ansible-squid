@@ -166,6 +166,10 @@ sslproxy_options NO_SSLv2,NO_SSLv3,SINGLE_DH_USE
 
 sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS
 
+# troubleshooting
+sslproxy_cert_error allow all
+sslproxy_flags DONT_VERIFY_PEER
+
 {% elif ansible_distribution == "Ubuntu" and squid_https %}
 #
 # squid-4 only
@@ -173,7 +177,7 @@ sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+EC
 sslcrtd_program /usr/lib/squid/security_file_certgen -s /var/lib/squid/ssl_db -M 4MB
 #tls_outgoing_options cafile=/usr/local/openssl/cabundle.file
 
-tls_outgoing_options options=NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
+tls_outgoing_options options=NO_SSLv3
 
 {% endif %}
 
@@ -198,10 +202,6 @@ ssl_bump bump all
 # ssl_bump peek DiscoverSNIHost
 # ssl_bump splice NoSSLIntercept
 # ssl_bump bump all
-
-# troubleshooting
-sslproxy_cert_error allow all
-sslproxy_flags DONT_VERIFY_PEER
 
 # http://www.squid-cache.org/Doc/config/https_port/
 # https://wiki.squid-cache.org/Features/HTTPS
