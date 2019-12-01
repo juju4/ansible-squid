@@ -35,10 +35,3 @@ describe command("curl -v -x http://localhost:#{proxy_port} http://www.badboys.c
   its(:stdout) { should match /<title>DansGuardian - Access Denied<\/title>/ }
   its(:exit_status) { should eq 0 }
 end
-
-describe command("curl -v -x http://localhost:#{proxy_port} http://www.eicar.org/download/eicar.com.txt"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
-  its(:stdout) { should match /<title>DansGuardian - Access Denied<\/title>/ }
-  its(:stdout) { should match /<b>Virus or bad content detected. Eicar-Test-Signature<\/b>/ }
-  its(:exit_status) { should eq 0 }
-end
-
