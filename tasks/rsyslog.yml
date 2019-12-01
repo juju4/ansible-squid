@@ -19,6 +19,7 @@
     dest: "{{ squid_syslog_target | dirname }}"
     state: directory
     mode: '0755'
+    owner: "{{ squid_user }}"
 
 - name: setup rsyslog to send squid logs to a specific target
   template:
