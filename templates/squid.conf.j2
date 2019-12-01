@@ -229,7 +229,11 @@ refresh_pattern .               0       20%     4320
 
 # ANONYMOUS/Privacy PROXY
 # (but Via off will generate Warning at each start...)
+{% if squid_via_disable %}
 via off
+{% else %}
+via on
+{% endif %}
 # http://www.squid-cache.org/Doc/config/forwarded_for/
 forwarded_for delete
 request_header_access Allow allow all

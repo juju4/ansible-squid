@@ -5,6 +5,8 @@ squidconf_template: squid.conf.j2
 
 # Do you want to keep query strings? have privacy consequence.
 squid_log_querystrings: true
+# Can support privacy/anonymity but goes against RFC 7230, 5.7.1
+squid_via_disable: false
 
 squid_syslog_target: /var/log/squid/squid.log
 
