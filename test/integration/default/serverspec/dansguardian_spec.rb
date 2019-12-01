@@ -37,6 +37,5 @@ describe command("curl -v -x http://localhost:#{proxy_port} http://www.badboys.c
 end
 
 describe file('/var/log/dansguardian/access.log'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
-  its(:content) { should match /http:\/\/www.google.com \*SCANNED\*/ }
   its(:content) { should match /http:\/\/www.badboys.com \*DENIED\* Banned site:/ }
 end

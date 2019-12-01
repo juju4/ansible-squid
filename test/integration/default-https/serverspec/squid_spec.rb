@@ -31,8 +31,9 @@ describe command("curl -v -x http://localhost:#{proxy_port} http://www.cnn.com")
   its(:stderr) { should match /HTTP\/1.1 301 Moved Permanently/ }
   its(:exit_status) { should eq 0 }
 end
+# block is at dansguardian level (port 8080)
 describe command("curl -v -x http://localhost:#{proxy_port} http://www.badboys.com"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
-  its(:stderr) { should match /301 Moved Permanently/ }
+  its(:stderr) { should match /HTTP\/1.1 200 OK/ }
   its(:exit_status) { should eq 0 }
 end
 
