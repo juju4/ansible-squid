@@ -34,6 +34,9 @@ env:
 #  - distribution: ubuntu
 #    version: 18.04
 #    suite: default-splash
+  - distribution: ubuntu
+    version: 18.04
+    suite: default-clamd
 
 before_install:
   - env
