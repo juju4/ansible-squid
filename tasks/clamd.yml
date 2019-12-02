@@ -31,12 +31,17 @@
 - name: check if existing signatures db
   stat: path=/var/lib/clamav/main.cvd
   register: db
+- name: check if existing daily db
+  stat: path=/var/lib/clamav/daily.cvd
+  register: db2
 - block:
     - name: stop freshclam service during update
       service: name=clamav-freshclam state=stopped
     - name: ensure signatures are present before starting clamav
-      command: "freshclam creates=/var/lib/clamav/main.cvd"
-  when: not db.stat.exists
+      command: "freshclam"
+      args:
+        creates: /var/lib/clamav/daily.cvd
+  when: not db.stat.exists or not db2.stat.exists
 
 # https://bugs.launchpad.net/ubuntu/+source/clamav/+bug/1784193
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884707
