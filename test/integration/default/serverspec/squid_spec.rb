@@ -41,3 +41,10 @@ describe command("curl -v -x http://localhost:#{proxy_port} http://www.eicar.org
   its(:stdout) { should include "EICAR-STANDARD-ANTIVIRUS-TEST-FILE!" }
   its(:exit_status) { should eq 0 }
 end
+
+describe file('/var/log/squid/cache.log') do
+  its(:content) { should match /Starting Squid Cache version / }
+  its(:content) { should match /Accepting HTTP Socket connections at/ }
+  its(:content) { should match /Completed Validation Procedure/ }
+  its(:content) { should_not match /WARNING/ }
+end
