@@ -333,7 +333,7 @@ refresh_all_ims on
 # http://squid-web-proxy-cache.1019090.n4.nabble.com/ACL-is-used-in-context-without-an-HTTP-response-Assuming-mismatch-td4677540.html
 #access_log none excludetrace
 
-{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8) %}
+{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
 access_log stdio:/var/log/squid/access.log squid
 ## Customize logging
 ## http://www.squid-cache.org/Doc/config/logformat/
