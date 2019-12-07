@@ -40,6 +40,5 @@ describe file('/var/log/clamav/freshclam.log'), :if => os[:family] == 'ubuntu' |
 end
 describe file('/var/log/clamav/clamav.log'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   its(:content) { should match /LOCAL: Unix socket file \/tmp\/clamd.ctl/ }
-  its(:content) { should match /Eicar-Test-Signature/ }
   its(:content) { should_not match /ERROR:/ }
 end
