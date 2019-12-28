@@ -8,7 +8,8 @@ squid_log_querystrings: true
 # Can support privacy/anonymity but goes against RFC 7230, 5.7.1
 squid_via_disable: false
 
-squid_syslog_target: /var/log/squid/squid.log
+# Don't mix /var/log/squid (logs directly written by squid as proxy user) and rsyslog logs (written by rsyslog as root/syslog user)
+squid_syslog_target: /var/log/squid.log
 
 squid_cache_admin_email: squidadmin@localhost.local
 squid_customlog_path: /var/log/squid/access_custom.log
