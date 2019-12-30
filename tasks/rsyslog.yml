@@ -20,6 +20,9 @@
     state: directory
     mode: '0755'
     owner: "{{ squid_user }}"
+  when: >
+    "'/var/log/' in squid_syslog_target" and
+    squid_syslog_target|dirname != '/var/log'
 
 - name: setup rsyslog to send squid logs to a specific target
   template:
