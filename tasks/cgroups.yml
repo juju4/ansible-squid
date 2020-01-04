@@ -7,7 +7,7 @@
       MemoryLimit={{ squid_cgroups_memorylimit | default('4G') }}
       CPUShares={{ squid_cgroups_cpushares | default('1024') }}
   args:
-    creates: {{ squid_systemd_cgroups_test }}
+    creates: "{{ squid_systemd_cgroups_test }}"
   notify:
     - reload systemd
     - restart squid
