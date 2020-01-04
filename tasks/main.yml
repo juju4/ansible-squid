@@ -26,7 +26,7 @@
     owner: root
     group: root
     mode: '0644'
-#    validate: squid -k parse -f %s
+    validate: squid -k parse -f %s
     backup: yes
   notify: restart squid
 
@@ -65,7 +65,10 @@
   when: squid_splash_enable|bool
 
 - name: enable and start squid service
-  service: name="{{ squid_svc }}" state=started enabled=yes
+  service:
+    name: "{{ squid_svc }}"
+    state: started
+    enabled: yes
 
 - include: rsyslog.yml
 
@@ -74,6 +77,9 @@
 
 - include: systemd.yml
   when: squid_systemd_restriction_enable|bool
+
+- include: calamaris.yml
+  when: squid_calamaris_enable|bool
 
 - include: testing.yml
   when: squid_testing|bool
