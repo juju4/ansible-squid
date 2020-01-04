@@ -23,9 +23,9 @@
   delegate_to: localhost
 
 - block:
-  - name: Squid openssl | install build tools
+  - name: Squid openssl | install build and report tools
     apt:
-      pkg: "{{ squidbuild_pkgs + squidhttps_pkgs }}"
+      pkg: "{{ squidbuild_pkgs + squidhttps_pkgs + squid_report_pkgs | default(omit) }}"
       state: present
       update_cache: yes
       cache_valid_time: 3600
