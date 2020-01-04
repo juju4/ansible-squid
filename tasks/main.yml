@@ -79,7 +79,7 @@
   when: squid_systemd_restriction_enable|bool
 
 - include: calamaris.yml
-  when: squid_calamaris_enable|bool
+  when: squid_calamaris_enable|bool and ansible_os_family == "Debian"
 
 - include: testing.yml
   when: squid_testing|bool
