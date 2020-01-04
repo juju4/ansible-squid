@@ -100,12 +100,6 @@
     - "squidclient_{{ SQUID_PKG }}_amd64.deb"
   when: squiddeb.stat.exists
 
-# if install with dpkg, not executing /etc/apt/apt.conf.d/99security and /etc/init.d is immutable
-#       OK with apt install
-- include: "immutable.yml target_dir=/etc/init.d state=pre"
-- include: "immutable.yml target_dir=/etc/init.d/squid state=pre"
-- include: "immutable.yml target_dir=/lib/systemd/system state=pre"
-- include: "immutable.yml target_dir=/lib/systemd/system/squid.service state=pre"
 - name: Squid openssl | install locally build package
   apt:
     deb: "{{ item }}"
@@ -113,8 +107,25 @@
     - "{{ squidbuild_dir }}/squid-common_{{ SQUID_PKG }}_all.deb"
     - "{{ squidbuild_dir }}/squid_{{ SQUID_PKG }}_amd64.deb"
     - "{{ squidbuild_dir }}/squidclient_{{ SQUID_PKG }}_amd64.deb"
-- include: "immutable.yml target_dir=/etc/init.d state=post"
-- include: "immutable.yml target_dir=/lib/systemd/system state=post"
+  register: squiddeb
+  ignore_errors: true
+- block:
+# if install with dpkg, not executing /etc/apt/apt.conf.d/99security and /etc/init.d is immutable
+#       OK with apt install
+    - include: "immutable.yml target_dir=/etc/init.d/ state=pre"
+    - include: "immutable.yml target_dir=/etc/init.d/squid state=pre"
+    - include: "immutable.yml target_dir=/lib/systemd/system state=pre"
+    - include: "immutable.yml target_dir=/lib/systemd/system/squid.service state=pre"
+    - name: Squid openssl | install locally build package (immutable)
+      apt:
+        deb: "{{ item }}"
+      with_items:
+        - "{{ squidbuild_dir }}/squid-common_{{ SQUID_PKG }}_all.deb"
+        - "{{ squidbuild_dir }}/squid_{{ SQUID_PKG }}_amd64.deb"
+        - "{{ squidbuild_dir }}/squidclient_{{ SQUID_PKG }}_amd64.deb"
+    - include: "immutable.yml target_dir=/etc/init.d state=post"
+    - include: "immutable.yml target_dir=/lib/systemd/system state=post"
+  when: squiddeb is failed
 
 - name: Squid openssl | prevent packages from being upgraded automatically
   dpkg_selections:
