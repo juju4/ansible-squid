@@ -6,7 +6,7 @@ export PATH=/usr/sbin:/usr/bin:/sbin:/bin
 umask 022
 
 ## get new ad server list
-curl -sS -L --compressed "http://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&showintro=0&mimetype=plaintext" > {{ squid_confdir }}/ad_block.txt 
+curl -sS -L --compressed "http://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&showintro=0&mimetype=plaintext" > /var/spool/squid/ad_block.txt 
 
 ## refresh squid
 [ X`pgrep -c squid` != X0 ] && {{ squid_svc }} -k reconfigure

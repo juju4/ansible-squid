@@ -29,5 +29,5 @@
 - name: ensure ads servers list exists
   command: "sh -x {{ scriptsdir }}/ad_servers_newlist.sh"
   args:
-    creates: "{{ squid_confdir }}/ad_block.txt"
+    creates: "/var/spool/squid/ad_block.txt"
   notify: restart squid

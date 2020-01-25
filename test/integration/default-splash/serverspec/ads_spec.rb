@@ -10,11 +10,10 @@ if os[:family] == 'redhat'
   proxy_port = 3128
 end
 
-describe file('/etc/squid/ad_block.txt') do
+describe file('/var/spool/squid/ad_block.txt') do
   its(:content) { should match /adblockanalytics.com/ }
 end
 
 describe file('/etc/squid/squid.conf') do
-  its(:content) { should match /acl ads dstdom_regex "\/etc\/squid\/ad_block.txt"/ }
+  its(:content) { should match /acl ads dstdom_regex "\/var\/spool\/squid\/ad_block.txt"/ }
 end
-

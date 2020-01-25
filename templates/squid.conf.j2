@@ -77,7 +77,7 @@ http_access deny manager
 
 {% if squid_filter_ads is defined and squid_filter_ads %}
 ## disable ads ( http://pgl.yoyo.org/adservers/ )
-acl ads dstdom_regex "{{ squid_confdir }}/ad_block.txt"
+acl ads dstdom_regex "/var/spool/squid/ad_block.txt"
 http_access deny ads
 #deny_info TCP_RESET ads
 
