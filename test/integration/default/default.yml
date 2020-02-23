@@ -8,5 +8,9 @@
         squid_report_pkgs:
           - calamaris
       when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
+    - set_fact:
+        squid_urlfiltering_enable: true
+        squid_urlfiltering_tool: e2guardian
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int > 18
   roles:
     - juju4.squid

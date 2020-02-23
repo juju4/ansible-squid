@@ -35,6 +35,7 @@ squid_noproxy_ips_template: no-proxy-ips.conf
 
 ## only packaged in ubuntu xenial, debian jessie, epel: squidguard, dansguardian
 ##	centos6: no dansguardian, only squidGuard
+##      19.04+: e2guardian
 ## https://blog.rootshell.be/2011/01/18/url-filtering-with-squid/
 ## http://dsi.ut-capitole.fr/blacklists/
 squid_urlfiltering_enable: true

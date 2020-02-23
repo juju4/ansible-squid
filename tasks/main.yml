@@ -55,6 +55,9 @@
 - include: dansguardian.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian'
 
+- include: e2guardian.yml
+  when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'e2guardian'
+
 - include: squidguard.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard'
 

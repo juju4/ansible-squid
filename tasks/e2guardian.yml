@@ -1,0 +1,8 @@
+---
+
+- name: install e2guardian package
+  package:
+    name: e2guardian
+    state: present
+  register: pkg_result
+  until: pkg_result is success
