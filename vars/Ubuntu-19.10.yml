@@ -22,3 +22,5 @@ squid_testing_pkgs:
   - curl
   - db-util
   - netcat
+
+get_rsyslog_version: 'rsyslogd -v | awk \'/rsyslogd/ { print $2 }\''
