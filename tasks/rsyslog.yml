@@ -24,6 +24,7 @@
     "'/var/log/' in squid_syslog_target" and
     squid_syslog_target|dirname != '/var/log'
 
+- debug: var=rsyslog_v.stdout
 - name: setup rsyslog to send squid logs to a specific target
   template:
     src: rsyslog-squid.conf.j2
