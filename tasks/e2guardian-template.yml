@@ -1,0 +1,8 @@
+---
+
+- name: Update Dansguardian template
+  replace:
+    dest: /etc/e2guardian/languages/ukenglish/template.html
+    regexp: "{{ item.re }}"
+    replace: "{{ item.rep }}"
+  with_items: "{{ squid_e2guardian_template }}"

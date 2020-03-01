@@ -35,7 +35,6 @@ squid_noproxy_ips_template: no-proxy-ips.conf
 
 ## only packaged in ubuntu xenial, debian jessie, epel: squidguard, dansguardian
 ##	centos6: no dansguardian, only squidGuard
-##      19.04+: e2guardian
 ## https://blog.rootshell.be/2011/01/18/url-filtering-with-squid/
 ## http://dsi.ut-capitole.fr/blacklists/
 squid_urlfiltering_enable: true
@@ -48,6 +47,17 @@ squid_dansguardian_language: 'ukenglish'
 squid_dansguardian_loglevel: 3
 squid_dansguardian_clamd: false
 squid_dansguardian_template:
+  - { re: 'YOUR ORG NAME', rep: 'Company Example.com' }
+##      19.04+: e2guardian
+#squid_urlfiltering_tool: e2guardian
+squid_e2guardian_filterip: 127.0.0.1
+squid_e2guardian_deniedaddress: 'http://localhost/cgi-bin/e2guardian.pl'
+squid_e2guardian_proxyip: 127.0.0.1
+squid_e2guardian_language: 'ukenglish'
+## 0 = none  1 = just denied  2 = all text based  3 = all requests
+squid_e2guardian_loglevel: 3
+squid_e2guardian_clamd: false
+squid_e2guardian_template:
   - { re: 'YOUR ORG NAME', rep: 'Company Example.com' }
 
 # http://www.squid-cache.org/Misc/log-analysis.html
