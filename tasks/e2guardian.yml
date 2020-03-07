@@ -46,6 +46,12 @@
     mode: '0644'
   when: not e2l.stat.exists
 
+- name: Ensure log file has right permissions
+  file:
+    path: /var/log/e2guardian/access.log
+    owner: "{{ squid_user }}"
+    mode: '0644'
+
 - name: Set domainsnobypass
   template:
     src: "{{ squid_e2guardian_nobypass_template | default('e2guardian-domainsnobypass.j2') }}"
