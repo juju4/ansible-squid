@@ -22,4 +22,6 @@
       with_items:
         - adblockanalytics.com
         - badboys.com
+      notify:
+        - e2guardian reload
       when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int > 18

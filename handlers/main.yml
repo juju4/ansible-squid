@@ -11,6 +11,9 @@
 - name: restart e2guardian
   service: name=e2guardian state=restarted
 
+- name: e2guardian reload
+  command: e2guardian -r
+
 - name: restart clamd
   service: name=clamav-daemon state=restarted
 
