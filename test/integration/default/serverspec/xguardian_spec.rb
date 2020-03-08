@@ -8,7 +8,7 @@ if (os[:family] == 'ubuntu' && os[:release] == '19.10')
   set denied_banner = 'E2Guardian - Access Denied'
 else
   set guardian_pkg = 'dansguardian'
-  set denied_banner = '<p><b>Access Denied.</b></p>'
+  set denied_banner = 'DansGuardian - Access Denied'
 end
 proxy_port = 8080
 
@@ -45,6 +45,6 @@ if (os[:family] == 'ubuntu' || os[:family] == 'debian')
   end
 
   describe file("/var/log/#{guardian_pkg}/access.log") do
-    its(:content) { should match /http:\/\/www.badboys.com *\*DENIED\*/ }
+    its(:content) { should match /http:\/\/www.badboys.com.*\*DENIED\*/ }
   end
 end

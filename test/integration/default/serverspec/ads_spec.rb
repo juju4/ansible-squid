@@ -7,7 +7,7 @@ if (os[:family] == 'ubuntu' && os[:release] == '19.10')
   set denied_banner = 'E2Guardian - Access Denied'
   proxy_port = 8080
 else
-  set denied_banner = 'DansGuardian - Access Denied'
+  set denied_banner = '<p><b>Access Denied.<\/b><\/p>'
   proxy_port = 8080
 end
 if os[:family] == 'redhat'
