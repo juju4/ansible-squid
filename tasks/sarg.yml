@@ -1,0 +1,8 @@
+---
+
+- name: sarg | Disable resolve_ip
+  replace:
+    dest: /etc/sarg/sarg.conf
+    regexp: '^resolve_ip.*'
+    replace: 'resolve_ip no'
+    backup: "{{ squid_backup | default(false) }}"

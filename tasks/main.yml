@@ -84,6 +84,9 @@
 - include: calamaris.yml
   when: squid_calamaris_enable|bool and ansible_os_family == "Debian"
 
+- include: sarg.yml
+  when: squid_sarg_enable|bool and ansible_os_family == "Debian"
+
 - include: testing.yml
   when: squid_testing|bool
 
