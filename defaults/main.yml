@@ -28,7 +28,9 @@ squid_testing: false
 
 # require distribution where squid compiled with ssl (ok centos, nok ubuntu)
 squid_https: false
-squid_certinfo: '/C=US/ST=CA/L=San Francisco/O=Ansible for squid'
+squid_cert_orgname: 'Ansible for squid'
+#squid_cert_san:
+#squid_cert_email:
 squid_certduration: 1095
 squid_noproxy_domains_template: no-proxy-domains.conf
 squid_noproxy_ips_template: no-proxy-ips.conf

@@ -10,26 +10,44 @@
     cache_valid_time: 3600
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
+- name: Check if OpenSSL private key exists
+  stat:
+    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+  register: private_key
+
+- name: Generate an OpenSSL private key
+  openssl_privatekey:
+    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+  when: not private_key.stat.exists
+
+- name: Generate an OpenSSL Certificate Signing Request
+  openssl_csr:
+    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
+    privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    organization_name: "{{ squid_cert_orgname | default('Ansible') }}"
+    common_name: "{{ certificate_cn }}"
+    subject_alt_name: "{{ squid_cert_san | default(omit) }}"
+    email_address: "{{ squid_cert_email | default(omit) }}"
+
 - name: Generate SSL self-signed certificate
-  command: >
-    openssl req -x509 -nodes -sha256 -days {{ squid_certduration }} -newkey rsa:2048
-        -subj "{{ squid_certinfo }}/CN={{ certificate_cn }}"
-        -keyout {{ ssl_privatedir }}/{{ ansible_fqdn }}.key
-        -out {{ ssl_dir }}/{{ ansible_fqdn }}.crt
-  args:
-    creates: "{{ ssl_dir }}/{{ ansible_fqdn }}.crt"
+  openssl_certificate:
+    path: "{{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt"
+    privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    csr_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
+    ownca_not_after: "{{ squid_certduration | default('+365d') }}"
+    provider: selfsigned
 
 - name: Validate private key file permissions
   file:
-    path: "{{ ssl_privatedir }}/{{ ansible_fqdn }}.key"
+    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
     owner: "root"
     group: "{{ ssl_user }}"
     mode: '0440'
 
 - name: Ensure CA file available in der format
   command: >
-    openssl x509 -in {{ ssl_dir }}/{{ ansible_fqdn }}.crt
+    openssl x509 -in {{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt
         -outform DER
-        -out {{ ssl_dir }}/{{ ansible_fqdn }}.der
+        -out {{ ssl_dir }}/squid-{{ ansible_fqdn }}.der
   args:
-    creates: "{{ ssl_dir }}/{{ ansible_fqdn }}.der"
+    creates: "{{ ssl_dir }}/squid-{{ ansible_fqdn }}.der"
