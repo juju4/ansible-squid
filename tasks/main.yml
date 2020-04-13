@@ -19,6 +19,9 @@
 - include_tasks: https.yml
   when: squid_https|bool
 
+- include: ads.yml
+  when: squid_filter_ads is defined and squid_filter_ads
+
 - name: update configuration
   template:
     src: "{{ squidconf_template }}"
@@ -60,9 +63,6 @@
 
 - include: squidguard.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard'
-
-- include: ads.yml
-  when: squid_filter_ads is defined and squid_filter_ads
 
 - include: splash.yml
   when: squid_splash_enable|bool
