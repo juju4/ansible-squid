@@ -152,8 +152,8 @@ http_port 3127 intercept
 {% if ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8 %}
 # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
 http_port 3129 ssl-bump \
-  cert={{ ssl_dir }}/{{ ansible_fqdn }}.crt \
-  key={{ ssl_privatedir }}/{{ ansible_fqdn }}.key \
+  cert={{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt \
+  key={{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key \
   generate-host-certificates=on dynamic_cert_mem_cache_size=4MB
 
 sslcrtd_program /usr/lib64/squid/ssl_crtd \
