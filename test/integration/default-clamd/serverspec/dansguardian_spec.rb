@@ -36,7 +36,7 @@ describe command("curl -v -x http://localhost:#{proxy_port} http://www.badboys.c
   its(:exit_status) { should eq 0 }
 end
 
-describe command("curl -v -x http://localhost:#{proxy_port} http://www.eicar.org/download/eicar.com.txt"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
+describe command("curl -v -x http://localhost:#{proxy_port} http://2016.eicar.org/86-0-Intended-use.html"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   its(:stdout) { should match /<title>DansGuardian - Access Denied<\/title>/ }
   its(:stdout) { should match /<b>Virus or bad content detected. Win.Test.EICAR_HDB-1<\/b>/ }
   its(:exit_status) { should eq 0 }
@@ -49,7 +49,7 @@ end
 describe file('/var/log/dansguardian/access.log'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   its(:content) { should match /http:\/\/www.google.com \*SCANNED\*/ }
   its(:content) { should match /http:\/\/www.badboys.com \*DENIED\* Banned site:/ }
-  its(:content) { should match /http:\/\/www.eicar.org\/download\/eicar.com.txt \*INFECTED\* \*DENIED\* Virus or bad content detected. Win.Test.EICAR_HDB-1/ }
+  its(:content) { should match /http:\/\/2016.eicar.org\/86-0-Intended-use.html \*INFECTED\* \*DENIED\* Virus or bad content detected. Win.Test.EICAR_HDB-1/ }
 end
 describe file('/var/log/clamav/clamav.log'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   its(:content) { should match /Win.Test.EICAR_HDB-1/ }
