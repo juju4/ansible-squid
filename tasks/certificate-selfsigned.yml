@@ -2,6 +2,16 @@
 
 - include_tasks: travis.yml
 
+- name: Ensure openssl is present
+  package:
+    name:
+      - openssl
+      - python3-pip
+      - python3-setuptools
+    state: present
+  register: pkg_result
+  until: pkg_result is success
+
 - name: apt | self-signed certificate packages dependencies
   apt:
     name: ssl-cert
@@ -9,6 +19,14 @@
     update_cache: yes
     cache_valid_time: 3600
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  register: pkg_result
+  until: pkg_result is success
+
+- name: Ensure python cryptography is present
+  pip:
+    name: cryptography
+    state: present
+    executable: pip3
 
 - name: Check if OpenSSL private key exists
   stat:
@@ -41,7 +59,7 @@
   file:
     path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
     owner: "root"
-    group: "{{ ssl_user }}"
+    group: "{% if ansible_os_family == 'Debian' %}ssl-cert{% else %}root{% endif %}"
     mode: '0440'
 
 - name: Ensure CA file available in der format
