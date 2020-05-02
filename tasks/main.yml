@@ -11,7 +11,12 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' and not squid_https
 
 - include: debian-https.yml
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' and squid_https
+  when: >
+    (
+      ansible_distribution == 'Debian' or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int == 18)
+    )
+    and squid_https
 
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
