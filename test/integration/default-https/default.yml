@@ -16,3 +16,14 @@
       when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int > 18
   roles:
     - juju4.squid
+  tasks:
+    - name: banned few websites for testing
+      lineinfile:
+        dest: /etc/e2guardian/lists/bannedsitelist
+        line: "{{ item }}"
+      with_items:
+        - adblockanalytics.com
+        - badboys.com
+      notify:
+        - e2guardian reload
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int > 18
