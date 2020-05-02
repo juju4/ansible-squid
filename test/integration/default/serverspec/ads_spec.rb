@@ -3,7 +3,7 @@ require 'serverspec'
 # Required by serverspec
 set :backend, :exec
 
-if (os[:family] == 'ubuntu' && os[:release] == '19.10')
+if (os[:family] == 'ubuntu' && (os[:release] == '19.10' or os[:release] == '20.04'))
   set denied_banner = 'E2Guardian - Access Denied'
   proxy_port = 8080
 else

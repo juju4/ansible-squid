@@ -3,7 +3,7 @@ require 'serverspec'
 # Required by serverspec
 set :backend, :exec
 
-if (os[:family] == 'ubuntu' && os[:release] == '19.10')
+if (os[:family] == 'ubuntu' && (os[:release] == '19.10' or os[:release] == '20.04'))
   set guardian_pkg = 'e2guardian'
   set denied_banner = 'E2Guardian - Access Denied'
 else
