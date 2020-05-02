@@ -10,13 +10,46 @@ squid_errors_template: /usr/share/squid/errors/
 squid_systemd_cgroups_test: /etc/systemd/system.control/squid.service.d/50-CPUQuota.conf
 
 ssl_user: ssl-cert
-ssl_dir: /etc/ssl
+ssl_dir: /etc/ssl/certs
 ssl_privatedir: /etc/ssl/private
 
 clamd_pkgs:
   - clamav-daemon
   - apparmor
   - apparmor-utils
+
+squidbuild_dir: /var/cache/build/squid
+squidbuild_pkgs:
+  - devscripts
+  - build-essential
+  - fakeroot
+  - debhelper
+  - dh-autoreconf
+  - dh-apparmor
+  - cdbs
+  - libcppunit-dev
+  - libsasl2-dev
+  - libxml2-dev
+  - libkrb5-dev
+  - libdb-dev
+  - libnetfilter-conntrack-dev
+  - libexpat1-dev
+  - libcap2-dev
+  - libldap2-dev
+  - libpam0g-dev
+  - libgnutls28-dev
+  - libssl-dev
+  - libdbi-perl
+  - libecap3
+  - libecap3-dev
+  - debian-keyring
+  - libsystemd-dev
+squidhttps_pkgs:
+  - squid-langpack
+
+# http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
+SQUID_VER: '4.11'
+SQUID_PKG: '4.11-2'
 
 squid_testing_pkgs:
   - curl
