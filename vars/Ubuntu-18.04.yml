@@ -43,6 +43,7 @@ squidbuild_pkgs:
   - libecap3
   - libecap3-dev
   - debian-keyring
+  - libsystemd-dev
 squidhttps_pkgs:
   - squid-langpack
 
