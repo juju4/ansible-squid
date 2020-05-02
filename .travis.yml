@@ -12,18 +12,18 @@ env:
     version: 7
     suite: default
   - distribution: ubuntu
-    version: 18.04
+    version: 20.04
     suite: default
   - distribution: ubuntu
-    version: "19.10"
+    version: 18.04
     suite: default
-#  - distribution: ubuntu
-#    version: 16.04
-#    suite: default
 #  - distribution: alpine
 #    version: 3.8
   - distribution: centos
     version: 7
+    suite: default-https
+  - distribution: ubuntu
+    version: 20.04
     suite: default-https
   - distribution: ubuntu
     version: 18.04
@@ -34,6 +34,9 @@ env:
 #  - distribution: ubuntu
 #    version: 18.04
 #    suite: default-splash
+  - distribution: ubuntu
+    version: 20.04
+    suite: default-clamd
   - distribution: ubuntu
     version: 18.04
     suite: default-clamd

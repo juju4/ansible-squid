@@ -1,0 +1,24 @@
+---
+
+squid_pkgs: "{{ [ 'squid' ] + squid_report_pkgs | default(omit) }}"
+
+squid_confdir: /etc/squid
+squid_svc: squid
+squid_spool: /var/spool/squid
+squid_user: proxy
+squid_errors_template: /usr/share/squid/errors/
+squid_systemd_cgroups_test: /etc/systemd/system.control/squid.service.d/50-CPUQuota.conf
+
+ssl_user: ssl-cert
+ssl_dir: /etc/ssl
+ssl_privatedir: /etc/ssl/private
+
+clamd_pkgs:
+  - clamav-daemon
+  - apparmor
+  - apparmor-utils
+
+squid_testing_pkgs:
+  - curl
+  - db-util
+  - netcat

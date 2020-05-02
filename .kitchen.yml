@@ -21,18 +21,10 @@ provisioner:
   ansible_connection: ssh
 
 platforms:
+  - name: ubuntu-20.04
   - name: ubuntu-18.04
-#  - name: ubuntu-16.04
-#  - name: ubuntu-14.04
-#  - name: ubuntu-12.04
-  - name: ubuntu-19.10
   - name: centos-8
   - name: centos-7
-#  - name: centos-6
-## Ansible 2.2+/cryptography: https://github.com/ansible/ansible/issues/276
-#    provisioner:
-## Desired version, only affects apt-get installs
-#      ansible_version: 2.1.2.0
 #  - name: alpine-3.4
 
 suites:
@@ -45,15 +37,18 @@ suites:
     includes:
       - centos-7
       - ubuntu-18.04
+      - ubuntu-20.04
   - name: default-splash
     run_list:
     attributes:
     includes:
       - centos-7
       - ubuntu-18.04
+      - ubuntu-20.04
   - name: default-clamd
     run_list:
     attributes:
     includes:
       - centos-7
       - ubuntu-18.04
+      - ubuntu-20.04
