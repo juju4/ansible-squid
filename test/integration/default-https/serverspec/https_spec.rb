@@ -18,8 +18,6 @@ describe command("curl -v -x http://localhost:#{proxy_port} https://www.google.c
   its(:stderr) { should match /Using HTTP2, server supports multi-use/ }
   its(:stderr) { should match /Connection state changed \(HTTP\/2 confirmed\)/ }
   its(:stderr) { should match /GET \/ HTTP\/2/ }
-  its(:stderr) { should match /\(IN\), TLS Unknown, Unknown \(23\):/ }
-  its(:stderr) { should match /\(OUT\), TLS Unknown, Unknown \(23\):/ }
   its(:exit_status) { should eq 0 }
 end
 
