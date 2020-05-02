@@ -35,9 +35,6 @@ env:
 #    version: 18.04
 #    suite: default-splash
   - distribution: ubuntu
-    version: 20.04
-    suite: default-clamd
-  - distribution: ubuntu
     version: 18.04
     suite: default-clamd
 
