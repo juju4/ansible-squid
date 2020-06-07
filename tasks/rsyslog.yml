@@ -8,20 +8,11 @@
   until: pkg_result is success
 
 - name: get rsyslog version
-  shell: "rsyslogd -v | awk -F'[ ,]' '/rsyslogd/ { print $2 }'"
+  shell: "rsyslogd -v | awk 'match($0, /rsyslogd\\s+([0-9.]+)/, a) { print a[1] }'"
   environment:
     PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
   changed_when: false
   register: rsyslog_v
-  when: ansible_distribution_major_version|int < 19
-
-- name: get rsyslog version
-  shell: "rsyslogd -v | awk '/rsyslogd/ { print $2 }'"
-  environment:
-    PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-  changed_when: false
-  register: rsyslog_v
-  when: ansible_distribution_major_version|int >= 19
 
 - name: Ensure base directory exists
   file:
