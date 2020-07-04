@@ -4,13 +4,21 @@
   vars:
     - squid_https: true
   pre_tasks:
-    - set_fact:
+    - name: RedHat8 | specific variables
+      set_fact:
+        squid_urlfiltering_enable: false
+        squid_urlfiltering_tool: squidguard
+        squid_report_pkgs: []
+      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '8'
+    - name: RedHat7 | specific variables
+      set_fact:
         squid_urlfiltering_enable: false
         squid_urlfiltering_tool: squidguard
         squid_report_pkgs:
           - calamaris
       when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
-    - set_fact:
+    - name: Ubuntu20.04+ | specific variables
+      set_fact:
         squid_urlfiltering_enable: true
         squid_urlfiltering_tool: e2guardian
       when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int > 18
