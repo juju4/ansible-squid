@@ -7,7 +7,6 @@ squid_svc: squid
 squid_spool: /var/spool/squid
 squid_user: proxy
 squid_errors_template: /usr/share/squid/errors/
-squid_systemd_cgroups_test: /etc/systemd/system.control/squid.service.d/50-CPUQuota.conf
 
 clamd_pkgs:
   - clamav-daemon

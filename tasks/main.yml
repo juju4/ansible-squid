@@ -83,9 +83,6 @@
 
 - include: rsyslog.yml
 
-- include: cgroups.yml
-  when: squid_cgroups_restriction_enable|bool
-
 - include: systemd.yml
   when: squid_systemd_restriction_enable|bool
 
