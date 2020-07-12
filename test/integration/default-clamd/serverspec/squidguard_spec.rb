@@ -28,7 +28,7 @@ describe command("curl -v -x http://localhost:#{proxy_port} http://www.cnn.com")
   its(:exit_status) { should eq 0 }
 end
 
-describe command("curl -x http://localhost:#{proxy_port} http://2016.eicar.org/86-0-Intended-use.html"), :if => os[:family] == 'redhat' && os[:release] == '6' do
+describe command("curl -x http://localhost:#{proxy_port} http://malware.wicar.org/data/eicar.com"), :if => os[:family] == 'redhat' && os[:release] == '6' do
   its(:stdout) { should match /<b>Virus or bad content detected. Eicar-Test-Signature<\/b>/ }
   its(:exit_status) { should eq 0 }
 end
