@@ -37,7 +37,7 @@ describe command("curl -v -x http://localhost:#{proxy_port} http://www.badboys.c
   its(:exit_status) { should eq 0 }
 end
 
-describe command("curl -v -x http://localhost:#{proxy_port} http://2016.eicar.org/86-0-Intended-use.html"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
+describe command("curl -v -x http://localhost:#{proxy_port} http://rexswain.com/eicar.com"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   its(:stdout) { should include "EICAR-STANDARD-ANTIVIRUS-TEST-FILE!" }
   its(:exit_status) { should eq 0 }
 end
