@@ -17,3 +17,6 @@ squid_testing_pkgs:
   - curl
   - db-util
   - netcat
+
+openssl_pkgs: ['openssl', 'python-pip', 'python-setuptools', 'python-openssl' ]
+squid_cryptography: pip

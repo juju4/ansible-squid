@@ -21,3 +21,10 @@ squid_testing_pkgs:
   - curl
   - libdb-utils
   - nmap-ncat
+
+python_pip: python3-pip
+openssl_pkgs:
+  - openssl
+  - python3-pip
+  - python3-setuptools
+  - python3-pyOpenSSL
