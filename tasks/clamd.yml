@@ -32,7 +32,7 @@
   stat: path=/var/lib/clamav/main.cvd
   register: db
 - name: check if existing daily db
-  stat: path=/var/lib/clamav/daily.cvd
+  stat: path=/var/lib/clamav/daily.cld
   register: db2
 - block:
     - name: stop freshclam service during update
@@ -40,7 +40,7 @@
     - name: ensure signatures are present before starting clamav
       command: "freshclam"
       args:
-        creates: /var/lib/clamav/daily.cvd
+        creates: /var/lib/clamav/daily.cld
   when: not db.stat.exists or not db2.stat.exists
 
 # https://bugs.launchpad.net/ubuntu/+source/clamav/+bug/1784193
