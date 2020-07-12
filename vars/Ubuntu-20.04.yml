@@ -47,8 +47,8 @@ squidhttps_pkgs:
   - squid-langpack
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
-SQUID_VER: '4.11'
-SQUID_PKG: '4.11-2'
+SQUID_VER: '4.12'
+SQUID_PKG: '4.12-1'
 
 squid_testing_pkgs:
   - curl
