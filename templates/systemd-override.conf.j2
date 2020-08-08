@@ -14,6 +14,7 @@ RestrictNamespaces=~user mnt
 LockPersonality=true
 {% endif %}
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+{% if not (ansible_virtualization_type is defined and
           ansible_virtualization_type == "docker"
         )
 %}
