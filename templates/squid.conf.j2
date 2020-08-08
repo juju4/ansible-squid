@@ -352,31 +352,31 @@ access_log {{ squid_customlog_path }} customlogformat
 {% if squid_jsonlog %}
 # https://gist.github.com/ryanbreed/57464e9db1ca162d92aa221696a84a76
 # https://wiki.squid-cache.org/Features/LogFormat
-logformat jsonExtended { \
-  "sn": %sn,  "timestamp": %ts.%03tu, \
-  "time": "%{{ '{%' }}Y-%m-%dT%H:%M:%S%z}tg", \
-  "time_local": "%tl", \
-  "conn": {"src_ip":"%>a","dst_ip":"%<a","dst_fqdn":"%<A","dst_port": "%<p" }, \
-  "req": {\
-    "bytes": %>st, "headerBytes": %>sh ,\
+logformat jsonExtended {\
+  "sn":%sn,"timestamp":%ts.%03tu,\
+  "time":"%{{ '{%' }}Y-%m-%dT%H:%M:%S%z}tg",\
+  "time_local":"%tl",\
+  "conn":{"src_ip":"%>a","dst_ip":"%<a","dst_fqdn":"%<A","dst_port":"%<p"},\
+  "req":{\
+    "bytes":%>st,"headerBytes":%>sh,\
     "method":"%rm","url":"%>ru","scheme":"%>rs","domain":"%>rd","path":"%>rp",\
-    "ua":"%{User-Agent}>h","referer":"%{Referer}>h","cookie":"%{Cookie}>h", \
+    "ua":"%{User-Agent}>h","referer":"%{Referer}>h","cookie":"%{Cookie}>h",\
     "accLang":"%{Accept-Language}>h","accEnc":"%{Accept-Encoding}>h",\
-    "host":"%{Host}>h", "origin":"%{Origin}>h","accept":"%{Accept}>h",\
+    "host":"%{Host}>h","origin":"%{Origin}>h","accept":"%{Accept}>h",\
     "xReqWith":"%{X-Requested-With}>h"\
-  }, \
-  "resp": {\
-    "bytes": %<st, "headerBytes": %<sh ,\
-    "code": "%<Hs", "mime-type":"%mt", \
-    "transferEncoding":"%{Transfer-Encoding}<h", \
-    "setCookie":"%{Set-Cookie}<h", \
-    "contentType":"%{Content-Type}<h", \
-    "contentLength":"%{Content-Length}<h", \
-    "contentEncoding":"%{Content-Encoding}<h", \
-    "server":"%{Server}<h" \
-  }, \
-  "bytes" : { "body": "%<bs", "total": %st }{% if squid_https %}, \
-  "ssl": {"subject":"%ssl::>cert_subject","issuer":"%ssl::>cert_issuer","sni":"%ssl::>sni"}\
+  },\
+  "resp":{\
+    "bytes":%<st,"headerBytes":%<sh,\
+    "code":"%<Hs","mime-type":"%mt",\
+    "transferEncoding":"%{Transfer-Encoding}<h",\
+    "setCookie":"%{Set-Cookie}<h",\
+    "contentType":"%{Content-Type}<h",\
+    "contentLength":"%{Content-Length}<h",\
+    "contentEncoding":"%{Content-Encoding}<h",\
+    "server":"%{Server}<h"\
+  },\
+  "bytes":{"body":"%<bs","total":%st}{% if squid_https %},\
+  "ssl":{"subject":"%ssl::>cert_subject","issuer":"%ssl::>cert_issuer","sni":"%ssl::>sni"}\
 {% else %} \
 {% endif %}
  \
