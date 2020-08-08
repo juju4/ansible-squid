@@ -354,6 +354,8 @@ access_log {{ squid_customlog_path }} customlogformat
 # https://wiki.squid-cache.org/Features/LogFormat
 logformat jsonExtended { \
   "sn": %sn,  "timestamp": %ts.%03tu, \
+  "time": "%Y-%m-%dT%H:%M:%S%z", \
+  "time_local": "%tl", \
   "conn": {"src_ip":"%>a","dst_ip":"%<a","dst_fqdn":"%<A","dst_port": "%<p" }, \
   "req": {\
     "bytes": %>st, "headerBytes": %>sh ,\
