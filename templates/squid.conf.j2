@@ -373,10 +373,17 @@ logformat jsonExtended { \
     "contentEncoding":"%{Content-Encoding}<h", \
     "server":"%{Server}<h" \
   }, \
-  "bytes" : { "body": "%<bs", "total": %st }, \
+  "bytes" : { "body": "%<bs", "total": %st }{% if squid_https %}, \
   "ssl": {"subject":"%ssl::>cert_subject","issuer":"%ssl::>cert_issuer","sni":"%ssl::>sni"}\
+{% else %} \
+{% endif %}
+ \
 }
+{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
+access_log stdio:/var/log/squid/access_json.log jsonExtended
+{% else %}
 access_log /var/log/squid/access_json.log jsonExtended
+{% endif %}
 
 {% endif %}
 {% if squid_remotesyslog %}
