@@ -2,7 +2,8 @@
 
 - hosts: all
   vars:
-    - squid_https: true
+    squid_https: true
+    squid_jsonlog: true
   pre_tasks:
     - name: RedHat8 | specific variables
       set_fact:
