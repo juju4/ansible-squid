@@ -13,6 +13,8 @@ squid_syslog_target: /var/log/squid.log
 
 squid_cache_admin_email: squidadmin@localhost.local
 squid_customlog_path: /var/log/squid/access_custom.log
+squid_jsonlog: false
+squid_remotesyslog: false
 
 # source IP and subnets allowed to connect (outside of private networks)
 squid_allowed_clients: []

@@ -349,6 +349,40 @@ access_log {{ squid_customlog_path }} customlogformat
 {% endif %}
 # human-readable time?
 #logformat squid %tg.%03tu %6tr %>a %Ss/%03Hs %
+{% if squid_jsonlog %}
+# https://gist.github.com/ryanbreed/57464e9db1ca162d92aa221696a84a76
+# https://wiki.squid-cache.org/Features/LogFormat
+logformat jsonExtended { \
+  "sn": %sn,  "timestamp": %ts.%03tu, \
+  "conn": {"src_ip":"%>a","dst_ip":"%<a","dst_fqdn":"%<A","dst_port": "%<p" }, \
+  "req": {\
+    "bytes": %>st, "headerBytes": %>sh ,\
+    "method":"%rm","url":"%>ru","scheme":"%>rs","domain":"%>rd","path":"%>rp",\
+    "ua":"%{User-Agent}>h","referer":"%{Referer}>h","cookie":"%{Cookie}>h", \
+    "accLang":"%{Accept-Language}>h","accEnc":"%{Accept-Encoding}>h",\
+    "host":"%{Host}>h", "origin":"%{Origin}>h","accept":"%{Accept}>h",\
+    "xReqWith":"%{X-Requested-With}>h"\
+  }, \
+  "resp": {\
+    "bytes": %<st, "headerBytes": %<sh ,\
+    "code": "%<Hs", "mime-type":"%mt", \
+    "transferEncoding":"%{Transfer-Encoding}<h", \
+    "setCookie":"%{Set-Cookie}<h", \
+    "contentType":"%{Content-Type}<h", \
+    "contentLength":"%{Content-Length}<h", \
+    "contentEncoding":"%{Content-Encoding}<h", \
+    "server":"%{Server}<h" \
+  }, \
+  "bytes" : { "body": "%<bs", "total": %st }, \
+  "ssl": {"subject":"%ssl::>cert_subject","issuer":"%ssl::>cert_issuer","sni":"%ssl::>sni"}\
+}
+access_log /var/log/squid/access_json.log jsonExtended
+
+{% endif %}
+{% if squid_remotesyslog %}
+## TCP logging
+access_log {{ squid_remotesyslog_target | default('tcp://192.168.1.254:514') }} jsonExtended
+{% endif %}
 
 {% if squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard' %}
 url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf
