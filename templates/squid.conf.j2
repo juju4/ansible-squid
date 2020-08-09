@@ -376,7 +376,12 @@ logformat jsonExtended {\
     "server":"%{Server}<h"\
   },\
   "bytes":{"body":"%<bs","total":%st}{% if squid_https %},\
-  "ssl":{"subject":"%ssl::>cert_subject","issuer":"%ssl::>cert_issuer","sni":"%ssl::>sni"}\
+  "ssl":{\
+    "subject":"%ssl::<cert_subject","issuer":"%ssl::<cert_issuer",\
+    "errors","ssl::<cert_errors",\
+    "sni":"%ssl::>sni",\
+    "tls_client":"%ssl::>negotiated_version","tls_server":"%ssl::<negotiated_version"\
+  }\
 {% else %} \
 {% endif %}
  \
