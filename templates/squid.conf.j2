@@ -349,7 +349,7 @@ access_log {{ squid_customlog_path }} customlogformat
 {% endif %}
 # human-readable time?
 #logformat squid %tg.%03tu %6tr %>a %Ss/%03Hs %
-{% if squid_jsonlog %}
+{% if squid_jsonlog is defined and squid_jsonlog %}
 # https://gist.github.com/ryanbreed/57464e9db1ca162d92aa221696a84a76
 # https://wiki.squid-cache.org/Features/LogFormat
 logformat jsonExtended {\
@@ -377,10 +377,14 @@ logformat jsonExtended {\
   },\
   "bytes":{"body":"%<bs","total":%st}{% if squid_https %},\
   "ssl":{\
-    "subject":"%ssl::<cert_subject","issuer":"%ssl::<cert_issuer",\
-    "errors","ssl::<cert_errors",\
-    "sni":"%ssl::>sni",\
-    "tls_client":"%ssl::>negotiated_version","tls_server":"%ssl::<negotiated_version"\
+    "subject_c":"%ssl::>cert_subject","issuer_c":"%ssl::>cert_issuer",\
+{% if not (ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 7) %}
+{# squid 3.5 - http://www.squid-cache.org/Versions/v3/3.5/cfgman/logformat.html #}
+    "subject_s":"%ssl::<cert_subject","issuer_s":"%ssl::<cert_issuer",\
+    "errors_s","ssl::<cert_errors",\
+    "ssl_nego_c":"%ssl::>negotiated_version","ssl_nego_s":"%ssl::<negotiated_version",\
+{% endif %}
+    "sni_c":"%ssl::>sni"\
   }\
 {% else %} \
 {% endif %}
