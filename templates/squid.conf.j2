@@ -75,6 +75,8 @@ http_access deny manager
 # https://wiki.squid-cache.org/SquidFaq/SquidAcl
 #
 
+acl proto_http proto http https
+
 {% if squid_filter_ads is defined and squid_filter_ads %}
 ## disable ads ( http://pgl.yoyo.org/adservers/ )
 acl ads dstdom_regex "/var/spool/squid/ad_block.txt"
@@ -332,7 +334,7 @@ refresh_all_ims on
 
 # WARNING: excludetrace_xxx ACL is used in context without an HTTP request. Assuming mismatch.
 # http://squid-web-proxy-cache.1019090.n4.nabble.com/ACL-is-used-in-context-without-an-HTTP-response-Assuming-mismatch-td4677540.html
-#access_log none excludetrace
+#access_log none excludetrace proto_http
 
 {% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
 access_log stdio:/var/log/squid/access.log squid
