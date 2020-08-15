@@ -36,6 +36,10 @@ cache_mgr {{ squid_cache_admin_email }}
 cache_mem 100 MB
 # default is 512 KB
 # maximum_object_size_in_memory 1 MB
+{% if squid_dns_v4_first is undefined or squid_dns_v4_first %}
+# https://serverfault.com/questions/644604/squid-https-tunnelling-using-connect-very-slow
+dns_v4_first on
+{% endif %}
 
 # Suppress Squid version string info in HTTP headers and HTML error pages. = not valid/bungled(3.5.12)
 #httpd_suppress_version_string off
