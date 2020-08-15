@@ -88,3 +88,12 @@ describe file('/var/log/squid/access.log') do
   its(:content) { should match /CONNECT www.google.com:443 / }
   its(:content) { should match /CONNECT expired.badssl.com:443 / }
 end
+
+describe command("openssl x509 -text -noout -in /etc/ssl/certs/squid-*.crt") do
+  its(:stdout) { should match /Ansible for squid/ }
+  its(:stdout) { should match /X509v3 Basic Constraints:/ }
+  its(:stdout) { should match /CA:TRUE/ }
+  its(:stdout) { should match /X509v3 Subject Alternative Name:/ }
+  its(:stderr) { should match /^$/ }
+  its(:exit_status) { should eq 0 }
+end

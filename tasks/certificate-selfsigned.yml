@@ -43,6 +43,9 @@
     common_name: "{{ certificate_cn }}"
     subject_alt_name: "{{ squid_cert_san | default(omit) }}"
     email_address: "{{ squid_cert_email | default(omit) }}"
+    basic_constraints:
+#      - 'critical'
+      - 'CA:TRUE'
 
 - name: Generate SSL self-signed certificate
   openssl_certificate:
@@ -51,6 +54,7 @@
     csr_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
     ownca_not_after: "{{ squid_certduration | default('+365d') }}"
     provider: selfsigned
+  notify: restart squid
 
 - name: Validate private key file permissions
   file:
