@@ -93,7 +93,7 @@ http_access deny ads
 # Adapt localnet in the ACL section to list your (internal) IP networks
 # from where browsing should be allowed
 http_access allow localnet
-{% if not squid_testing %}
+{% if squid_allow_localhost %}
 http_access allow localhost
 {% endif %}
 {% if squid_allowed_clients != [] %}

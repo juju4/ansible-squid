@@ -4,6 +4,7 @@
   vars:
     squid_splash_enable: true
     squid_testing: true
+    squid_allow_localhost: false
     squid_splash_timeout: 15
   pre_tasks:
     - name: RedHat8 | specific variables
