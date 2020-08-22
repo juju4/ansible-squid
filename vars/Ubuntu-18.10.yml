@@ -21,3 +21,4 @@ squid_testing_pkgs:
   - curl
   - db-util
   - netcat
+  - jq

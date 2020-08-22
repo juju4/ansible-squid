@@ -48,3 +48,12 @@ describe file('/var/log/squid/cache.log') do
   its(:content) { should match /Completed Validation Procedure/ }
   its(:content) { should_not match /WARNING/ }
 end
+
+describe command("tail -1 /var/log/squid/access_json.log | jq .") do
+  its(:stdout) { should include "time_local" }
+  its(:stdout) { should include "method" }
+  its(:stderr) { should match /^$/ }
+  its(:exit_status) { should eq 0 }
+end
+
+describe file('/var/log/squid/cache.log') do

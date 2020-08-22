@@ -13,3 +13,4 @@ squid_testing_pkgs:
   - curl
   - libdb-utils
   - nmap-ncat
+  - jq
