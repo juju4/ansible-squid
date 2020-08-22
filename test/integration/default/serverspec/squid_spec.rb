@@ -55,5 +55,3 @@ describe command("tail -1 /var/log/squid/access_json.log | jq .") do
   its(:stderr) { should match /^$/ }
   its(:exit_status) { should eq 0 }
 end
-
-describe file('/var/log/squid/cache.log') do
