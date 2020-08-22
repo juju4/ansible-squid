@@ -3,6 +3,7 @@
 - hosts: all
   vars:
     squid_jsonlog: true
+    squid_testing: true
   pre_tasks:
     - name: RedHat8 | specific variables
       set_fact:
