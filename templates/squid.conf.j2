@@ -387,7 +387,7 @@ logformat jsonExtended {\
 {% if not (ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 7) %}
 {# squid 3.5 - http://www.squid-cache.org/Versions/v3/3.5/cfgman/logformat.html #}
     "subject_s":"%ssl::<cert_subject","issuer_s":"%ssl::<cert_issuer",\
-    "errors_s","ssl::<cert_errors",\
+    "errors_s":"%ssl::<cert_errors",\
     "ssl_nego_c":"%ssl::>negotiated_version","ssl_nego_s":"%ssl::<negotiated_version",\
 {% endif %}
     "sni_c":"%ssl::>sni"\
