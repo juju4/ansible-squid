@@ -30,6 +30,14 @@
 - include: ads.yml
   when: squid_filter_ads is defined and squid_filter_ads
 
+- name: Configure given extra list templates
+  template:
+    src: "{{ item.s }}.j2"
+    dest: "{{ item.d }}"
+    mode: "{{ item.m }}"
+    backup: yes
+  with_items: "{{ squid_list_templates }}"
+
 - name: update configuration
   template:
     src: "{{ squidconf_template }}"

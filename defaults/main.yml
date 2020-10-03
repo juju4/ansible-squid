@@ -37,6 +37,8 @@ squid_cert_orgname: 'Ansible for squid'
 squid_certduration: 1095
 squid_noproxy_domains_template: no-proxy-domains.conf
 squid_noproxy_ips_template: no-proxy-ips.conf
+squid_list_templates: []
+#  - { name: domain_block, action: deny, type: dstdomain, s: squid-block.conf, d: /var/spool/squid/domain_block.txt, m: '0644' }
 
 ## only packaged in ubuntu xenial, debian jessie, epel: squidguard, dansguardian
 ##	centos6: no dansguardian, only squidGuard

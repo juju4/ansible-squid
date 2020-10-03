@@ -88,6 +88,10 @@ http_access deny ads
 #deny_info TCP_RESET ads
 
 {% endif %}
+{% for item in squid_list_templates %}
+acl {{ item.name }} {{ item.type }} "{{ item.d }}"
+http_access {{ item.action }} {{ item.name }}
+{% endfor %}
 
 # Example rule allowing access from your local networks.
 # Adapt localnet in the ACL section to list your (internal) IP networks
