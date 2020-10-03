@@ -219,6 +219,14 @@ ssl_bump bump all
 #https_port 3129 tls-min-version=1.2
 {% endif %}
 
+# if sslbump / tls interception, squid will break websockets as not supported
+# http://lists.squid-cache.org/pipermail/squid-users/2017-January/013953.html
+# https://askubuntu.com/questions/936015/squid3-proxy-server-ssl-bump-blocking-web-socket-connections
+# https://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cloudCollaboration/spark/hybridservices/datasecurity/cmgt_b_hybrid-data-security/cmgt_b_hybrid-data-security_appendix_01010.pdf
+# Test: https://www.websocket.org/echo.html
+# you need either to exclude corresponding domains, either enable following line
+#on_unsupported_protocol tunnel all
+
 # Leave coredumps in the first cache dir
 coredump_dir {{ squid_spool }}
 
@@ -233,6 +241,8 @@ strip_query_terms off
 refresh_pattern ^ftp:           1440    20%     10080
 refresh_pattern ^gopher:        1440    0%      1440
 refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
+# Images
+refresh_pattern -i \.(gif|png|jpeg|jpg|bmp|tif|tiff|ico)(\?.*|$) 10080 50% 43200 override-expire override-lastmod reload-into-ims ignore-reload ignore-no-cache ignore-auth ignore-private
 #refresh_pattern (Release|Packages(.gz)*)$      0       20%     2880
 # example lin deb packages
 #refresh_pattern (\.deb|\.udeb)$   129600 100% 129600
@@ -377,7 +387,9 @@ logformat jsonExtended {\
   },\
   "resp":{\
     "bytes":%<st,"headerBytes":%<sh,\
-    "code":"%<Hs","mime-type":"%mt",\
+    "code_nexthop":"%<Hs",\
+    "code_c":"%>Hs",\
+    "mime-type":"%mt",\
     "transferEncoding":"%{Transfer-Encoding}<h",\
     "setCookie":"%{Set-Cookie}<h",\
     "contentType":"%{Content-Type}<h",\
