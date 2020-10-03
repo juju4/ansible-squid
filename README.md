@@ -67,6 +67,8 @@ Ubuntu: https://bugs.launchpad.net/ubuntu/+source/squid3/+bug/16669 (addressed i
 Squid 4.1-4.11: ["SSL-Bump and certificate generation features are not yet supported by GnuTLS builds."](http://www.squid-cache.org/Versions/v4/RELEASENOTES.html#ss2.8)
 Squid 5.0: [No mention](https://github.com/squid-cache/squid/blob/master/ChangeLog)
 
+* [How to fix X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY Squid error](https://docs.diladele.com/faq/squid/fix_unable_to_get_issuer_cert_locally.html)
+
 ## License
 
 BSD 2-clause
