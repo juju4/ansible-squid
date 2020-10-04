@@ -83,7 +83,7 @@ before_install:
   - gem install kitchen-ansible
   - gem install kitchen-sync
   - gem install kitchen-lxd_cli
-  - gem install kitchen-inspec
+  - gem install kitchen-inspec --version "=2.0.0"
   - gem list
   - which kitchen
 ## ssh key for lxd_cli ?
