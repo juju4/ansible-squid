@@ -86,16 +86,12 @@ before_install:
   - gem install kitchen-inspec
   - gem list
   - which kitchen
-  - kitchen --version
 ## ssh key for lxd_cli ?
   - ls ~/.ssh
   - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
 ## sudo/su get us a non-usual PATH ...
   - '[ "X${distribution}" == "Xcentos" ] && sudo -E su $USER -c "sh -x ./test/lxd/centos-ssh-image.sh ${version}" || true'
   - sudo -E su $USER -c "env"
-  - sudo -E su $USER -c "which kitchen"
-  - sudo -E su $USER -c "kitchen --version"
-  - sudo -E su $USER -c "env PATH=$GEM_HOME/bin:$PATH which kitchen"
   - sudo -E su $USER -c "env PATH=$GEM_HOME/bin:$PATH kitchen diagnose --all"
 #  - sudo -E su $USER -c "kitchen diagnose --all"
 #  - sudo -E -u $USER kitchen diagnose --all
