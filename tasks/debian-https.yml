@@ -8,7 +8,14 @@
   loop:
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }} universe"
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }}-updates universe"
-    - "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }}-security universe"
+
+- name: Ubuntu | Enable universe security repository
+  lineinfile:
+    dest: /etc/apt/sources.list
+    mode: '0644'
+    owner: root
+    regexp: "^deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }}-security universe"
+    line: "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }}-security universe"
 
 - name: Ensure squid build dir exists
   file:
