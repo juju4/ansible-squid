@@ -1,5 +1,9 @@
 ---
 
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
 - name: restart squid
   service:
     name: "{{ squid_svc }}"
@@ -22,7 +26,3 @@
 
 - name: restart rsyslog
   service: name=rsyslog state=restarted
-
-- name: reload systemd
-  systemd:
-    daemon_reload: yes
