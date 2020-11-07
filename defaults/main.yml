@@ -27,6 +27,10 @@ squid_splash_template: splash.php.j2
 squid_splash_url: http://localhost/splash.php
 squid_splash_timeout: 7200
 
+squid_reporting: true
+squid_reporting_template: squid_report.sh
+squid_reporting_dest: /var/tmp
+
 squid_testing: false
 squid_testing_debug: false
 squid_testing_tsung: false

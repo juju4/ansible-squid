@@ -1,0 +1,19 @@
+---
+
+- name: Ensure /usr/local/scripts exists
+  file:
+    dest: /usr/local/scripts
+    state: directory
+    mode: '0755'
+
+- name: Ensure reporting script exists
+  template:
+    src: "{{ squid_reporting_template }}.j2"
+    dest: "/usr/local/scripts/{{ squid_reporting_template | basename }}"
+    mode: '0755'
+
+- name: Add squid report in logrotate
+  lineinfile:
+    dest: /etc/logrotate.d/squid
+    line: "\t\ttest ! -x /usr/local/scripts/{{ squid_reporting_template | basename }} || /usr/local/scripts/{{ squid_reporting_template | basename }} > {{ squid_reporting_dest }}/squid-report-`date +%Y%m%d`"
+    insertafter: '^\tprerotate$'
