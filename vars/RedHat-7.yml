@@ -24,6 +24,7 @@ squid_testing_pkgs:
   - libdb-utils
   - nmap-ncat
   - jq
+  - tsung
 
 python_pip: python36-pip
 openssl_pkgs:

@@ -28,6 +28,11 @@ squid_splash_url: http://localhost/splash.php
 squid_splash_timeout: 7200
 
 squid_testing: false
+squid_testing_debug: false
+squid_testing_tsung: false
+squid_testing_tsung_template_noproxy: tsung-test1-noproxy.xml
+squid_testing_tsung_template_proxy: tsung-test1-proxy.xml
+squid_testing_tsung_logdir: /tmp/tsung
 
 # require distribution where squid compiled with ssl (ok centos, nok ubuntu)
 squid_https: false

@@ -55,3 +55,4 @@ squid_testing_pkgs:
   - db-util
   - netcat
   - jq
+  - tsung

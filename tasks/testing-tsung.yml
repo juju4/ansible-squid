@@ -1,0 +1,28 @@
+---
+
+- name: Setup tsung config
+  template:
+    src: "{{ item }}.j2"
+    dest: "/tmp/{{ item }}"
+    mode: '0600'
+  with_items:
+    - "{{ squid_testing_tsung_template_noproxy }}"
+    - "{{ squid_testing_tsung_template_proxy }}"
+
+- name: Execute load test with tsung without proxy
+  command: "tsung -f /tmp/{{ squid_testing_tsung_template_noproxy }} -l {{ squid_testing_tsung_logdir }} start"
+  changed_when: false
+  register: tsung1
+
+- name: pause between test
+  pause: minutes=1
+
+- name: Execute load test with tsung with proxy
+  command: "tsung -f /tmp/{{ squid_testing_tsung_template_proxy }} -l {{ squid_testing_tsung_logdir }} start"
+  changed_when: false
+  register: tsung2
+
+- name: Get log files
+  set_fact:
+    tsung1_log: "{{ tsung1.stdout | regex_findall('Log directory is: (.*)') | first }}"
+    tsung2_log: "{{ tsung2.stdout | regex_findall('Log directory is: (.*)') | first }}"

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="notice" version="1.0">
+
+  <clients>
+  <!-- Execution from local station -->
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+
+  <!-- Server side setup -->
+  <servers>
+    <server host="localhost" port="3128" type="tcp"></server>
+<!--
+    <server host="www.google.com" port="443" type="ssl"></server>
+    <server host="www.youtube.com" port="443" type="ssl"></server>
+    <server host="www.amazon.com" port="443" type="ssl"></server>
+-->
+  </servers>
+
+  <load>
+    <arrivalphase phase="1" duration="10" unit="second">
+      <users arrivalrate="5" unit="second"></users>
+    </arrivalphase>
+  </load>
+
+  <options>
+   <option type="ts_http" name="user_agent">
+    <user_agent probability="20">Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/532.0 (KHTML, like Gecko) Chrome/4.0.201.1 Safari/532.0 Tsung/testing</user_agent>
+    <user_agent probability="30">Mozilla/5.0 (Windows NT 10.0; WOW64; rv:82.0) Gecko/20100101 Firefox/82.0 Tsung/testing</user_agent>
+    <user_agent probability="50">Mozilla/5.0 (IE 11.0; Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C; rv:11.0) like Gecko Tsung/testing</user_agent>
+   </option>
+   <option type="ts_http" name="http_use_server_as_proxy" value="true"></option>
+  </options>
+
+  <sessions>
+    <session name="http" weight="10" type="ts_http">
+      <thinktime value="2" random="true"></thinktime>
+
+      <transaction name="index_request">
+        <request> <http url="https://www.google.com" method="GET" version="1.1"></http> </request>
+      </transaction>
+
+    </session>
+  </sessions>
+</tsung>
