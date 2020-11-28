@@ -5,86 +5,86 @@
   vars:
     proxy_port: 3128
   tasks:
-  - name: Ensure /etc/squid/squid.conf config file is present
-    stat:
-      path: /etc/squid/squid.conf
-    register: cfg
-  - name: Validate config present
-    assert:
-      that: cfg.stat.exists and cfg.stat.size != 0
+    - name: Ensure /etc/squid/squid.conf config file is present
+      stat:
+        path: /etc/squid/squid.conf
+      register: cfg
+    - name: Validate config present
+      assert:
+        that: cfg.stat.exists and cfg.stat.size != 0
 
-  - name: Ensure process is running
-    command: pgrep -u root squid
-    register: ps
-    changed_when: false
-    ignore_errors: true
-  - name: Validate ps output
-    assert:
-      that: ps.stdout
-    ignore_errors: true
+    - name: Ensure process is running
+      command: pgrep -u root squid
+      register: ps
+      changed_when: false
+      ignore_errors: true
+    - name: Validate ps output
+      assert:
+        that: ps.stdout
+      ignore_errors: true
 
-  - name: Ensure ports are listening
-    wait_for:
-      host: "{{ item.h }}"
-      port: "{{ item.p }}"
-      timeout: 10
-    with_items:
-      - { h: localhost, p: "{{ proxy_port }}" }
+    - name: Ensure ports are listening
+      wait_for:
+        host: "{{ item.h }}"
+        port: "{{ item.p }}"
+        timeout: 10
+      with_items:
+        - { h: localhost, p: "{{ proxy_port }}" }
 
-  - name: Test curl www.google.com
-    command: curl -v -x http://localhost:{{ proxy_port }} http://www.google.com
-    register: curl1
-    changed_when: false
-  - name: Validate curl1 output
-    assert:
-      that: >
-        "'<title>Google</title>' in curl1.stdout and 'HTTP/1.1 200 OK' in curl1.stderr"
+    - name: Test curl www.google.com
+      command: curl -v -x http://localhost:{{ proxy_port }} http://www.google.com
+      register: curl1
+      changed_when: false
+    - name: Validate curl1 output
+      assert:
+        that: >
+          "'<title>Google</title>' in curl1.stdout and 'HTTP/1.1 200 OK' in curl1.stderr"
 
-  - name: Test curl www.cnn.com
-    command: curl -v -x http://localhost:{{ proxy_port }} http://www.cnn.com
-    register: curl2
-    changed_when: false
-  - name: Validate curl2 output
-    assert:
-      that: >
-        "'HTTP/1.1 301 Moved Permanently' in curl2.stderr"
+    - name: Test curl www.cnn.com
+      command: curl -v -x http://localhost:{{ proxy_port }} http://www.cnn.com
+      register: curl2
+      changed_when: false
+    - name: Validate curl2 output
+      assert:
+        that: >
+          "'HTTP/1.1 301 Moved Permanently' in curl2.stderr"
 
-  - name: Test curl www.badboys.com
-    command: curl -v -x http://localhost:{{ proxy_port }} http://www.badboys.com
-    register: curl3
-    changed_when: false
-  - name: Validate curl3 output
-    assert:
-      that: >
-        "'HTTP/1.1 301 Moved Permanently' in curl3.stderr"
+    - name: Test curl www.badboys.com
+      command: curl -v -x http://localhost:{{ proxy_port }} http://www.badboys.com
+      register: curl3
+      changed_when: false
+    - name: Validate curl3 output
+      assert:
+        that: >
+          "'HTTP/1.1 301 Moved Permanently' in curl3.stderr"
 
-  - name: Test curl malware.wicar.org
-    command: curl -v -x http://localhost:{{ proxy_port }} http://malware.wicar.org/data/eicar.com
-    register: curl4
-    changed_when: false
-  - name: Validate curl4 output
-    assert:
-      that: >
-        "'EICAR-STANDARD-ANTIVIRUS-TEST-FILE!' in curl4.stdout"
+    - name: Test curl malware.wicar.org
+      command: curl -v -x http://localhost:{{ proxy_port }} http://malware.wicar.org/data/eicar.com
+      register: curl4
+      changed_when: false
+    - name: Validate curl4 output
+      assert:
+        that: >
+          "'EICAR-STANDARD-ANTIVIRUS-TEST-FILE!' in curl4.stdout"
 
-  - name: Fetch content of /var/log/squid/cache.log
-    slurp:
-      src: /var/log/squid/cache.log
-    register: cache
-  - name: Validate /var/log/squid/cache.log
-    assert:
-      that: >
-        "'Starting Squid Cache version ' in cache['content'] | b64decode and
-        'Accepting HTTP Socket connections at' in cache['content'] | b64decode and
-        'Completed Validation Procedure' in cache['content'] | b64decode and
-        'WARNING' not in cache['content'] | b64decode"
+    - name: Fetch content of /var/log/squid/cache.log
+      slurp:
+        src: /var/log/squid/cache.log
+      register: cache
+    - name: Validate /var/log/squid/cache.log
+      assert:
+        that: >
+          "'Starting Squid Cache version ' in cache['content'] | b64decode and
+          'Accepting HTTP Socket connections at' in cache['content'] | b64decode and
+          'Completed Validation Procedure' in cache['content'] | b64decode and
+          'WARNING' not in cache['content'] | b64decode"
 
-  - name: Fetch content of /var/log/squid/access_json.log
-    slurp:
-      src: /var/log/squid/access_json.log
-    register: log
-  - name: Validate /var/log/squid/access_json.log
-    assert:
-      that: >
-        "'time_local' in loh['content'] | b64decode and
-        'method' in cache['content'] | b64decode"
+    - name: Fetch content of /var/log/squid/access_json.log
+      slurp:
+        src: /var/log/squid/access_json.log
+      register: log
+    - name: Validate /var/log/squid/access_json.log
+      assert:
+        that: >
+          "'time_local' in loh['content'] | b64decode and
+          'method' in cache['content'] | b64decode"
