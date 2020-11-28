@@ -22,17 +22,17 @@
   with_items:
     - { re: '^UNCONFIGURED - Please remove this line', rep: '#UNCONFIGURED - Please remove this line' }
     - { re: "^filterip =.*", rep: "filterip = {{ squid_dansguardian_filterip }}" }
-#    - { re: "^proxyip =.*", rep: "proxyip = {{ squid_dansguardian_proxyip }}" }
+    # - { re: "^proxyip =.*", rep: "proxyip = {{ squid_dansguardian_proxyip }}" }
     - { re: "^#daemonuser = 'dansguardian'", rep: "daemonuser = 'proxy'" }
     - { re: "^#daemongroup = 'dansguardian'", rep: "daemongroup = 'proxy'" }
     - { re: "^accessdeniedaddress = .*", rep: "accessdeniedaddress = '{{ squid_dansguardian_deniedaddress }}'" }
     - { re: "^loglevel = .*", rep: "loglevel = {{ squid_dansguardian_loglevel }}" }
     - { re: "^loguseragent = .*", rep: "loguseragent = on" }
-#    - { re: "^nologger = .*", rep: "nologger = on" }
+    # - { re: "^nologger = .*", rep: "nologger = on" }
     - { re: "#loglocation = .*", rep: "loglocation = '/var/log/dansguardian/access.log'" }
     - { re: "^language = '.*'", rep: "language = '{{ squid_dansguardian_language }}'" }
     - { re: "^forwardedfor = .*", rep: "forwardedfor = on" }
-#    - { re: "^usexforwardedfor = '.*'", rep: "usexforwardedfor = on" }
+    # - { re: "^usexforwardedfor = '.*'", rep: "usexforwardedfor = on" }
   notify:
     - restart dansguardian
 

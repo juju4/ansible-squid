@@ -66,8 +66,8 @@
         remote_src: true
 
     - name: Squid openssl | build package - be patient...
-      #command: dpkg-buildpackage -rfakeroot -b
-      #command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
+      # command: dpkg-buildpackage -rfakeroot -b
+      # command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
       ## without signing else set up a gpg key before
       command: dpkg-buildpackage -rfakeroot -b -uc -us
       args:
@@ -118,8 +118,8 @@
   register: squiddeb
   ignore_errors: true
 - block:
-# if install with dpkg, not executing /etc/apt/apt.conf.d/99security and /etc/init.d is immutable
-#       OK with apt install
+    # if install with dpkg, not executing /etc/apt/apt.conf.d/99security and /etc/init.d is immutable
+    #       OK with apt install
     - include: "immutable.yml target_dir=/etc/init.d/ state=pre"
     - include: "immutable.yml target_dir=/etc/init.d/squid state=pre"
     - include: "immutable.yml target_dir=/lib/systemd/system state=pre"

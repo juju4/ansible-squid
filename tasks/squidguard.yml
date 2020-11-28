@@ -31,7 +31,7 @@
     }
 
 - name: squidguard | initialize db
-#  command: "squidGuard -C all"
+  # command: "squidGuard -C all"
   command: sh /etc/cron.daily/squidGuard
   args:
     creates: /var/lib/squidGuard/blacklists/adult/domains

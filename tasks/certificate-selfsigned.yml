@@ -44,7 +44,7 @@
     subject_alt_name: "{{ squid_cert_san | default(omit) }}"
     email_address: "{{ squid_cert_email | default(omit) }}"
     basic_constraints:
-#      - 'critical'
+      # - 'critical'
       - 'CA:TRUE'
 
 - name: Generate SSL self-signed certificate

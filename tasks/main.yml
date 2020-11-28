@@ -64,8 +64,8 @@
     regexp: '<p>Generated %T by %h \(%s\)</p>'
     replace: '<p>Generated %T by %h (Squid Proxy)</p>'
     mode: '0644'
-## Note: backup is generating mess if rerun as we are not differencing files from their backup...
-#    backup=yes
+    # Note: backup is generating mess if rerun as we are not differencing files from their backup...
+    # backup=yes
   with_fileglob:
     - "{{ squid_errors_template }}en/ERR_*"
 
