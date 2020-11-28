@@ -32,40 +32,57 @@
         - { h: localhost, p: "{{ proxy_port }}" }
 
     - name: Test curl www.google.com
-      command: curl -v -x http://localhost:{{ proxy_port }} http://www.google.com
+      uri:
+        url: http://www.google.com
+        return_content: yes
       register: curl1
+      environment:
+        http_proxy: "http://localhost:{{ proxy_port }}"
+        https_proxy: "http://localhost:{{ proxy_port }}"
       changed_when: false
     - name: Validate curl1 output
       assert:
         that: >
-          "'<title>Google</title>' in curl1.stdout and 'HTTP/1.1 200 OK' in curl1.stderr"
+          "'<title>Google</title>' in curl1.content and curl1.status == 200"
 
     - name: Test curl www.cnn.com
-      command: curl -v -x http://localhost:{{ proxy_port }} http://www.cnn.com
+      uri:
+        url: http://www.cnn.com
       register: curl2
+      environment:
+        http_proxy: "http://localhost:{{ proxy_port }}"
+        https_proxy: "http://localhost:{{ proxy_port }}"
       changed_when: false
     - name: Validate curl2 output
       assert:
         that: >
-          "'HTTP/1.1 301 Moved Permanently' in curl2.stderr"
+          "curl2.status == 301"
 
     - name: Test curl www.badboys.com
-      command: curl -v -x http://localhost:{{ proxy_port }} http://www.badboys.com
+      uri:
+        url: http://www.badboys.com
       register: curl3
+      environment:
+        http_proxy: "http://localhost:{{ proxy_port }}"
+        https_proxy: "http://localhost:{{ proxy_port }}"
       changed_when: false
     - name: Validate curl3 output
       assert:
         that: >
-          "'HTTP/1.1 301 Moved Permanently' in curl3.stderr"
+          "curl3.status == 301"
 
     - name: Test curl malware.wicar.org
-      command: curl -v -x http://localhost:{{ proxy_port }} http://malware.wicar.org/data/eicar.com
+      uri:
+        url: http://malware.wicar.org/data/eicar.com
       register: curl4
+      environment:
+        http_proxy: "http://localhost:{{ proxy_port }}"
+        https_proxy: "http://localhost:{{ proxy_port }}"
       changed_when: false
     - name: Validate curl4 output
       assert:
         that: >
-          "'EICAR-STANDARD-ANTIVIRUS-TEST-FILE!' in curl4.stdout"
+          "'EICAR-STANDARD-ANTIVIRUS-TEST-FILE!' in curl4.content"
 
     - name: Fetch content of /var/log/squid/cache.log
       slurp:
