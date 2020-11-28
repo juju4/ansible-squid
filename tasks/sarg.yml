@@ -5,4 +5,5 @@
     dest: /etc/sarg/sarg.conf
     regexp: '^resolve_ip.*'
     replace: 'resolve_ip no'
+    mode: '0644'
     backup: "{{ squid_backup | default(false) }}"

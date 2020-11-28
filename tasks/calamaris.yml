@@ -5,6 +5,7 @@
     dest: /etc/calamaris/cron.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
+    mode: '0644'
     backup: "{{ squid_backup | default(false) }}"
   with_items: "{{ squid_calamaris_cron_conf }}"
 

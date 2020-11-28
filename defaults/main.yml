@@ -88,9 +88,9 @@ squid_calamaris_dirs:
   - /var/www/calamaris/monthly
 # action can be: nothing, mail, web, both
 squid_calamaris_cron_conf:
-    - { re: '^daily:.*', rep: "daily:root:/var/www/calamaris/daily/index.html:mail:'Squid daily'" }
-    - { re: '^weekly:.*', rep: "weekly:root:/var/www/calamaris/weekly/index.html:mail:'Squid weekly'" }
-    - { re: '^monthly:.*', rep: "monthly:root:/var/www/calamaris/monthly/index.html:mail:'Squid monthly'" }
+  - { re: '^daily:.*', rep: "daily:root:/var/www/calamaris/daily/index.html:mail:'Squid daily'" }
+  - { re: '^weekly:.*', rep: "weekly:root:/var/www/calamaris/weekly/index.html:mail:'Squid weekly'" }
+  - { re: '^monthly:.*', rep: "monthly:root:/var/www/calamaris/monthly/index.html:mail:'Squid monthly'" }
 squid_sarg_enable: true
 
 squid_cgroups_restriction_enable: true

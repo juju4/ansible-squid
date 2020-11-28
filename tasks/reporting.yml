@@ -15,5 +15,6 @@
 - name: Add squid report in logrotate
   lineinfile:
     dest: /etc/logrotate.d/squid
-    line: "\t\ttest ! -x /usr/local/scripts/{{ squid_reporting_template | basename }} || /usr/local/scripts/{{ squid_reporting_template | basename }} > {{ squid_reporting_dest }}/squid-report-`date +%Y%m%d`"
+    line: "\t\ttest ! -x /usr/local/scripts/{{ squid_reporting_template | basename }} || /usr/local/scripts/{{ squid_reporting_template | basename }} > {{ squid_reporting_dest }}/squid-report-`date +%Y%m%d` 2>&1"
     insertafter: '^\tprerotate$'
+    mode: '0644'

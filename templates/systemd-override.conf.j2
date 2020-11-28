@@ -20,7 +20,7 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 %}
 {% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 16) %}
 
-SystemCallFilter=mprotect mmap read brk setresuid fstat prctl close futex capset write setgid setgroups munmap socket socketpair lseek getpid setsockopt sysinfo poll flock capget rt_sigaction rt_sigprocmask kill umask getuid arch_prctl set_robust_list prlimit64 geteuid set_tid_address stat execve access openat connect setgroups setsid sendto dup2 ftruncate fsync statfs clone unlink wait4 alarm fcntl chdir epoll_create bind getsockname epoll_ctl pipe setuid select dup recvfrom rename listen epoll_wait accept fchmod ioctl getsockopt getdents getrusage uname getrandom sendmmsg{% if squid_splash_enable is defined and squid_splash_enable %} pread64 pwrite64 fdatasync{% endif %}
+#SystemCallFilter=mprotect mmap read brk setresuid fstat prctl close futex capset write setgid setgroups munmap socket socketpair lseek getpid setsockopt sysinfo poll flock capget rt_sigaction rt_sigprocmask kill umask getuid arch_prctl set_robust_list prlimit64 geteuid set_tid_address stat execve access openat connect setgroups setsid sendto dup2 ftruncate fsync statfs clone unlink wait4 alarm fcntl chdir epoll_create bind getsockname epoll_ctl pipe setuid select dup recvfrom rename listen epoll_wait accept fchmod ioctl getsockopt getdents getrusage uname getrandom sendmmsg{% if squid_splash_enable is defined and squid_splash_enable %} pread64 pwrite64 fdatasync{% endif %}
 
 {% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) %}
 #SystemCallFilter=~@debug @mount @cpu-emulation @obsolete @privileged
@@ -36,5 +36,5 @@ CPUQuota={{ squid_cgroups_cpuquota | default('80%') }}
 MemoryLimit={{ squid_cgroups_memorylimit | default('4G') }}
 {% endif %}
 
-Restart=on-failure
-RestartSec=5s
+#Restart=on-failure
+#RestartSec=5s

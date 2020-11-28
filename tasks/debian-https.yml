@@ -30,77 +30,78 @@
   delegate_to: localhost
 
 - block:
-  - name: Squid openssl | install build and report tools
-    apt:
-      pkg: "{{ squidbuild_pkgs + squidhttps_pkgs + squid_report_pkgs | default(omit) }}"
-      state: present
-      update_cache: yes
-      cache_valid_time: 3600
-    register: pkg_result
-    until: pkg_result is success
+    - name: Squid openssl | install build and report tools
+      apt:
+        pkg: "{{ squidbuild_pkgs + squidhttps_pkgs + squid_report_pkgs | default(omit) }}"
+        state: present
+        update_cache: yes
+        cache_valid_time: 3600
+      register: pkg_result
+      until: pkg_result is success
 
-  - name: Get diladele patches
-    get_url:
-      url: "{{ item }}"
-      dest: "{{ squidbuild_dir }}/{{ item | basename }}"
-      mode: '0600'
-    with_items:
-      - https://raw.githubusercontent.com/diladele/squid-ubuntu/master/src/ubuntu18/rules.patch
-      - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_PKG }}.dsc"
-      - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_VER }}.orig.tar.xz"
-      - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_VER }}.orig.tar.xz.asc"
-      - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_PKG }}.debian.tar.xz"
-    register: dl_result
-    until: dl_result is success
+    - name: Get diladele patches
+      get_url:
+        url: "{{ item }}"
+        dest: "{{ squidbuild_dir }}/{{ item | basename }}"
+        mode: '0600'
+      with_items:
+        - https://raw.githubusercontent.com/diladele/squid-ubuntu/master/src/ubuntu18/rules.patch
+        - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_PKG }}.dsc"
+        - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_VER }}.orig.tar.xz"
+        - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_VER }}.orig.tar.xz.asc"
+        - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ SQUID_PKG }}.debian.tar.xz"
+      register: dl_result
+      until: dl_result is success
 
-  - name: Squid openssl | unpack source
-    command: "dpkg-source -x squid_{{ SQUID_PKG }}.dsc"
-    args:
-      chdir: "{{ squidbuild_dir }}"
-      creates: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}/debian/rules"
+    - name: Squid openssl | unpack source
+      command: "dpkg-source -x squid_{{ SQUID_PKG }}.dsc"
+      args:
+        chdir: "{{ squidbuild_dir }}"
+        creates: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}/debian/rules"
 
-  - name: Squid openssl | patch rules
-    patch:
-      src: "{{ squidbuild_dir }}/rules.patch"
-      dest: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}/debian/rules"
-      remote_src: true
+    - name: Squid openssl | patch rules
+      patch:
+        src: "{{ squidbuild_dir }}/rules.patch"
+        dest: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}/debian/rules"
+        remote_src: true
 
-  - name: Squid openssl | build package - be patient...
-    #command: dpkg-buildpackage -rfakeroot -b
-    #command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
-    ## without signing else set up a gpg key before
-    command: dpkg-buildpackage -rfakeroot -b -uc -us
-    args:
-      chdir: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}"
-      creates: "{{ squidbuild_dir }}/squid_{{ SQUID_PKG }}_amd64.deb"
-    async: 3600
-    poll: 0
-    register: dpkgbuild
+    - name: Squid openssl | build package - be patient...
+      #command: dpkg-buildpackage -rfakeroot -b
+      #command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
+      ## without signing else set up a gpg key before
+      command: dpkg-buildpackage -rfakeroot -b -uc -us
+      args:
+        chdir: "{{ squidbuild_dir }}/squid-{{ SQUID_VER }}"
+        creates: "{{ squidbuild_dir }}/squid_{{ SQUID_PKG }}_amd64.deb"
+      async: 3600
+      poll: 0
+      register: dpkgbuild
 
-  - name: Squid openssl | check on async task for pkg building
-    async_status:
-      jid: "{{ dpkgbuild.ansible_job_id }}"
-    register: job_result
-    until: job_result.finished or dpkgbuild.finished
-    retries: 30
-    delay: 60
-    when: dpkgbuild is changed
+    - name: Squid openssl | check on async task for pkg building
+      async_status:
+        jid: "{{ dpkgbuild.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished or dpkgbuild.finished
+      retries: 30
+      delay: 60
+      when: dpkgbuild is changed
 
-  - name: Squid openssl | Recover file on orchestrator
-    fetch:
-      src: "{{ item }}"
-      dest: "{{ orchestrator_files_archives }}/"
-      flat: yes
-    with_items:
-      - "{{ squidbuild_dir }}/squid-common_{{ SQUID_PKG }}_all.deb"
-      - "{{ squidbuild_dir }}/squid_{{ SQUID_PKG }}_amd64.deb"
-      - "{{ squidbuild_dir }}/squidclient_{{ SQUID_PKG }}_amd64.deb"
+    - name: Squid openssl | Recover file on orchestrator
+      fetch:
+        src: "{{ item }}"
+        dest: "{{ orchestrator_files_archives }}/"
+        flat: yes
+      with_items:
+        - "{{ squidbuild_dir }}/squid-common_{{ SQUID_PKG }}_all.deb"
+        - "{{ squidbuild_dir }}/squid_{{ SQUID_PKG }}_amd64.deb"
+        - "{{ squidbuild_dir }}/squidclient_{{ SQUID_PKG }}_amd64.deb"
   when: not squiddeb.stat.exists
 
 - name: Squid openssl | Recover file on orchestrator
   copy:
     src: "{{ orchestrator_files_archives }}/{{ item }}"
     dest: "{{ squidbuild_dir }}/"
+    mode: '0644'
   with_items:
     - "squid-common_{{ SQUID_PKG }}_all.deb"
     - "squid_{{ SQUID_PKG }}_amd64.deb"

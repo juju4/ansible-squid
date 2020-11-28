@@ -5,4 +5,5 @@
     dest: /etc/e2guardian/languages/ukenglish/template.html
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
+    mode: '0644'
   with_items: "{{ squid_e2guardian_template }}"

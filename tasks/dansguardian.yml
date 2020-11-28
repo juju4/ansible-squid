@@ -17,6 +17,7 @@
     dest: /etc/dansguardian/dansguardian.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
+    mode: '0644'
     backup: yes
   with_items:
     - { re: '^UNCONFIGURED - Please remove this line', rep: '#UNCONFIGURED - Please remove this line' }
@@ -40,11 +41,12 @@
     dest: /etc/dansguardian/dansguardian.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
+    mode: '0644'
     backup: yes
   with_items:
     - { re: "^#contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'",
         rep: "contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'"
-      }
+    }
   notify:
     - restart dansguardian
   when: squid_dansguardian_clamd|bool
@@ -54,6 +56,7 @@
     dest: /etc/dansguardian/contentscanners/clamdscan.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
+    mode: '0644'
     backup: yes
   with_items:
     - { re: "^clamdudsfile = .*", rep: "clamdudsfile = /tmp/clamd.ctl" }

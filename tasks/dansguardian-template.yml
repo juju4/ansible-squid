@@ -5,5 +5,5 @@
     dest: /etc/dansguardian/languages/ukenglish/template.html
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
+    mode: '0644'
   with_items: "{{ squid_dansguardian_template }}"
-

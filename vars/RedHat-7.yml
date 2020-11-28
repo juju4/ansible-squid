@@ -20,15 +20,15 @@ ssl_dir: /etc/pki/tls/certs
 ssl_privatedir: /etc/pki/tls/private
 
 squid_testing_pkgs:
-  - curl
-  - libdb-utils
-  - nmap-ncat
-  - jq
-  - tsung
+    - curl
+    - libdb-utils
+    - nmap-ncat
+    - jq
+    - tsung
 
 python_pip: python36-pip
 openssl_pkgs:
-  - openssl
-  - python3-pip
-  - python3-setuptools
-  - pyOpenSSL
+    - openssl
+    - python3-pip
+    - python3-setuptools
+    - pyOpenSSL

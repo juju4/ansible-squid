@@ -13,6 +13,7 @@
     dest: /etc/clamav/clamd.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
+    mode: '0644'
     backup: yes
   with_items:
     - { re: "^User .*", rep: "User {{ squid_user }}" }

@@ -19,5 +19,5 @@ squid_testing_pkgs:
   - netcat
   - jq
 
-openssl_pkgs: ['openssl', 'python-pip', 'python-setuptools', 'python-openssl' ]
+openssl_pkgs: ['openssl', 'python-pip', 'python-setuptools', 'python-openssl']
 squid_cryptography: pip

@@ -13,6 +13,7 @@
     dest: /etc/squid/squidGuard.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
+    mode: '0644'
   with_items:
     - { re: '^dbhome .*', rep: 'dbhome /var/lib/squidGuard' }
 
@@ -21,12 +22,13 @@
     dest: /etc/cron.daily/squidGuard
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
+    mode: '0644'
   with_items:
     - { re: '^ENABLED=.*', rep: 'ENABLED=1' }
-## teledanmark down, new list from http://www.squidguard.org/blacklists.html
+    # teledanmark down, new list from http://www.squidguard.org/blacklists.html
     - { re: 'http://ftp.teledanmark.no/pub/www/proxy/squidguard/contrib/blacklists.tar.gz',
         rep: 'http://squidguard.mesd.k12.or.us/blacklists.tgz'
-      }
+    }
 
 - name: squidguard | initialize db
 #  command: "squidGuard -C all"
