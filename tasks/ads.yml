@@ -30,4 +30,6 @@
   command: "sh -x {{ scriptsdir }}/ad_servers_newlist.sh"
   args:
     creates: "/var/spool/squid/ad_block.txt"
-  notify: restart squid
+  notify:
+    - restart squid
+    - restart squid - docker

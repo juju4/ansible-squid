@@ -54,7 +54,9 @@
     csr_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
     ownca_not_after: "{{ squid_certduration | default('+365d') }}"
     provider: selfsigned
-  notify: restart squid
+  notify:
+    - restart squid
+    - restart squid - docker
 
 - name: Validate private key file permissions
   file:

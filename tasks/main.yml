@@ -47,7 +47,9 @@
     mode: '0644'
     validate: squid -k parse -f %s
     backup: yes
-  notify: restart squid
+  notify:
+    - restart squid
+    - restart squid - docker
 
 - name: ensure log dir exists
   file:
