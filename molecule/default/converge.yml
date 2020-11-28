@@ -7,6 +7,9 @@
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
   remote_user: root
+  vars:
+    squid_jsonlog: true
+    squid_testing: true
   pre_tasks:
     - name: Ubuntu | Install python3
       raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
@@ -27,5 +30,34 @@
       when: >
         (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 16) or
         (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8)
+    - name: RedHat8 | specific variables
+      set_fact:
+        squid_urlfiltering_enable: false
+        squid_urlfiltering_tool: squidguard
+        squid_report_pkgs: []
+      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '8'
+    - name: RedHat7 | specific variables
+      set_fact:
+        squid_urlfiltering_enable: false
+        squid_urlfiltering_tool: squidguard
+        squid_report_pkgs:
+          - calamaris
+      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
+    - name: Ubuntu20.04+ | specific variables
+      set_fact:
+        squid_urlfiltering_enable: true
+        squid_urlfiltering_tool: e2guardian
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int > 18
   roles:
     - juju4.squid
+  tasks:
+    - name: banned few websites for testing
+      lineinfile:
+        dest: /etc/e2guardian/lists/bannedsitelist
+        line: "{{ item }}"
+      with_items:
+        - adblockanalytics.com
+        - badboys.com
+      notify:
+        - e2guardian reload
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int > 18
