@@ -23,6 +23,11 @@
         that: ps.stdout
       ignore_errors: true
 
+    - name: check all processes
+      command: ps aux
+      register: psa
+    - debug: var=psa verbosity=1
+
     - name: Ensure ports are listening
       wait_for:
         host: "{{ item.h }}"
