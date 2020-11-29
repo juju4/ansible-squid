@@ -10,6 +10,11 @@
   with_items:
     - "{{ scriptsdir }}"
 
+- name: Ensure curl is present
+  package:
+    name: curl
+    state: present
+
 - name: add ad servers newlist script
   template:
     src: ad_servers_newlist.sh.j2
