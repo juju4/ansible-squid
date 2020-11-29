@@ -14,11 +14,7 @@
         )
 
 - name: restart squid - docker
-  service:
-    name: squid
-    state: restarted
-    sleep: 5
-    use: service
+  shell: killall squid; /usr/sbin/squid -sYC
   when: >
     (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
@@ -37,6 +33,13 @@
     not (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
         )
+
+- name: restart e2guardian - docker
+  command: /usr/sbin/e2guardian -Q
+  when: >
+    (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+    )
 
 - name: e2guardian reload
   command: e2guardian -r

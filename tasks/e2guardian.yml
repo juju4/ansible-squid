@@ -30,6 +30,7 @@
     # - { re: "^usexforwardedfor = '.*'", rep: "usexforwardedfor = on" }
   notify:
     - restart e2guardian
+    - restart e2guardian - docker
 
 - name: check few permissions
   file: "dest=/var/log/e2guardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
