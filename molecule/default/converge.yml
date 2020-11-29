@@ -55,6 +55,7 @@
       lineinfile:
         dest: /etc/e2guardian/lists/bannedsitelist
         line: "{{ item }}"
+        mode: '0644'
       with_items:
         - adblockanalytics.com
         - badboys.com
