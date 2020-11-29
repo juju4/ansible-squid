@@ -14,7 +14,7 @@
         )
 
 - name: restart squid - docker
-  shell: pkill squid; /usr/sbin/squid -sYC
+  shell: pkill squid; nohup /usr/sbin/squid -sYC
   when: >
     (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
