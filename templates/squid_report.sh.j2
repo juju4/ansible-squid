@@ -81,4 +81,4 @@ echo
 echo
 
 
-find {{ squid_reporting_dest }} -name 'report-*' -mtime +{{ squid_reporting_purge | default('10') }} -exec rm {} \;
+find {{ squid_reporting_dest }} -name 'squid-report-*' -mtime +{{ squid_reporting_purge | default('10') }} -exec rm {} \; 2>/dev/null
