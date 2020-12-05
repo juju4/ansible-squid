@@ -1,5 +1,9 @@
 [![Build Status - Master](https://travis-ci.org/juju4/ansible-squid.svg?branch=master)](https://travis-ci.org/juju4/ansible-squid)
 [![Build Status - Devel](https://travis-ci.org/juju4/ansible-squid.svg?branch=devel)](https://travis-ci.org/juju4/ansible-squid/branches)
+
+[![Actions Status - Master](https://github.com/juju4/ansible-squid/workflows/AnsibleCI/badge.svg)](https://github.com/juju4/ansible-squid/actions?query=branch%3Amaster)
+[![Actions Status - Devel](https://github.com/juju4/ansible-squid/workflows/AnsibleCI/badge.svg?branch=devel)](https://github.com/juju4/ansible-squid/actions?query=branch%3Adevel)
+
 # Squid ansible role
 
 Ansible role to setup a secure and clean Squid proxy with
@@ -19,10 +23,11 @@ It was tested on the following versions:
  * 2.0
  * 2.2
  * 2.5
+ * 2.10
 
 ### Operating systems
 
-Tested Ubuntu 14.04, 16.04, 18.04 and centos7
+Tested Ubuntu 16.04, 18.04, 20.04 and centos7-8
 
 ## Example Playbook
 
@@ -72,4 +77,3 @@ Squid 5.0: [No mention](https://github.com/squid-cache/squid/blob/master/ChangeL
 ## License
 
 BSD 2-clause
-
