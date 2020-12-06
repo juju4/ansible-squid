@@ -103,6 +103,12 @@
 - block:
     - name: Docker | start squid
       shell: nohup /usr/sbin/squid -sYC &
+    - name: Docker | check process
+      command: ps aux
+      changed_when: false
+      ignore_errors: true
+      register: ps
+    - debug: var=ps verbosity=1
     - name: Docker | add start marker
       file:
         path: /root/.ansible_squid_start
