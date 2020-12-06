@@ -35,7 +35,7 @@
       ignore_errors: true
       register: logs
     - debug: var=logs verbosity=1
-    - name: Validate no ERROR: or FATAL: in logs
+    - name: Validate no ERROR or FATAL in logs
       assert:
         that: >
           "'ERROR: ' not in logs.stdout and 'FATAL: ' in not logs.stdout"
