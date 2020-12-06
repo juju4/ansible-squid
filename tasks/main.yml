@@ -49,7 +49,6 @@
     backup: yes
   notify:
     - restart squid
-    - restart squid - docker
 
 - name: ensure log dir exists
   file:
@@ -95,6 +94,13 @@
     not (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
         )
+
+- name: Docker | start squid
+  shell: nohup /usr/sbin/squid -sYC &
+  when: >
+    (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+    )
 
 - include: rsyslog.yml
 

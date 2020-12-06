@@ -56,7 +56,6 @@
     provider: selfsigned
   notify:
     - restart squid
-    - restart squid - docker
 
 - name: Validate private key file permissions
   file:

@@ -37,4 +37,3 @@
     creates: "/var/spool/squid/ad_block.txt"
   notify:
     - restart squid
-    - restart squid - docker

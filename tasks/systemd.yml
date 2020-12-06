@@ -15,4 +15,3 @@
   notify:
     - reload systemd
     - restart squid
-    - restart squid - docker

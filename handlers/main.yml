@@ -13,13 +13,6 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
         )
 
-- name: restart squid - docker
-  shell: pkill squid; nohup /usr/sbin/squid -sYC &
-  when: >
-    (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
-    )
-
 - name: restart dansguardian
   service: name=dansguardian state=restarted
   when: >
