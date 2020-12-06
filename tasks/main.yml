@@ -101,6 +101,8 @@
   register: marker1
 
 - block:
+    - name: Docker | create swap directories
+      command: squid -z
     - name: Docker | start squid
       shell: nohup /usr/sbin/squid -sYC &
     - name: Docker | check process
