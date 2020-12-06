@@ -95,9 +95,21 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
         )
 
-- name: Docker | start squid
-  shell: nohup /usr/sbin/squid -sYC &
+- name: Docker | check start marker
+  stat:
+    path: /root/.ansible_squid_start
+  register: marker1
+
+- block:
+    - name: Docker | start squid
+      shell: nohup /usr/sbin/squid -sYC &
+    - name: Docker | add start marker
+      file:
+        path: /root/.ansible_squid_start
+        mode: '0600'
+        state: touch
   when: >
+    not marker1.stat.exists and
     (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
     )
