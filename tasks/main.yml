@@ -110,7 +110,8 @@
       changed_when: false
       ignore_errors: true
       register: ps
-    - debug: var=ps verbosity=1
+    - name: Debug | process output
+      debug: var=ps verbosity=1
     - name: Docker | add start marker
       file:
         path: /root/.ansible_squid_start
@@ -139,7 +140,8 @@
 - include: testing.yml
   when: squid_testing|bool
 
-- meta: flush_handlers
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: Ensure clamd available before ending
   wait_for:
