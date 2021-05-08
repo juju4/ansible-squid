@@ -30,6 +30,11 @@ jq -r 'select(.resp.code_c == "403" or .resp.code_c == "200" or (.resp.code_c | 
 echo
 echo
 
+echo "** Top Domain 503"
+jq -r 'select(.resp.code_c == "503") | .req.domain + " by: " + .req.ua' $f | sort | uniq -c | sort -nr
+echo
+echo
+
 echo "** Certificates subject_s"
 jq -r '.ssl.subject_s' $f | sort | uniq -c | sort -nr
 echo "** Certificates issuer_s"
@@ -63,8 +68,12 @@ echo
 
 echo "** Req bytes max/avg/min"
 jq -s 'map(.req.bytes) | "Median: " + (sort | if length % 2 == 0 then .[length/2] else .[(length-1)/2] end |  tostring), "Average: " + (map(select(. != null)) | add/length | tostring), "Min: " + (map(select(. != null)) | min | tostring), "Max: " + (max | tostring)' $f
+echo "** Top5 Large Req bytes > 100KB"
+jq -r 'select(.req.bytes > 100000) | .req.domain + " from: " + .conn.src_ip + " by: " + .req.ua' $f | sort | uniq -c | sort -nr | head -5
 echo "** Resp bytes max/avg/min"
 jq -s 'map(.resp.bytes) | "Median: " + (sort | if length % 2 == 0 then .[length/2] else .[(length-1)/2] end |  tostring), "Average: " + (map(select(. != null)) | add/length | tostring), "Min: " + (map(select(. != null)) | min | tostring), "Max: " + (max | tostring)' $f
+echo "** Top5 Large Resp bytes > 1.5MB"
+jq -r 'select(.resp.bytes > 1500000) | .req.domain + " from: " + .conn.src_ip + " by: " + .req.ua' $f | sort | uniq -c | sort -nr | head -5
 echo
 echo
 
