@@ -21,4 +21,3 @@ iptables -t nat $ipt_arg -A OUTPUT -p tcp --dport 8080 -j REDIRECT --to-port $SQ
 ## delete
 #iptables -L --line-numbers
 #iptables -t nat -A OUTPUT -D #number#
-

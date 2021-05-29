@@ -33,4 +33,3 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.network "forwarded_port", guest: 3128, host: 8128
     config.vm.network "forwarded_port", guest: 3129, host: 8129
 end
-

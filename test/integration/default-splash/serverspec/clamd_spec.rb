@@ -10,7 +10,7 @@ end
 describe service('clamav-daemon'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   it { should be_enabled }
   it { should be_running }
-end  
+end
 
 describe process("freshclam"), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   its(:user) { should eq "clamav" }

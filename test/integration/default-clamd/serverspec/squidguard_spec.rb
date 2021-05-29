@@ -12,7 +12,7 @@ end
 describe service('squidGuard'), :if => os[:family] == 'redhat' && os[:release] == '6' do
   it { should be_enabled }
   it { should be_running }
-end  
+end
 
 describe file('/usr/sbin/squidGuard'), :if => os[:family] == 'redhat' && os[:release] == '6' do
   it { should be_executable }
@@ -32,4 +32,3 @@ describe command("curl -x http://localhost:#{proxy_port} http://malware.wicar.or
   its(:stdout) { should match /<b>Virus or bad content detected. Eicar-Test-Signature<\/b>/ }
   its(:exit_status) { should eq 0 }
 end
-

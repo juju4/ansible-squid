@@ -21,7 +21,6 @@
     - name: Validate ps output
       assert:
         that: ps.stdout
-      ignore_errors: true
 
     - name: check all processes
       command: ps aux

@@ -12,7 +12,7 @@ end
 describe service('squidGuard'), :if => os[:family] == 'redhat' && os[:release] == '6' do
   it { should be_enabled }
   it { should be_running }
-end  
+end
 
 describe file('/usr/sbin/squidGuard'), :if => os[:family] == 'redhat' && os[:release] == '6' do
   it { should be_executable }

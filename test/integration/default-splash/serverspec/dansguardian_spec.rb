@@ -12,7 +12,7 @@ end
 describe service('dansguardian'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   it { should be_enabled }
   it { should be_running }
-end  
+end
 
 describe file('/usr/sbin/dansguardian'), :if => os[:family] == 'ubuntu' || os[:family] == 'debian' do
   it { should be_executable }

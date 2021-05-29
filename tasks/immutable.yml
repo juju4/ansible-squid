@@ -15,11 +15,9 @@
       command: "lsattr -d '{{ target_dir }}'"
       register: dir
       changed_when: false
-      ignore_errors: true
 
     - name: Remove immutable attribute
       command: "chattr -i '{{ target_dir }}'"
-      ignore_errors: true
       when: dir.stdout.find('-i-') != -1
   when: state == 'pre' and imm.stat.exists
 
@@ -29,4 +27,3 @@
   #   dest: "{{ target_dir }}"
   #  attributes: '----i-----I--e--'
   when: state == 'post'
-  ignore_errors: true
