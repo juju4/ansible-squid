@@ -36,15 +36,15 @@
     dest: "{{ item.d }}"
     mode: "{{ item.m }}"
     backup: yes
-  with_items: "{{ squid_list_templates }}"
+  with_items: "{{ squid_list_templates_acl }}"
 
 - name: update configuration
   template:
     src: "{{ squidconf_template }}"
     dest: "{{ squid_confdir }}/squid.conf"
     owner: root
-    group: root
-    mode: '0644'
+    group: "{{ squid_user }}"
+    mode: '0640'
     validate: squid -k parse -f %s
     backup: yes
   notify:
