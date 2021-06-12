@@ -10,28 +10,28 @@
     state: restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
 - name: restart dansguardian
   service: name=dansguardian state=restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
 - name: restart e2guardian
   service: name=e2guardian state=restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
 - name: restart e2guardian - docker
   command: /usr/sbin/e2guardian -Q
   when: >
     (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
     )
 
 - name: e2guardian reload
@@ -47,5 +47,5 @@
   service: name=rsyslog state=restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )

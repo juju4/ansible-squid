@@ -92,7 +92,7 @@
     enabled: yes
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
 - name: Docker | check start marker
@@ -120,7 +120,7 @@
   when: >
     not marker1.stat.exists and
     (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "VirtualPC")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
     )
 
 - include: rsyslog.yml
