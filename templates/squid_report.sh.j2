@@ -1,91 +1,94 @@
 #!/bin/sh
 
-date=`date +%Y%m%d`
+export export PATH=/usr/bin:/bin
+umask 077
+
+date=$(date +%Y%m%d)
 f=/var/log/squid/access_json.log
 echo
 echo
-echo "      SQUID DAILY REPORT $date for $f"
+echo "      SQUID DAILY REPORT ${date} for ${f}"
 echo
 echo
 
 echo "** Source IP blocked"
-jq -r 'select(.resp.code_c == "403") | .conn.src_ip' $f | sort | uniq -c | sort -nr
+jq -r 'select(.resp.code_c == "403") | .conn.src_ip' "${f}" | sort | uniq -c | sort -nr
 echo "** Source IP allowed"
-jq -r 'select(.resp.code_c == "200") | .conn.src_ip' $f | sort | uniq -c | sort -nr
+jq -r 'select(.resp.code_c == "200") | .conn.src_ip' "${f}" | sort | uniq -c | sort -nr
 echo "** Source IP error"
-jq -r 'select(.resp.code_c | startswith("50")) | .conn.src_ip' $f | sort | uniq -c | sort -nr
+jq -r 'select(.resp.code_c | startswith("50")) | .conn.src_ip' "${f}" | sort | uniq -c | sort -nr
 echo "** Source IP others"
-jq -r 'select(.resp.code_c == "403" or .resp.code_c == "200" or (.resp.code_c | startswith("50")) | not) | .conn.src_ip' $f | sort | uniq -c | sort -nr
+jq -r 'select(.resp.code_c == "403" or .resp.code_c == "200" or (.resp.code_c | startswith("50")) | not) | .conn.src_ip' "${f}" | sort | uniq -c | sort -nr
 echo
 echo
 
 echo "** Top User-agent blocked"
-jq -r 'select(.resp.code_c == "403") | .req.ua' $f | sort | uniq -c | sort -nr
+jq -r 'select(.resp.code_c == "403") | .req.ua' "${f}" | sort | uniq -c | sort -nr
 echo "** Top User-agent allowed"
-jq -r 'select(.resp.code_c == "200") | .req.ua' $f | sort | uniq -c | sort -nr
+jq -r 'select(.resp.code_c == "200") | .req.ua' "${f}" | sort | uniq -c | sort -nr
 echo "** Top User-agent error"
-jq -r 'select(.resp.code_c | startswith("50")) | .req.ua' $f | sort | uniq -c | sort -nr
+jq -r 'select(.resp.code_c | startswith("50")) | .req.ua' "${f}" | sort | uniq -c | sort -nr
 echo "** Top User-agent other"
-jq -r 'select(.resp.code_c == "403" or .resp.code_c == "200" or (.resp.code_c | startswith("50")) | not) | .req.ua' $f | sort | uniq -c | sort -nr
+jq -r 'select(.resp.code_c == "403" or .resp.code_c == "200" or (.resp.code_c | startswith("50")) | not) | .req.ua' "${f}" | sort | uniq -c | sort -nr
 echo
 echo
 
 echo "** Top Domain 503"
-jq -r 'select(.resp.code_c == "503") | .req.domain + " by: " + .req.ua' $f | sort | uniq -c | sort -nr
+jq -r 'select(.resp.code_c == "503") | .req.domain + " by: " + .req.ua' "${f}" | sort | uniq -c | sort -nr
 echo
 echo
 
 echo "** Certificates subject_s"
-jq -r '.ssl.subject_s' $f | sort | uniq -c | sort -nr
+jq -r '.ssl.subject_s' "${f}" | sort | uniq -c | sort -nr
 echo "** Certificates issuer_s"
-jq -r '.ssl.issuer_s' $f | sort | uniq -c | sort -nr
+jq -r '.ssl.issuer_s' "${f}" | sort | uniq -c | sort -nr
 echo "** Certificates ssl_nego_s"
-jq -r '.ssl.ssl_nego_s' $f | sort | uniq -c | sort -nr
+jq -r '.ssl.ssl_nego_s' "${f}" | sort | uniq -c | sort -nr
 echo
 echo
 
 echo "** Scheme"
-jq -r '.req.scheme' $f | sort | uniq -c | sort -nr
+jq -r '.req.scheme' "${f}" | sort | uniq -c | sort -nr
 echo
 echo
 
 echo "** HTTP return code code_c"
-jq -r '.resp.code_c' $f | sort | uniq -c | sort -nr
+jq -r '.resp.code_c' "${f}" | sort | uniq -c | sort -nr
 echo "** HTTP return code code_nexthop"
-jq -r '.resp.code_nexthop' $f | sort | uniq -c | sort -nr
+jq -r '.resp.code_nexthop' "${f}" | sort | uniq -c | sort -nr
 echo
 echo
 
 echo "** HTTP Method"
-jq -r '.req.method' $f | sort | uniq -c | sort -nr
+jq -r '.req.method' "${f}" | sort | uniq -c | sort -nr
 echo
 echo
 
 echo "** mime-type"
-jq -r '.resp."mime-type"' $f | sort | uniq -c | sort -nr
+jq -r '.resp."mime-type"' "${f}" | sort | uniq -c | sort -nr
 echo
 echo
 
 echo "** Req bytes max/avg/min"
 jq -s 'map(.req.bytes) | "Median: " + (sort | if length % 2 == 0 then .[length/2] else .[(length-1)/2] end |  tostring), "Average: " + (map(select(. != null)) | add/length | tostring), "Min: " + (map(select(. != null)) | min | tostring), "Max: " + (max | tostring)' $f
 echo "** Top5 Large Req bytes > 100KB"
-jq -r 'select(.req.bytes > 100000) | .req.domain + " from: " + .conn.src_ip + " by: " + .req.ua' $f | sort | uniq -c | sort -nr | head -5
+jq -r 'select(.req.bytes > 100000) | .req.domain + " from: " + .conn.src_ip + " by: " + .req.ua' "${f}" | sort | uniq -c | sort -nr | head -5
 echo "** Resp bytes max/avg/min"
 jq -s 'map(.resp.bytes) | "Median: " + (sort | if length % 2 == 0 then .[length/2] else .[(length-1)/2] end |  tostring), "Average: " + (map(select(. != null)) | add/length | tostring), "Min: " + (map(select(. != null)) | min | tostring), "Max: " + (max | tostring)' $f
 echo "** Top5 Large Resp bytes > 1.5MB"
-jq -r 'select(.resp.bytes > 1500000) | .req.domain + " from: " + .conn.src_ip + " by: " + .req.ua' $f | sort | uniq -c | sort -nr | head -5
+jq -r 'select(.resp.bytes > 1500000) | .req.domain + " from: " + .conn.src_ip + " by: " + .req.ua' "${f}" | sort | uniq -c | sort -nr | head -5
 echo
 echo
 
 # For selected IP1
 echo "** IP1 blocked: domain + UA"
-jq -r 'select(.conn.src_ip == "IP1.x.y.z" and .resp.code_c == "403") | .req.domain + " by: " + .req.ua' $f | sort | uniq -c | sort -nr
+jq -r 'select(.conn.src_ip == "IP1.x.y.z" and .resp.code_c == "403") | .req.domain + " by: " + .req.ua' "${f}" | sort | uniq -c | sort -nr
 echo "** IP1 allowed: domain + UA"
-jq -r 'select(.conn.src_ip == "IP1.x.y.z" and .resp.code_c == "200") | .req.domain + " by: " + .req.ua' $f | sort | uniq -c | sort -nr
+jq -r 'select(.conn.src_ip == "IP1.x.y.z" and .resp.code_c == "200") | .req.domain + " by: " + .req.ua' "${f}" | sort | uniq -c | sort -nr
 echo "** IP1 error: domain + UA"
-jq -r 'select(.conn.src_ip == "IP1.x.y.z" and (.resp.code_c | startswith("50"))) | .req.domain + " by: " + .req.ua' $f | sort | uniq -c | sort -nr
+jq -r 'select(.conn.src_ip == "IP1.x.y.z" and (.resp.code_c | startswith("50"))) | .req.domain + " by: " + .req.ua' "${f}" | sort | uniq -c | sort -nr
 echo "** IP1 other: domain + UA"
-jq -r 'select(.conn.src_ip == "IP1.x.y.z" and (.resp.code_c == "403" or .resp.code_c == "200" or (.resp.code_c | startswith("50")) | not)) | .req.domain + " by: " + .req.ua' $f | sort | uniq -c | sort -nr
+jq -r 'select(.conn.src_ip == "IP1.x.y.z" and (.resp.code_c == "403" or .resp.code_c == "200" or (.resp.code_c | startswith("50")) | not)) | .req.domain + " by: " + .req.ua' "${f}" | sort | uniq -c | sort -nr
 echo
 echo
 
