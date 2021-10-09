@@ -6,3 +6,9 @@
     state: present
   register: pkg_result
   until: pkg_result is success
+
+- name: RHEL7 | Install certifi
+  pip:
+    name: certifi
+    state: present
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 7
