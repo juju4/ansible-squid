@@ -82,7 +82,7 @@
         jid: "{{ dpkgbuild.ansible_job_id }}"
       register: job_result
       until: job_result.finished or dpkgbuild.finished
-      retries: 30
+      retries: 60
       delay: 60
       when: dpkgbuild is changed
 
@@ -133,7 +133,7 @@
         - "{{ squidbuild_dir }}/squidclient_{{ squid_pkg }}_amd64.deb"
     - include: "immutable.yml target_dir=/etc/init.d state=post"
     - include: "immutable.yml target_dir=/lib/systemd/system state=post"
-  when: squiddeb is failed
+  when: squiddeb is failed and ansible_distribution_release != '20.04'
 
 - name: Squid openssl | prevent packages from being upgraded automatically
   dpkg_selections:
