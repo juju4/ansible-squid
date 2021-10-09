@@ -43,12 +43,13 @@ squidbuild_pkgs:
   - libecap3-dev
   - debian-keyring
   - libsystemd-dev
+  - libtdb-dev
 squidhttps_pkgs:
   - squid-langpack
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
-squid_ver: '4.13'
-squid_pkg: '4.13-1'
+squid_ver: '5.1'
+squid_pkg: '5.1-2'
 
 squid_testing_pkgs:
   - curl
