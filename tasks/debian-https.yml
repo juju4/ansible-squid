@@ -120,10 +120,22 @@
 - block:
     # if install with dpkg, not executing /etc/apt/apt.conf.d/99security and /etc/init.d is immutable
     #       OK with apt install
-    - import_tasks: "immutable.yml target_dir=/etc/init.d/ state=pre"
-    - import_tasks: "immutable.yml target_dir=/etc/init.d/squid state=pre"
-    - import_tasks: "immutable.yml target_dir=/lib/systemd/system state=pre"
-    - import_tasks: "immutable.yml target_dir=/lib/systemd/system/squid.service state=pre"
+    - import_tasks: immutable.yml
+      vars:
+        target_dir: /etc/init.d/
+        state: pre
+    - import_tasks: immutable.yml
+      vars:
+        target_dir: /etc/init.d/squid
+        state: pre
+    - import_tasks: immutable.yml
+      vars:
+        target_dir: /lib/systemd/system
+        state: pre
+    - import_tasks: immutable.yml
+      vars:
+        target_dir: /lib/systemd/system/squid.service
+        state: pre
     - name: Squid openssl | install locally build package (immutable)
       apt:
         deb: "{{ item }}"
@@ -131,8 +143,14 @@
         - "{{ squidbuild_dir }}/squid-common_{{ squid_pkg }}_all.deb"
         - "{{ squidbuild_dir }}/squid_{{ squid_pkg }}_amd64.deb"
         - "{{ squidbuild_dir }}/squidclient_{{ squid_pkg }}_amd64.deb"
-    - import_tasks: "immutable.yml target_dir=/etc/init.d state=post"
-    - import_tasks: "immutable.yml target_dir=/lib/systemd/system state=post"
+    - import_tasks: immutable.yml
+      vars:
+        target_dir: /etc/init.d/
+        state: post
+    - import_tasks: immutable.yml
+      vars:
+        target_dir: /lib/systemd/system
+        state: post
   when: squiddeb is failed and ansible_distribution_release != '20.04'
 
 - name: Squid openssl | prevent packages from being upgraded automatically
