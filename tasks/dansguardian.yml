@@ -9,7 +9,7 @@
   register: pkg_result
   until: pkg_result is success
 
-- include: clamd.yml
+- import_tasks: clamd.yml
   when: squid_dansguardian_clamd|bool
 
 - name: dansguardian | review settings
@@ -80,7 +80,7 @@
     mode: '0600'
   when: not danl.stat.exists
 
-- include: dansguardian-template.yml
+- import_tasks: dansguardian-template.yml
 
 - name: ensure dansguardian is started and enabled
   service:

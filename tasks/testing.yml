@@ -7,5 +7,5 @@
   register: pkg_result
   until: pkg_result is success
 
-- include: testing-tsung.yml
+- import_tasks: testing-tsung.yml
   when: squid_testing_tsung

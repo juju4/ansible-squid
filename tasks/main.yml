@@ -7,13 +7,13 @@
   include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
   when: ansible_os_family == "RedHat"
 
-- include: debian.yml
+- import_tasks: debian.yml
   when: >
     ((ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
       and not squid_https
     )
 
-- include: debian-https.yml
+- import_tasks: debian-https.yml
   when: >
     (
       ansible_distribution == 'Debian' or
@@ -21,13 +21,13 @@
     )
     and squid_https
 
-- include: redhat.yml
+- import_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
 
 - include_tasks: https.yml
   when: squid_https|bool
 
-- include: ads.yml
+- import_tasks: ads.yml
   when: squid_filter_ads is defined and squid_filter_ads
 
 - name: Configure given extra list templates
@@ -73,16 +73,16 @@
 - name: copy script for transparent proxy user
   copy: src=transparent-user.sh dest=/usr/local/bin/transparent-user.sh mode=0755
 
-- include: dansguardian.yml
+- import_tasks: dansguardian.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian'
 
-- include: e2guardian.yml
+- import_tasks: e2guardian.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'e2guardian'
 
-- include: squidguard.yml
+- import_tasks: squidguard.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard'
 
-- include: splash.yml
+- import_tasks: splash.yml
   when: squid_splash_enable|bool
 
 - name: enable and start squid service
@@ -123,21 +123,21 @@
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
     )
 
-- include: rsyslog.yml
+- import_tasks: rsyslog.yml
 
-- include: systemd.yml
+- import_tasks: systemd.yml
   when: squid_systemd_restriction_enable|bool
 
-- include: calamaris.yml
+- import_tasks: calamaris.yml
   when: squid_calamaris_enable|bool and ansible_os_family == "Debian"
 
-- include: sarg.yml
+- import_tasks: sarg.yml
   when: squid_sarg_enable|bool and ansible_os_family == "Debian"
 
-- include: reporting.yml
+- import_tasks: reporting.yml
   when: squid_reporting
 
-- include: testing.yml
+- import_tasks: testing.yml
   when: squid_testing|bool
 
 - name: Flush handlers

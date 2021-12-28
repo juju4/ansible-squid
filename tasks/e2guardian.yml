@@ -61,7 +61,7 @@
     owner: "{{ squid_user }}"
     mode: '0600'
 
-- include: e2guardian-template.yml
+- import_tasks: e2guardian-template.yml
 
 - name: ensure e2guardian is started and enabled
   service:
