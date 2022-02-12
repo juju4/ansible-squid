@@ -80,6 +80,7 @@
       uri:
         url: http://www.badboys.com
         follow_redirects: none
+        status_code: [200, 301]
       register: curl3
       environment:
         http_proxy: "http://localhost:{{ proxy_port }}"
