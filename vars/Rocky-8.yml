@@ -1,0 +1,31 @@
+---
+
+squid_pkgs: "{{ [ 'squid', 'crontabs' ] + squid_report_pkgs | default(omit) }}"
+
+squid_confdir: /etc/squid
+squid_svc: squid
+squid_spool: /var/spool/squid
+squid_user: squid
+squid_errors_template: /usr/share/squid/errors/
+
+## no package for dansguardian or squidguard...
+squid_urlfiltering_tool:
+
+squidguard_pkgs: []
+
+ssl_user: root
+ssl_dir: /etc/pki/tls/certs
+ssl_privatedir: /etc/pki/tls/private
+
+squid_testing_pkgs:
+  - curl
+  - libdb-utils
+  - nmap-ncat
+  - jq
+
+python_pip: python3-pip
+openssl_pkgs:
+  - openssl
+  - python3-pip
+  - python3-setuptools
+  - python3-pyOpenSSL
