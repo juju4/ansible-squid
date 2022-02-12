@@ -103,7 +103,9 @@
 - block:
     - name: Docker | create swap directories
       command: squid -z
-    - name: Docker | start squid
+      args:
+        creates: /var/spool/squid/00
+    - name: Docker | start squid  # noqa no-changed-when
       shell: nohup /usr/sbin/squid -sYC &
     - name: Docker | check process
       command: ps aux
