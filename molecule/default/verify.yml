@@ -79,6 +79,7 @@
     - name: Test curl www.badboys.com
       uri:
         url: http://www.badboys.com
+        follow_redirects: none
       register: curl3
       environment:
         http_proxy: "http://localhost:{{ proxy_port }}"
