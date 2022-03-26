@@ -1,7 +1,7 @@
 ---
 
 - name: install clamav daemon package
-  package:
+  ansible.builtin.package:
     name: "{{ clamd_pkgs }}"
     state: present
   register: pkg_result
@@ -9,7 +9,7 @@
 
 ## clamd and dansguardian need the same user to scan files
 - name: clamd | review settings
-  replace:
+  ansible.builtin.replace:
     dest: /etc/clamav/clamd.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
@@ -24,25 +24,25 @@
     - restart clamd
 
 - name: clamd | check few permissions
-  file: "dest={{ item.d }} state={{ item.s }} mode={{ item.m }} owner={{ squid_user }}"
+  ansible.builtin.file: "dest={{ item.d }} state={{ item.s }} mode={{ item.m }} owner={{ squid_user }}"
   with_items:
     - { d: /var/log/clamav, s: directory, m: '0755' }
     - { d: /var/log/clamav/clamav.log, s: file, m: '0640' }
 
 - name: check if existing signatures db
-  stat: path=/var/lib/clamav/main.cvd
+  ansible.builtin.stat: path=/var/lib/clamav/main.cvd
   register: db
 - name: check if existing daily.cld db
-  stat: path=/var/lib/clamav/daily.cld
+  ansible.builtin.stat: path=/var/lib/clamav/daily.cld
   register: db2
 - name: check if existing daily.cvd db
-  stat: path=/var/lib/clamav/daily.cvd
+  ansible.builtin.stat: path=/var/lib/clamav/daily.cvd
   register: db3
 - block:
     - name: stop freshclam service during update
-      service: name=clamav-freshclam state=stopped
+      ansible.builtin.service: name=clamav-freshclam state=stopped
     - name: ensure signatures are present before starting clamav
-      command: "freshclam"
+      ansible.builtin.command: "freshclam"
       args:
         creates: /var/lib/clamav/daily.cld
   when: not db.stat.exists or (not db2.stat.exists and not db3.stat.exists)
@@ -50,17 +50,17 @@
 # https://bugs.launchpad.net/ubuntu/+source/clamav/+bug/1784193
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884707
 # - name: Ubuntu | Switch off apparmor for clamd
-#   file:
+#   ansible.builtin.file:
 #     src: /etc/apparmor.d/usr.sbin.clamd
 #     dest: /etc/apparmor.d/disable/usr.sbin.clamd
 #     state: link
 #   notify:
 #     - remove clamd apparmor profile
 #
-# - meta: flush_handlers
+# - ansible.builtin.meta: flush_handlers
 
 - name: ensure clamav is started and enabled
-  service: name={{ item }} state=started enabled=yes
+  ansible.builtin.service: name={{ item }} state=started enabled=yes
   with_items:
     - clamav-daemon
     - clamav-freshclam

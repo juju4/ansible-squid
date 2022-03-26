@@ -1,7 +1,7 @@
 ---
 
 - name: Update Dansguardian template
-  replace:
+  ansible.builtin.replace:
     dest: /etc/dansguardian/languages/ukenglish/template.html
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"

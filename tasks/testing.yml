@@ -1,7 +1,7 @@
 ---
 
 - name: install testing tools
-  package:
+  ansible.builtin.package:
     name: "{{ squid_testing_pkgs }}"
     state: present
   register: pkg_result

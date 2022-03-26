@@ -1,7 +1,7 @@
 ---
 
 - name: Set Calamaris report target
-  replace:
+  ansible.builtin.replace:
     dest: /etc/calamaris/cron.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
@@ -10,7 +10,7 @@
   with_items: "{{ squid_calamaris_cron_conf }}"
 
 - name: Ensure Calamaris report directories exist
-  file:
+  ansible.builtin.file:
     dest: "{{ item }}"
     state: directory
     mode: '0755'

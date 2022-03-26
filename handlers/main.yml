@@ -1,11 +1,11 @@
 ---
 
 - name: reload systemd
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: yes
 
 - name: restart squid
-  service:
+  ansible.builtin.service:
     name: "{{ squid_svc }}"
     state: restarted
   when: >
@@ -14,37 +14,37 @@
         )
 
 - name: restart dansguardian
-  service: name=dansguardian state=restarted
+  ansible.builtin.service: name=dansguardian state=restarted
   when: >
     not (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
 - name: restart e2guardian
-  service: name=e2guardian state=restarted
+  ansible.builtin.service: name=e2guardian state=restarted
   when: >
     not (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
         )
 
 - name: restart e2guardian - docker
-  command: /usr/sbin/e2guardian -Q
+  ansible.builtin.command: /usr/sbin/e2guardian -Q
   when: >
     (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
     )
 
 - name: e2guardian reload
-  command: e2guardian -r
+  ansible.builtin.command: e2guardian -r
 
 - name: restart clamd
-  service: name=clamav-daemon state=restarted
+  ansible.builtin.service: name=clamav-daemon state=restarted
 
 - name: remove clamd apparmor profile
-  command: apparmor_parser -R /etc/apparmor.d/usr.sbin.clamd
+  ansible.builtin.command: apparmor_parser -R /etc/apparmor.d/usr.sbin.clamd
 
 - name: restart rsyslog
-  service: name=rsyslog state=restarted
+  ansible.builtin.service: name=rsyslog state=restarted
   when: >
     not (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")

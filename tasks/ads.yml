@@ -3,7 +3,7 @@
 # see template/squid.conf.j2
 
 - name: Ensure directory exists
-  file:
+  ansible.builtin.file:
     dest: "{{ item }}"
     mode: '0755'
     state: directory
@@ -11,18 +11,18 @@
     - "{{ scriptsdir }}"
 
 - name: Ensure curl is present
-  package:
+  ansible.builtin.package:
     name: curl
     state: present
 
 - name: add ad servers newlist script
-  template:
+  ansible.builtin.template:
     src: ad_servers_newlist.sh.j2
     dest: "{{ scriptsdir }}/ad_servers_newlist.sh"
     mode: '0755'
 
 - name: add refresh cron task to refresh ads servers list
-  cron:
+  ansible.builtin.cron:
     name: "ads servers list refresh"
     minute: "45"
     hour: "2"
@@ -32,7 +32,7 @@
     cron_file: ansible_adslist_refresh
 
 - name: ensure ads servers list exists
-  command: "sh -x {{ scriptsdir }}/ad_servers_newlist.sh"
+  ansible.builtin.command: "sh -x {{ scriptsdir }}/ad_servers_newlist.sh"
   args:
     creates: "/var/spool/squid/ad_block.txt"
   notify:

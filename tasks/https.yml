@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure squid compiled with ssl
-  command: squid -v
+  ansible.builtin.command: squid -v
   register: squidv
   failed_when: >
     ('with-openssl' not in squidv.stdout and '--enable-ssl-crtd ' not in squidv.stdout) and
@@ -11,7 +11,7 @@
 - include_tasks: certificate-selfsigned.yml
 
 - name: Ensure /var/lib/squid exists
-  file:
+  ansible.builtin.file:
     dest: /var/lib/squid
     state: directory
     mode: '0700'
@@ -20,7 +20,7 @@
     setype: squid_cache_t
 
 - name: Configure Proxy exclusion for SSL inspection
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/etc/squid/{{ item }}"
     mode: '0644'
@@ -29,7 +29,7 @@
     - "{{ squid_noproxy_ips_template }}"
 
 - name: RedHat | Initialize SSL database
-  command: /usr/lib64/squid/ssl_crtd -c -s /var/lib/squid/ssl_db
+  ansible.builtin.command: /usr/lib64/squid/ssl_crtd -c -s /var/lib/squid/ssl_db
   args:
     creates: /var/lib/squid/ssl_db/index.txt
   become: yes
@@ -37,7 +37,7 @@
   when: ansible_os_family == "RedHat"
 
 - name: Debian | Initialize SSL database
-  command: /usr/lib/squid/security_file_certgen -c -s /var/lib/squid/ssl_db -M 4MB
+  ansible.builtin.command: /usr/lib/squid/security_file_certgen -c -s /var/lib/squid/ssl_db -M 4MB
   args:
     creates: /var/lib/squid/ssl_db/index.txt
   become: yes

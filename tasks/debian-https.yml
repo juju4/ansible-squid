@@ -3,14 +3,14 @@
 # https://docs.diladele.com/howtos/build_squid_4_on_ubuntu/index.html
 
 - name: Ubuntu | Enable universe repository
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "{{ item }}"
   loop:
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }} universe"
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }}-updates universe"
 
 - name: Ubuntu | Enable universe security repository
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/apt/sources.list
     mode: '0644'
     owner: root
@@ -18,20 +18,20 @@
     line: "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release|lower }}-security universe"
 
 - name: Ensure squid build dir exists
-  file:
+  ansible.builtin.file:
     dest: "{{ squidbuild_dir }}"
     state: directory
     mode: '0700'
 
 - name: Squid openssl | Check if orchestrator has deb
-  stat:
+  ansible.builtin.stat:
     path: "{{ orchestrator_files_archives }}/squid_{{ squid_pkg }}_amd64.deb"
   register: squiddeb
   delegate_to: localhost
 
 - block:
     - name: Squid openssl | install build and report tools
-      apt:
+      ansible.builtin.apt:
         pkg: "{{ squidbuild_pkgs + squidhttps_pkgs + squid_report_pkgs | default(omit) }}"
         state: present
         update_cache: yes
@@ -40,7 +40,7 @@
       until: pkg_result is success
 
     - name: Get diladele patches
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ item }}"
         dest: "{{ squidbuild_dir }}/{{ item | basename }}"
         mode: '0600'
@@ -54,7 +54,7 @@
       until: dl_result is success
 
     - name: Squid openssl | unpack source
-      command: "dpkg-source -x squid_{{ squid_pkg }}.dsc"
+      ansible.builtin.command: "dpkg-source -x squid_{{ squid_pkg }}.dsc"
       args:
         chdir: "{{ squidbuild_dir }}"
         creates: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/debian/rules"
@@ -69,7 +69,7 @@
       # command: dpkg-buildpackage -rfakeroot -b
       # command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
       ## without signing else set up a gpg key before
-      command: dpkg-buildpackage -rfakeroot -b -uc -us
+      ansible.builtin.command: dpkg-buildpackage -rfakeroot -b -uc -us
       args:
         chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
         creates: "{{ squidbuild_dir }}/squid_{{ squid_pkg }}_amd64.deb"
@@ -78,7 +78,7 @@
       register: dpkgbuild
 
     - name: Squid openssl | check on async task for pkg building
-      async_status:
+      ansible.builtin.async_status:
         jid: "{{ dpkgbuild.ansible_job_id }}"
       register: job_result
       until: job_result.finished or dpkgbuild.finished
@@ -87,7 +87,7 @@
       when: dpkgbuild is changed
 
     - name: Squid openssl | Recover file on orchestrator
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ item }}"
         dest: "{{ orchestrator_files_archives }}/"
         flat: yes
@@ -98,7 +98,7 @@
   when: not squiddeb.stat.exists
 
 - name: Squid openssl | Recover file on orchestrator
-  copy:
+  ansible.builtin.copy:
     src: "{{ orchestrator_files_archives }}/{{ item }}"
     dest: "{{ squidbuild_dir }}/"
     mode: '0644'
@@ -109,7 +109,7 @@
   when: squiddeb.stat.exists
 
 - name: Squid openssl | install locally build package
-  apt:
+  ansible.builtin.apt:
     deb: "{{ item }}"
   with_items:
     - "{{ squidbuild_dir }}/squid-common_{{ squid_pkg }}_all.deb"
@@ -137,7 +137,7 @@
         target_dir: /lib/systemd/system/squid.service
         state: pre
     - name: Squid openssl | install locally build package (immutable)
-      apt:
+      ansible.builtin.apt:
         deb: "{{ item }}"
       with_items:
         - "{{ squidbuild_dir }}/squid-common_{{ squid_pkg }}_all.deb"
@@ -154,6 +154,6 @@
   when: squiddeb is failed and ansible_distribution_release != '20.04'
 
 - name: Squid openssl | prevent packages from being upgraded automatically
-  dpkg_selections:
+  ansible.builtin.dpkg_selections:
     name: squid
     selection: hold

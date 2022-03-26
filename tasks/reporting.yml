@@ -1,19 +1,19 @@
 ---
 
 - name: Ensure /usr/local/scripts exists
-  file:
+  ansible.builtin.file:
     dest: /usr/local/scripts
     state: directory
     mode: '0755'
 
 - name: Ensure reporting script exists
-  template:
+  ansible.builtin.template:
     src: "{{ squid_reporting_template }}.j2"
     dest: "/usr/local/scripts/{{ squid_reporting_template | basename }}"
     mode: '0755'
 
 - name: Add squid report in logrotate
-  lineinfile:  # noqa no-tabs
+  ansible.builtin.lineinfile:  # noqa no-tabs
     dest: /etc/logrotate.d/squid
     line: "\t\ttest ! -x /usr/local/scripts/{{ squid_reporting_template | basename }} || sudo -u proxy /usr/local/scripts/{{ squid_reporting_template | basename }} 2>&1 >/dev/null"
     insertafter: '^\tprerotate$'

@@ -1,7 +1,7 @@
 ---
 
 - name: apt | install squid
-  apt:
+  ansible.builtin.apt:
     pkg: "{{ squid_pkgs }}"
     state: present
     update_cache: yes

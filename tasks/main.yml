@@ -1,10 +1,10 @@
 ---
 
 - name: Include version-specific variables for Ubuntu.
-  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
   when: ansible_distribution == 'Ubuntu'
 - name: Include version-specific variables for RedHat
-  include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  ansible.builtin.include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
   when: ansible_os_family == "RedHat"
 
 - import_tasks: debian.yml
@@ -31,7 +31,7 @@
   when: squid_filter_ads is defined and squid_filter_ads
 
 - name: Configure given extra list templates
-  template:
+  ansible.builtin.template:
     src: "{{ item.s }}.j2"
     dest: "{{ item.d }}"
     mode: "{{ item.m }}"
@@ -39,7 +39,7 @@
   with_items: "{{ squid_list_templates_acl }}"
 
 - name: update configuration
-  template:
+  ansible.builtin.template:
     src: "{{ squidconf_template }}"
     dest: "{{ squid_confdir }}/squid.conf"
     owner: root
@@ -51,7 +51,7 @@
     - restart squid
 
 - name: ensure log dir exists
-  file:
+  ansible.builtin.file:
     dest: "{{ squid_customlog_path | dirname }}"
     state: directory
     mode: '0755'
@@ -60,7 +60,7 @@
 
 ## http://wiki.squid-cache.org/Features/CustomErrors
 - name: remove squid signature from templates
-  replace:
+  ansible.builtin.replace:
     dest: "{{ item }}"
     regexp: '<p>Generated %T by %h \(%s\)</p>'
     replace: '<p>Generated %T by %h (Squid Proxy)</p>'
@@ -71,7 +71,7 @@
     - "{{ squid_errors_template }}en/ERR_*"
 
 - name: copy script for transparent proxy user
-  copy: src=transparent-user.sh dest=/usr/local/bin/transparent-user.sh mode=0755
+  ansible.builtin.copy: src=transparent-user.sh dest=/usr/local/bin/transparent-user.sh mode=0755
 
 - import_tasks: dansguardian.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian'
@@ -86,7 +86,7 @@
   when: squid_splash_enable|bool
 
 - name: enable and start squid service
-  service:
+  ansible.builtin.service:
     name: "{{ squid_svc }}"
     state: started
     enabled: yes
@@ -96,26 +96,26 @@
         )
 
 - name: Docker | check start marker
-  stat:
+  ansible.builtin.stat:
     path: /root/.ansible_squid_start
   register: marker1
 
 - block:
     - name: Docker | create swap directories
-      command: squid -z
+      ansible.builtin.command: squid -z
       args:
         creates: /var/spool/squid/00
     - name: Docker | start squid  # noqa no-changed-when
-      shell: nohup /usr/sbin/squid -sYC &
+      ansible.builtin.shell: nohup /usr/sbin/squid -sYC &
     - name: Docker | check process
-      command: ps aux
+      ansible.builtin.command: ps aux
       changed_when: false
       ignore_errors: true
       register: ps
     - name: Debug | process output
-      debug: var=ps verbosity=1
+      ansible.builtin.debug: var=ps verbosity=1
     - name: Docker | add start marker
-      file:
+      ansible.builtin.file:
         path: /root/.ansible_squid_start
         mode: '0600'
         state: touch
@@ -140,10 +140,10 @@
   when: squid_reporting
 
 - name: Flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Ensure clamd available before ending
-  wait_for:
+  ansible.builtin.wait_for:
     path: /tmp/clamd.ctl
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian' and squid_dansguardian_clamd
 

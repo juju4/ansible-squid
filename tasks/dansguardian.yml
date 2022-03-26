@@ -3,7 +3,7 @@
 # if whitelisting mode: http://askubuntu.com/questions/569102/how-to-use-dansguardian-as-a-whitelist
 
 - name: install dansguardian package
-  package:
+  ansible.builtin.package:
     name: dansguardian
     state: present
   register: pkg_result
@@ -13,7 +13,7 @@
   when: squid_dansguardian_clamd|bool
 
 - name: dansguardian | review settings
-  replace:
+  ansible.builtin.replace:
     dest: /etc/dansguardian/dansguardian.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
@@ -37,7 +37,7 @@
     - restart dansguardian
 
 - name: dansguardian | review settings for clamscan
-  replace:
+  ansible.builtin.replace:
     dest: /etc/dansguardian/dansguardian.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
@@ -52,7 +52,7 @@
   when: squid_dansguardian_clamd|bool
 
 - name: dansguardian | review clamdscan settings
-  replace:
+  ansible.builtin.replace:
     dest: /etc/dansguardian/contentscanners/clamdscan.conf
     regexp: "{{ item.re }}"
     replace: "{{ item.rep }}"
@@ -65,15 +65,15 @@
   when: squid_dansguardian_clamd|bool
 
 - name: check few permissions
-  file: "dest=/var/log/dansguardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
+  ansible.builtin.file: "dest=/var/log/dansguardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
 
 - name: check log file exists
-  stat:
+  ansible.builtin.stat:
     path: /var/log/dansguardian.log
   register: danl
 
 - name: touch log file
-  file:
+  ansible.builtin.file:
     path: /var/log/dansguardian.log
     state: touch
     owner: "{{ squid_user }}"
@@ -83,7 +83,7 @@
 - import_tasks: dansguardian-template.yml
 
 - name: ensure dansguardian is started and enabled
-  service:
+  ansible.builtin.service:
     name: dansguardian
     state: started
     enabled: yes

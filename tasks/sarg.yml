@@ -1,7 +1,7 @@
 ---
 
 - name: sarg | Disable resolve_ip
-  replace:
+  ansible.builtin.replace:
     dest: /etc/sarg/sarg.conf
     regexp: '^resolve_ip.*'
     replace: 'resolve_ip no'

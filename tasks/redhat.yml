@@ -1,7 +1,7 @@
 ---
 
 - name: yum | install squid and dependencies
-  yum:
+  ansible.builtin.yum:
     name: "{{ squid_pkgs }}"
     state: present
   register: pkg_result
