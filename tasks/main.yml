@@ -37,6 +37,8 @@
     mode: "{{ item.m }}"
     backup: yes
   with_items: "{{ squid_list_templates_acl }}"
+  notify:
+    - restart squid
 
 - name: update configuration
   ansible.builtin.template:
