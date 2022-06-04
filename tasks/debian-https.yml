@@ -61,7 +61,7 @@
         creates: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/debian/rules"
 
     - name: Squid openssl | patch rules
-      patch:
+      ansible.posix.patch:
         src: "{{ squidbuild_dir }}/rules.patch"
         dest: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/debian/rules"
         remote_src: true
