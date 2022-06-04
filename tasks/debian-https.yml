@@ -29,7 +29,8 @@
   register: squiddeb
   delegate_to: localhost
 
-- block:
+- name: Squid openssl deb
+  block:
     - name: Squid openssl | install build and report tools
       ansible.builtin.apt:
         pkg: "{{ squidbuild_pkgs + squidhttps_pkgs + squid_report_pkgs | default(omit) }}"
@@ -117,7 +118,8 @@
     - "{{ squidbuild_dir }}/squidclient_{{ squid_pkg }}_amd64.deb"
   register: squiddeb
   ignore_errors: true
-- block:
+- name: Deb install
+  block:
     # if install with dpkg, not executing /etc/apt/apt.conf.d/99security and /etc/init.d is immutable
     #       OK with apt install
     - import_tasks: immutable.yml

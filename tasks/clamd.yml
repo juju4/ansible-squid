@@ -38,7 +38,8 @@
 - name: check if existing daily.cvd db
   ansible.builtin.stat: path=/var/lib/clamav/daily.cvd
   register: db3
-- block:
+- name: Initial clamav db
+  block:
     - name: stop freshclam service during update
       ansible.builtin.service: name=clamav-freshclam state=stopped
     - name: ensure signatures are present before starting clamav

@@ -102,7 +102,8 @@
     path: /root/.ansible_squid_start
   register: marker1
 
-- block:
+- name: Container start
+  block:
     - name: Docker | create swap directories
       ansible.builtin.command: squid -z
       args:
