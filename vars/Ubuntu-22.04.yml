@@ -1,0 +1,59 @@
+---
+
+squid_pkgs: "{{ [ 'squid' ] + squid_report_pkgs | default(omit) }}"
+
+squid_confdir: /etc/squid
+squid_svc: squid
+squid_spool: /var/spool/squid
+squid_user: proxy
+squid_errors_template: /usr/share/squid/errors/
+
+ssl_user: ssl-cert
+ssl_dir: /etc/ssl/certs
+ssl_privatedir: /etc/ssl/private
+
+clamd_pkgs:
+  - clamav-daemon
+  - apparmor
+  - apparmor-utils
+
+squidbuild_dir: /var/cache/build/squid
+squidbuild_pkgs:
+  - devscripts
+  - build-essential
+  - fakeroot
+  - debhelper
+  - dh-autoreconf
+  - dh-apparmor
+  - cdbs
+  - libcppunit-dev
+  - libsasl2-dev
+  - libxml2-dev
+  - libkrb5-dev
+  - libdb-dev
+  - libnetfilter-conntrack-dev
+  - libexpat1-dev
+  - libcap2-dev
+  - libldap2-dev
+  - libpam0g-dev
+  - libgnutls28-dev
+  - libssl-dev
+  - libdbi-perl
+  - libecap3
+  - libecap3-dev
+  - debian-keyring
+  - libsystemd-dev
+  - libtdb-dev
+squidhttps_pkgs:
+  - squid-langpack
+
+# http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
+squid_ver: '5.1'
+squid_pkg: '5.1-2'
+
+squid_testing_pkgs:
+  - curl
+  - db-util
+  - netcat
+  - jq
+  - tsung
