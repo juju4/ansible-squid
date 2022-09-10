@@ -28,18 +28,20 @@
     - "{{ squid_noproxy_domains_template }}"
     - "{{ squid_noproxy_ips_template }}"
 
-- name: RedHat | Initialize SSL database
+- name: RedHat<8 | Initialize SSL database
   ansible.builtin.command: /usr/lib64/squid/ssl_crtd -c -s /var/lib/squid/ssl_db
   args:
     creates: /var/lib/squid/ssl_db/index.txt
   become: yes
   become_user: "{{ squid_user }}"
-  when: ansible_os_family == "RedHat"
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 8)
 
-- name: Debian | Initialize SSL database
-  ansible.builtin.command: /usr/lib/squid/security_file_certgen -c -s /var/lib/squid/ssl_db -M 4MB
+- name: Debian+Redhat>=8 | Initialize SSL database
+  ansible.builtin.command: "{{ squid_libexec }}/security_file_certgen -c -s /var/lib/squid/ssl_db -M 4MB"
   args:
     creates: /var/lib/squid/ssl_db/index.txt
   become: yes
   become_user: "{{ squid_user }}"
-  when: ansible_os_family == "Debian"
+  when: >
+    ansible_os_family == "Debian" or
+    (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
