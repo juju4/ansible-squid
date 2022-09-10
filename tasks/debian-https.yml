@@ -46,7 +46,7 @@
         dest: "{{ squidbuild_dir }}/{{ item | basename }}"
         mode: '0600'
       with_items:
-        - https://raw.githubusercontent.com/diladele/squid-ubuntu/master/src/ubuntu18/rules.patch
+        - https://raw.githubusercontent.com/diladele/squid-ubuntu/e4b640aad98b732147ba0fa9be0ccccbe4d8a87f/src/ubuntu18/rules.patch
         - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ squid_pkg }}.dsc"
         - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ squid_ver }}.orig.tar.xz"
         - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ squid_ver }}.orig.tar.xz.asc"
