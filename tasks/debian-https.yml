@@ -65,6 +65,7 @@
         src: "{{ squidbuild_dir }}/rules.patch"
         dest: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/debian/rules"
         remote_src: true
+      when: ansible_distribution_release == 'bionic'
 
     - name: Squid openssl | build package - be patient...
       # command: dpkg-buildpackage -rfakeroot -b
