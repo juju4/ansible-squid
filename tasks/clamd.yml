@@ -1,6 +1,6 @@
 ---
 
-- name: install clamav daemon package
+- name: Install clamav daemon package
   ansible.builtin.package:
     name: "{{ clamd_pkgs }}"
     state: present
@@ -8,7 +8,7 @@
   until: pkg_result is success
 
 ## clamd and dansguardian need the same user to scan files
-- name: clamd | review settings
+- name: Clamd | review settings
   ansible.builtin.replace:
     dest: /etc/clamav/clamd.conf
     regexp: "{{ item.re }}"
@@ -21,28 +21,28 @@
     # FIXME! apparmor seems to block /var/run/clamav/clamd.ctl
     - { re: "^LocalSocket .*", rep: "LocalSocket /tmp/clamd.ctl" }
   notify:
-    - restart clamd
+    - Restart clamd
 
-- name: clamd | check few permissions
+- name: Clamd | check few permissions
   ansible.builtin.file: "dest={{ item.d }} state={{ item.s }} mode={{ item.m }} owner={{ squid_user }}"
   with_items:
     - { d: /var/log/clamav, s: directory, m: '0755' }
     - { d: /var/log/clamav/clamav.log, s: file, m: '0640' }
 
-- name: check if existing signatures db
+- name: Check if existing signatures db
   ansible.builtin.stat: path=/var/lib/clamav/main.cvd
   register: db
-- name: check if existing daily.cld db
+- name: Check if existing daily.cld db
   ansible.builtin.stat: path=/var/lib/clamav/daily.cld
   register: db2
-- name: check if existing daily.cvd db
+- name: Check if existing daily.cvd db
   ansible.builtin.stat: path=/var/lib/clamav/daily.cvd
   register: db3
 - name: Initial clamav db
   block:
-    - name: stop freshclam service during update
+    - name: Stop freshclam service during update
       ansible.builtin.service: name=clamav-freshclam state=stopped
-    - name: ensure signatures are present before starting clamav
+    - name: Ensure signatures are present before starting clamav
       ansible.builtin.command: "freshclam"
       args:
         creates: /var/lib/clamav/daily.cld
@@ -60,7 +60,7 @@
 #
 # - ansible.builtin.meta: flush_handlers
 
-- name: ensure clamav is started and enabled
+- name: Ensure clamav is started and enabled
   ansible.builtin.service: name={{ item }} state=started enabled=yes
   with_items:
     - clamav-daemon

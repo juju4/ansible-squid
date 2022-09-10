@@ -15,13 +15,13 @@
     name: curl
     state: present
 
-- name: add ad servers newlist script
+- name: Add ad servers newlist script
   ansible.builtin.template:
     src: ad_servers_newlist.sh.j2
     dest: "{{ scriptsdir }}/ad_servers_newlist.sh"
     mode: '0755'
 
-- name: add refresh cron task to refresh ads servers list
+- name: Add refresh cron task to refresh ads servers list
   ansible.builtin.cron:
     name: "ads servers list refresh"
     minute: "45"
@@ -31,9 +31,9 @@
     job: "{{ scriptsdir }}/ad_servers_newlist.sh > /dev/null"
     cron_file: ansible_adslist_refresh
 
-- name: ensure ads servers list exists
+- name: Ensure ads servers list exists
   ansible.builtin.command: "sh -x {{ scriptsdir }}/ad_servers_newlist.sh"
   args:
     creates: "/var/spool/squid/ad_block.txt"
   notify:
-    - restart squid
+    - Restart squid

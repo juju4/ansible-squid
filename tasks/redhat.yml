@@ -1,6 +1,6 @@
 ---
 
-- name: yum | install squid and dependencies
+- name: Redhat | install squid and dependencies
   ansible.builtin.yum:
     name: "{{ squid_pkgs }}"
     state: present

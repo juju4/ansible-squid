@@ -2,7 +2,7 @@
 # review /etc/dansguardian/lists/ for content filtering rules
 # if whitelisting mode: http://askubuntu.com/questions/569102/how-to-use-dansguardian-as-a-whitelist
 
-- name: install dansguardian package
+- name: Install dansguardian package
   ansible.builtin.package:
     name: dansguardian
     state: present
@@ -10,9 +10,9 @@
   until: pkg_result is success
 
 - import_tasks: clamd.yml
-  when: squid_dansguardian_clamd|bool
+  when: squid_dansguardian_clamd | bool
 
-- name: dansguardian | review settings
+- name: Dansguardian | review settings
   ansible.builtin.replace:
     dest: /etc/dansguardian/dansguardian.conf
     regexp: "{{ item.re }}"
@@ -34,9 +34,9 @@
     - { re: "^forwardedfor = .*", rep: "forwardedfor = on" }
     # - { re: "^usexforwardedfor = '.*'", rep: "usexforwardedfor = on" }
   notify:
-    - restart dansguardian
+    - Restart dansguardian
 
-- name: dansguardian | review settings for clamscan
+- name: Dansguardian | review settings for clamscan
   ansible.builtin.replace:
     dest: /etc/dansguardian/dansguardian.conf
     regexp: "{{ item.re }}"
@@ -48,10 +48,10 @@
         rep: "contentscanner = '/etc/dansguardian/contentscanners/clamdscan.conf'"
     }
   notify:
-    - restart dansguardian
-  when: squid_dansguardian_clamd|bool
+    - Restart dansguardian
+  when: squid_dansguardian_clamd | bool
 
-- name: dansguardian | review clamdscan settings
+- name: Dansguardian | review clamdscan settings
   ansible.builtin.replace:
     dest: /etc/dansguardian/contentscanners/clamdscan.conf
     regexp: "{{ item.re }}"
@@ -61,18 +61,18 @@
   with_items:
     - { re: "^clamdudsfile = .*", rep: "clamdudsfile = /tmp/clamd.ctl" }
   notify:
-    - restart dansguardian
-  when: squid_dansguardian_clamd|bool
+    - Restart dansguardian
+  when: squid_dansguardian_clamd | bool
 
-- name: check few permissions
+- name: Check few permissions
   ansible.builtin.file: "dest=/var/log/dansguardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
 
-- name: check log file exists
+- name: Check log file exists
   ansible.builtin.stat:
     path: /var/log/dansguardian.log
   register: danl
 
-- name: touch log file
+- name: Touch log file
   ansible.builtin.file:
     path: /var/log/dansguardian.log
     state: touch
@@ -82,7 +82,7 @@
 
 - import_tasks: dansguardian-template.yml
 
-- name: ensure dansguardian is started and enabled
+- name: Ensure dansguardian is started and enabled
   ansible.builtin.service:
     name: dansguardian
     state: started

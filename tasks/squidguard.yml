@@ -1,14 +1,14 @@
 ---
 ## FIXME! Work in progress/incomplete compare to dansguardian
 
-- name: install squidguard package
+- name: Install squidguard package
   ansible.builtin.package:
     name: "{{ squidguard_pkgs }}"
     state: present
   register: pkg_result
   until: pkg_result is success
 
-- name: squidguard | fix configuration issues
+- name: Squidguard | fix configuration issues
   ansible.builtin.replace:
     dest: /etc/squid/squidGuard.conf
     regexp: "{{ item.re }}"
@@ -17,7 +17,7 @@
   with_items:
     - { re: '^dbhome .*', rep: 'dbhome /var/lib/squidGuard' }
 
-- name: squidguard | enable refresh cron task
+- name: Squidguard | enable refresh cron task
   ansible.builtin.replace:
     dest: /etc/cron.daily/squidGuard
     regexp: "{{ item.re }}"
@@ -30,19 +30,19 @@
         rep: 'http://squidguard.mesd.k12.or.us/blacklists.tgz'
     }
 
-- name: squidguard | initialize db
+- name: Squidguard | initialize db
   # command: "squidGuard -C all"
   ansible.builtin.command: sh /etc/cron.daily/squidGuard
   args:
     creates: /var/lib/squidGuard/blacklists/adult/domains
 
-- name: check few directories
+- name: Check few directories
   ansible.builtin.file: "dest={{ item }} state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
   with_items:
     - /var/lib/squidGuard/blacklists/porn
     - /var/lib/squidGuard/blacklists/adult
 
-- name: ensure squidguard is started and enabled
+- name: Ensure squidguard is started and enabled
   ansible.builtin.service: name={{ item }} state=started enabled=yes
   with_items:
     - squidGuard

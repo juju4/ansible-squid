@@ -1,6 +1,6 @@
 ---
 
-squid_pkgs: "{{ [ 'squid' ] + squid_report_pkgs | default(omit) }}"
+squid_pkgs: "{{ ['squid'] + squid_report_pkgs | default(omit) }}"
 
 squid_confdir: /etc/squid
 squid_svc: squid

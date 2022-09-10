@@ -19,7 +19,7 @@
       ansible_distribution == 'Debian' or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18)
     )
-    and squid_https
+    and squid_https and False
 
 - import_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
@@ -38,9 +38,9 @@
     backup: yes
   with_items: "{{ squid_list_templates_acl }}"
   notify:
-    - restart squid
+    - Restart squid
 
-- name: update configuration
+- name: Update configuration
   ansible.builtin.template:
     src: "{{ squidconf_template }}"
     dest: "{{ squid_confdir }}/squid.conf"
@@ -50,9 +50,9 @@
     validate: squid -k parse -f %s
     backup: yes
   notify:
-    - restart squid
+    - Restart squid
 
-- name: ensure log dir exists
+- name: Ensure log dir exists
   ansible.builtin.file:
     dest: "{{ squid_customlog_path | dirname }}"
     state: directory
@@ -61,7 +61,7 @@
   when: squid_customlog_path is defined and squid_customlog_path
 
 ## http://wiki.squid-cache.org/Features/CustomErrors
-- name: remove squid signature from templates
+- name: Remove squid signature from templates
   ansible.builtin.replace:
     dest: "{{ item }}"
     regexp: '<p>Generated %T by %h \(%s\)</p>'
@@ -72,7 +72,7 @@
   with_fileglob:
     - "{{ squid_errors_template }}en/ERR_*"
 
-- name: copy script for transparent proxy user
+- name: Copy script for transparent proxy user
   ansible.builtin.copy: src=transparent-user.sh dest=/usr/local/bin/transparent-user.sh mode=0755
 
 - import_tasks: dansguardian.yml
@@ -87,7 +87,7 @@
 - import_tasks: splash.yml
   when: squid_splash_enable|bool
 
-- name: enable and start squid service
+- name: Enable and start squid service
   ansible.builtin.service:
     name: "{{ squid_svc }}"
     state: started

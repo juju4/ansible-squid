@@ -14,7 +14,7 @@
   changed_when: false
   register: tsung1
 
-- name: pause between test
+- name: Pause between test
   ansible.builtin.pause: minutes=1
 
 - name: Execute load test with tsung with proxy

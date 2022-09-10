@@ -4,12 +4,12 @@
 
 - name: Ensure openssl is present
   ansible.builtin.package:
-    name: "{{ openssl_pkgs | default(['openssl', 'python3-pip', 'python3-setuptools', 'python3-openssl' ]) }}"
+    name: "{{ openssl_pkgs | default(['openssl', 'python3-pip', 'python3-setuptools', 'python3-openssl']) }}"
     state: present
   register: pkg_result
   until: pkg_result is success
 
-- name: apt | self-signed certificate packages dependencies
+- name: Debian | self-signed certificate packages dependencies
   ansible.builtin.apt:
     name: ssl-cert
     state: present
@@ -55,7 +55,7 @@
     ownca_not_after: "{{ squid_certduration | default('+365d') }}"
     provider: selfsigned
   notify:
-    - restart squid
+    - Restart squid
 
 - name: Validate private key file permissions
   ansible.builtin.file:

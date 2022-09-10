@@ -1,6 +1,6 @@
 ---
 
-- name: apt | install squid
+- name: Debian | install squid
   ansible.builtin.apt:
     pkg: "{{ squid_pkgs }}"
     state: present

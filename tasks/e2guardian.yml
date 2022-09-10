@@ -1,13 +1,13 @@
 ---
 
-- name: install e2guardian package
+- name: Install e2guardian package
   ansible.builtin.package:
     name: e2guardian
     state: present
   register: pkg_result
   until: pkg_result is success
 
-- name: e2guardian | review settings
+- name: E2guardian | review settings
   ansible.builtin.replace:
     dest: /etc/e2guardian/e2guardian.conf
     regexp: "{{ item.re }}"
@@ -29,18 +29,18 @@
     - { re: "^forwardedfor = .*", rep: "forwardedfor = on" }
     # - { re: "^usexforwardedfor = '.*'", rep: "usexforwardedfor = on" }
   notify:
-    - restart e2guardian
-    - restart e2guardian - docker
+    - Restart e2guardian
+    - Restart e2guardian - docker
 
-- name: check few permissions
+- name: Check few permissions
   ansible.builtin.file: "dest=/var/log/e2guardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
 
-- name: check log file exists
+- name: Check log file exists
   ansible.builtin.stat:
     path: /var/log/e2guardian/access.log
   register: e2l
 
-- name: touch log file
+- name: Touch log file
   ansible.builtin.file:
     path: /var/log/e2guardian/access.log
     state: touch
@@ -63,7 +63,7 @@
 
 - import_tasks: e2guardian-template.yml
 
-- name: ensure e2guardian is started and enabled
+- name: Ensure e2guardian is started and enabled
   ansible.builtin.service:
     name: e2guardian
     state: started

@@ -13,5 +13,5 @@
     dest: /etc/systemd/system/squid.service.d/override.conf
     mode: '0644'
   notify:
-    - reload systemd
-    - restart squid
+    - Reload systemd
+    - Restart squid

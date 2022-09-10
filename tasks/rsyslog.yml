@@ -11,7 +11,7 @@
   ansible.builtin.package_facts:
     manager: auto
 
-- name: get rsyslog version
+- name: Get rsyslog version
   ansible.builtin.set_fact:
     rsyslog_v: "{{ ansible_facts.packages['rsyslog'][0]['version'] }}"
 
@@ -28,11 +28,11 @@
     "'/var/log/' in squid_syslog_target" and
     squid_syslog_target|dirname != '/var/log'
 
-- name: setup rsyslog to send squid logs to a specific target
+- name: Setup rsyslog to send squid logs to a specific target
   ansible.builtin.template:
     src: rsyslog-squid.conf.j2
     dest: /etc/rsyslog.d/30-squid.conf
     mode: '0644'
     backup: yes
   notify:
-    - restart rsyslog
+    - Restart rsyslog
