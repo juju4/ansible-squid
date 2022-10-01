@@ -30,6 +30,7 @@
   delegate_to: localhost
 
 - name: Squid openssl deb
+  when: not squiddeb.stat.exists
   block:
     - name: Squid openssl | install build and report tools
       ansible.builtin.apt:
@@ -97,7 +98,6 @@
         - "{{ squidbuild_dir }}/squid-common_{{ squid_pkg }}_all.deb"
         - "{{ squidbuild_dir }}/squid_{{ squid_pkg }}_amd64.deb"
         - "{{ squidbuild_dir }}/squidclient_{{ squid_pkg }}_amd64.deb"
-  when: not squiddeb.stat.exists
 
 - name: Squid openssl | Recover file on orchestrator
   ansible.builtin.copy:
@@ -120,6 +120,7 @@
   register: squiddeb
   ignore_errors: true
 - name: Deb install
+  when: squiddeb is failed and ansible_distribution_release != '20.04'
   block:
     # if install with dpkg, not executing /etc/apt/apt.conf.d/99security and /etc/init.d is immutable
     #       OK with apt install
@@ -154,7 +155,6 @@
       vars:
         target_dir: /lib/systemd/system
         state: post
-  when: squiddeb is failed and ansible_distribution_release != '20.04'
 
 - name: Squid openssl | prevent packages from being upgraded automatically
   ansible.builtin.dpkg_selections:

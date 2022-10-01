@@ -18,4 +18,4 @@ galaxy_info:
     - system
     - security
 dependencies:
-  - juju4.redhat_epel
+  - role: juju4.redhat_epel

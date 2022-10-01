@@ -39,6 +39,7 @@
   ansible.builtin.stat: path=/var/lib/clamav/daily.cvd
   register: db3
 - name: Initial clamav db
+  when: not db.stat.exists or (not db2.stat.exists and not db3.stat.exists)
   block:
     - name: Stop freshclam service during update
       ansible.builtin.service: name=clamav-freshclam state=stopped
@@ -46,7 +47,6 @@
       ansible.builtin.command: "freshclam"
       args:
         creates: /var/lib/clamav/daily.cld
-  when: not db.stat.exists or (not db2.stat.exists and not db3.stat.exists)
 
 # https://bugs.launchpad.net/ubuntu/+source/clamav/+bug/1784193
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884707
