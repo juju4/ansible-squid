@@ -39,6 +39,7 @@ squid_testing_tsung_template_proxy: tsung-test1-proxy.xml
 squid_testing_tsung_logdir: /tmp/tsung
 
 # require distribution where squid compiled with ssl (ok centos, nok ubuntu)
+squid_https_build: false
 squid_https: false
 squid_cert_orgname: 'Ansible for squid'
 # squid_cert_san:
