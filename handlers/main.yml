@@ -19,7 +19,7 @@
     state: restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type =:  "containerd")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type ==  "containerd")
         )
 
 - name: Restart e2guardian
@@ -28,7 +28,7 @@
     state: restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type =:  "containerd")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type ==  "containerd")
         )
 
 - name: Restart e2guardian - docker
@@ -55,5 +55,5 @@
     state: restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type =:  "containerd")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type ==  "containerd")
         )
