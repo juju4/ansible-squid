@@ -33,7 +33,12 @@
     - Restart e2guardian - docker
 
 - name: Check few permissions
-  ansible.builtin.file: "dest=/var/log/e2guardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
+  ansible.builtin.file:
+    dest: "/var/log/e2guardian"
+    state: "directory"
+    mode: "0755"
+    owner: "{{ squid_user }}"
+    group: "{{ squid_user }}"
 
 - name: Check log file exists
   ansible.builtin.stat:
@@ -61,7 +66,8 @@
     owner: "{{ squid_user }}"
     mode: '0600'
 
-- import_tasks: e2guardian-template.yml
+- name: Import e2guardian-template
+  ansible.builtin.import_tasks: e2guardian-template.yml
 
 - name: Ensure e2guardian is started and enabled
   ansible.builtin.service:

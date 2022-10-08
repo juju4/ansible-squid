@@ -8,7 +8,8 @@
     '--with-gnutls' not in squidv.stdout
   changed_when: false
 
-- include_tasks: certificate-selfsigned.yml
+- name: Include certificate-selfsigned
+  ansible.builtin.include_tasks: certificate-selfsigned.yml
 
 - name: Ensure /var/lib/squid exists
   ansible.builtin.file:

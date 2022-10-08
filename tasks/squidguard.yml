@@ -37,12 +37,20 @@
     creates: /var/lib/squidGuard/blacklists/adult/domains
 
 - name: Check few directories
-  ansible.builtin.file: "dest={{ item }} state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: "directory"
+    mode: "0755"
+    owner: "{{ squid_user }}"
+    group: "{{ squid_user }}"
   with_items:
     - /var/lib/squidGuard/blacklists/porn
     - /var/lib/squidGuard/blacklists/adult
 
 - name: Ensure squidguard is started and enabled
-  ansible.builtin.service: name={{ item }} state=started enabled=yes
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: "started"
+    enabled: "yes"
   with_items:
     - squidGuard

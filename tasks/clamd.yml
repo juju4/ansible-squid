@@ -24,25 +24,34 @@
     - Restart clamd
 
 - name: Clamd | check few permissions
-  ansible.builtin.file: "dest={{ item.d }} state={{ item.s }} mode={{ item.m }} owner={{ squid_user }}"
+  ansible.builtin.file:
+    dest: "{{ item.d }}"
+    state: "{{ item.s }}"
+    mode: "{{ item.m }}"
+    owner: "{{ squid_user }}"
   with_items:
     - { d: /var/log/clamav, s: directory, m: '0755' }
     - { d: /var/log/clamav/clamav.log, s: file, m: '0640' }
 
 - name: Check if existing signatures db
-  ansible.builtin.stat: path=/var/lib/clamav/main.cvd
+  ansible.builtin.stat:
+    path: /var/lib/clamav/main.cvd
   register: db
 - name: Check if existing daily.cld db
-  ansible.builtin.stat: path=/var/lib/clamav/daily.cld
+  ansible.builtin.stat:
+    path: /var/lib/clamav/daily.cld
   register: db2
 - name: Check if existing daily.cvd db
-  ansible.builtin.stat: path=/var/lib/clamav/daily.cvd
+  ansible.builtin.stat:
+    path: /var/lib/clamav/daily.cvd
   register: db3
 - name: Initial clamav db
   when: not db.stat.exists or (not db2.stat.exists and not db3.stat.exists)
   block:
     - name: Stop freshclam service during update
-      ansible.builtin.service: name=clamav-freshclam state=stopped
+      ansible.builtin.service:
+        name: clamav-freshclam
+        state: stopped
     - name: Ensure signatures are present before starting clamav
       ansible.builtin.command: "freshclam"
       args:
@@ -61,7 +70,10 @@
 # - ansible.builtin.meta: flush_handlers
 
 - name: Ensure clamav is started and enabled
-  ansible.builtin.service: name={{ item }} state=started enabled=yes
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
   with_items:
     - clamav-daemon
     - clamav-freshclam

@@ -9,7 +9,8 @@
   register: pkg_result
   until: pkg_result is success
 
-- import_tasks: clamd.yml
+- name: Import clamd
+  ansible.builtin.import_tasks: clamd.yml
   when: squid_dansguardian_clamd | bool
 
 - name: Dansguardian | review settings
@@ -65,7 +66,12 @@
   when: squid_dansguardian_clamd | bool
 
 - name: Check few permissions
-  ansible.builtin.file: "dest=/var/log/dansguardian state=directory mode=0755 owner={{ squid_user }} group={{ squid_user }}"
+  ansible.builtin.file:
+    dest: "/var/log/dansguardian"
+    state: "directory"
+    mode: "0755"
+    owner: "{{ squid_user }}"
+    group: "{{ squid_user }}"
 
 - name: Check log file exists
   ansible.builtin.stat:
@@ -80,7 +86,8 @@
     mode: '0600'
   when: not danl.stat.exists
 
-- import_tasks: dansguardian-template.yml
+- name: Import dansguardian-template
+  ansible.builtin.import_tasks: dansguardian-template.yml
 
 - name: Ensure dansguardian is started and enabled
   ansible.builtin.service:

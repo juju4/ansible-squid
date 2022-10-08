@@ -1,6 +1,7 @@
 ---
 
-- include_tasks: travis.yml
+- name: Include travis
+  ansible.builtin.include_tasks: travis.yml
 
 - name: Ensure openssl is present
   ansible.builtin.package:
@@ -31,12 +32,12 @@
   register: private_key
 
 - name: Generate an OpenSSL private key
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
   when: not private_key.stat.exists
 
 - name: Generate an OpenSSL Certificate Signing Request
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
     privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
     organization_name: "{{ squid_cert_orgname | default('Ansible') }}"
@@ -48,7 +49,7 @@
       - 'CA:TRUE'
 
 - name: Generate SSL self-signed certificate
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: "{{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt"
     privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
     csr_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"

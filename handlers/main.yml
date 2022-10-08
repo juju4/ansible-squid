@@ -14,17 +14,21 @@
         )
 
 - name: Restart dansguardian
-  ansible.builtin.service: name=dansguardian state=restarted
+  ansible.builtin.service:
+    name: dansguardian
+    state: restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type =:  "containerd")
         )
 
 - name: Restart e2guardian
-  ansible.builtin.service: name=e2guardian state=restarted
+  ansible.builtin.service:
+    name: e2guardian
+    state: restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type =:  "containerd")
         )
 
 - name: Restart e2guardian - docker
@@ -38,14 +42,18 @@
   ansible.builtin.command: e2guardian -r
 
 - name: Restart clamd
-  ansible.builtin.service: name=clamav-daemon state=restarted
+  ansible.builtin.service:
+    name: clamav-daemon
+    state: restarted
 
 - name: Remove clamd apparmor profile
   ansible.builtin.command: apparmor_parser -R /etc/apparmor.d/usr.sbin.clamd
 
 - name: Restart rsyslog
-  ansible.builtin.service: name=rsyslog state=restarted
+  ansible.builtin.service:
+    name: rsyslog
+    state: restarted
   when: >
     not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type =:  "containerd")
         )

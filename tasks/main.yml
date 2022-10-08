@@ -7,13 +7,15 @@
   ansible.builtin.include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
   when: ansible_os_family == "RedHat"
 
-- import_tasks: debian.yml
+- name: Import debian
+  ansible.builtin.import_tasks: debian.yml
   when: >
     ((ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
       and not squid_https
     )
 
-- import_tasks: debian-https.yml
+- name: Import debian-https
+  ansible.builtin.import_tasks: debian-https.yml
   when: >
     (
       ansible_distribution == 'Debian' or
@@ -21,13 +23,16 @@
     )
     and squid_https_build|bool
 
-- import_tasks: redhat.yml
+- name: Import redhat
+  ansible.builtin.import_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
 
-- include_tasks: https.yml
+- name: Include https
+  ansible.builtin.include_tasks: https.yml
   when: squid_https|bool
 
-- import_tasks: ads.yml
+- name: Import ads
+  ansible.builtin.import_tasks: ads.yml
   when: squid_filter_ads is defined and squid_filter_ads
 
 - name: Configure given extra list templates
@@ -73,18 +78,25 @@
     - "{{ squid_errors_template }}en/ERR_*"
 
 - name: Copy script for transparent proxy user
-  ansible.builtin.copy: src=transparent-user.sh dest=/usr/local/bin/transparent-user.sh mode=0755
+  ansible.builtin.copy:
+    src: transparent-user.sh
+    dest: /usr/local/bin/transparent-user.sh
+    mode: 0755
 
-- import_tasks: dansguardian.yml
+- name: Import dansguardian
+  ansible.builtin.import_tasks: dansguardian.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian'
 
-- import_tasks: e2guardian.yml
+- name: Import e2guardian
+  ansible.builtin.import_tasks: e2guardian.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'e2guardian'
 
-- import_tasks: squidguard.yml
+- name: Import squidguard
+  ansible.builtin.import_tasks: squidguard.yml
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'squidguard'
 
-- import_tasks: splash.yml
+- name: Import splash
+  ansible.builtin.import_tasks: splash.yml
   when: squid_splash_enable|bool
 
 - name: Enable and start squid service
@@ -121,25 +133,32 @@
       ignore_errors: true
       register: ps
     - name: Debug | process output
-      ansible.builtin.debug: var=ps verbosity=1
+      ansible.builtin.debug:
+        var: ps
+        verbosity: 1
     - name: Docker | add start marker
       ansible.builtin.file:
         path: /root/.ansible_squid_start
         mode: '0600'
         state: touch
 
-- import_tasks: rsyslog.yml
+- name: Import rsyslog
+  ansible.builtin.import_tasks: rsyslog.yml
 
-- import_tasks: systemd.yml
+- name: Import systemd
+  ansible.builtin.import_tasks: systemd.yml
   when: squid_systemd_restriction_enable|bool
 
-- import_tasks: calamaris.yml
+- name: Import calamaris
+  ansible.builtin.import_tasks: calamaris.yml
   when: squid_calamaris_enable|bool and ansible_os_family == "Debian"
 
-- import_tasks: sarg.yml
+- name: Import sarg
+  ansible.builtin.import_tasks: sarg.yml
   when: squid_sarg_enable|bool and ansible_os_family == "Debian"
 
-- import_tasks: reporting.yml
+- name: Import reporting
+  ansible.builtin.import_tasks: reporting.yml
   when: squid_reporting
 
 - name: Flush handlers
@@ -150,5 +169,6 @@
     path: /tmp/clamd.ctl
   when: squid_urlfiltering_enable is defined and squid_urlfiltering_enable and squid_urlfiltering_tool == 'dansguardian' and squid_dansguardian_clamd
 
-- import_tasks: testing.yml
+- name: Import testing
+  ansible.builtin.import_tasks: testing.yml
   when: squid_testing|bool
