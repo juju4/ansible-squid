@@ -49,7 +49,7 @@
       - 'CA:TRUE'
 
 - name: Generate SSL self-signed certificate
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: "{{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt"
     privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
     csr_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
