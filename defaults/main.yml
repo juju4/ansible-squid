@@ -60,7 +60,7 @@ squid_list_access: []
 ## https://blog.rootshell.be/2011/01/18/url-filtering-with-squid/
 ## http://dsi.ut-capitole.fr/blacklists/
 squid_urlfiltering_enable: true
-squid_urlfiltering_tool: dansguardian
+squid_urlfiltering_tool: e2guardian
 squid_dansguardian_filterip: 127.0.0.1
 squid_dansguardian_deniedaddress: 'http://localhost/cgi-bin/dansguardian.pl'
 squid_dansguardian_proxyip: 127.0.0.1
