@@ -7,9 +7,13 @@ on:
   schedule:  # run weekly, every monday 02:30
     - cron: '30 2 * * 1'
 
+permissions: {}
+
 jobs:
   build:
 
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -33,11 +37,11 @@ jobs:
       MOLECULE_NO_LOG: "false"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: juju4.squid
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
       - name: Install dependencies
