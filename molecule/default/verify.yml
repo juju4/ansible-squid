@@ -4,6 +4,12 @@
   hosts: molecule
   vars:
     proxy_port: 3128
+  pre_tasks:
+    - name: RedHat | Ensure pgrep is present
+      ansible.builtin.package:
+        name: procps-ng
+        state: present
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
   tasks:
     - name: Ensure /etc/squid/squid.conf config file is present
       ansible.builtin.stat:
