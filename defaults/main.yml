@@ -2,6 +2,9 @@
 
 scriptsdir: /usr/local/scripts
 squidconf_template: squid.conf.j2
+squid_http_port_listen: 3128
+squid_http_port_intercept_listen: 3127
+squid_http_port_ssl_listen: 3129
 
 squid_allow_localhost: true
 # Do you want to keep query strings? have privacy consequence.

@@ -157,16 +157,16 @@ http_access deny all
 
 # Squid normally listens to port 3128
 {% if not squid_https %}
-http_port 3128
+http_port {{ squid_http_port_listen }}
 {% else %}
-http_port 3128
+http_port {{ squid_http_port_listen }}
 # Transparent, https://wiki.squid-cache.org/ConfigExamples/Intercept/LinuxRedirect
 # https://wiki.squid-cache.org/KnowledgeBase/HostHeaderForgery
-http_port 3127 intercept
+http_port {{ squid_http_port_intercept_listen }} intercept
 {# Only redhat with openssl support, latest debian/ubuntu with gnutls but missing cert generators #}
 {% if ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8 %}
 # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
-http_port 3129 ssl-bump \
+http_port {{ squid_http_port_ssl_listen }} ssl-bump \
   cert={{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt \
   key={{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key \
   generate-host-certificates=on dynamic_cert_mem_cache_size=4MB
