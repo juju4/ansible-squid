@@ -296,7 +296,7 @@ request_header_access Cookie allow all
 request_header_access Server deny all
 request_header_access X-Forwarded-For deny all
 request_header_access All deny all
-{% if squid_urlfiltering_tool == 'dansguardian' %}
+{% if squid_urlfiltering_tool == 'dansguardian' or squid_urlfiltering_tool == 'e2guardian' %}
 {# http://squid.sourceforge.net/follow_xff/ #}
 {# https://gist.github.com/alvarow/fa409edc70aeb4cf89bbc83c1c78f392 #}
 follow_x_forwarded_for allow localhost
