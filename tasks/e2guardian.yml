@@ -17,6 +17,8 @@
   with_items:
     - { re: '^UNCONFIGURED - Please remove this line', rep: '#UNCONFIGURED - Please remove this line' }
     - { re: "^filterip =.*", rep: "filterip = {{ squid_e2guardian_filterip }}" }
+    - { re: "^filterports =.*", rep: "filterports = {{ squid_e2guardian_filterports }}" }
+    - { re: "^httpworkers =.*", rep: "httpworkers = {{ squid_e2guardian_httpworkers }}" }
     # - { re: "^proxyip =.*", rep: "proxyip = {{ squid_e2guardian_proxyip }}" }
     - { re: "^#daemonuser = 'e2guardian'", rep: "daemonuser = 'proxy'" }
     - { re: "^#daemongroup = 'e2guardian'", rep: "daemongroup = 'proxy'" }

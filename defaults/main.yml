@@ -76,6 +76,8 @@ squid_dansguardian_template:
 ##      19.04+: e2guardian
 # squid_urlfiltering_tool: e2guardian
 squid_e2guardian_filterip: 127.0.0.1
+squid_e2guardian_filterports: 8080
+squid_e2guardian_httpworkers: 500
 squid_e2guardian_deniedaddress: 'http://localhost/cgi-bin/e2guardian.pl'
 squid_e2guardian_proxyip: 127.0.0.1
 squid_e2guardian_language: 'ukenglish'
