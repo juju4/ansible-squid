@@ -32,14 +32,16 @@
         )
 
 - name: Restart e2guardian - docker
-  ansible.builtin.command: /usr/sbin/e2guardian -Q
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: /usr/sbin/e2guardian -Q
   when: >
     (ansible_virtualization_type is defined and
           (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
     )
 
 - name: E2guardian reload
-  ansible.builtin.command: e2guardian -r
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: e2guardian -r
 
 - name: Restart clamd
   ansible.builtin.service:
@@ -47,7 +49,8 @@
     state: restarted
 
 - name: Remove clamd apparmor profile
-  ansible.builtin.command: apparmor_parser -R /etc/apparmor.d/usr.sbin.clamd
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: apparmor_parser -R /etc/apparmor.d/usr.sbin.clamd
 
 - name: Restart rsyslog
   ansible.builtin.service:

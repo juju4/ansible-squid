@@ -1,6 +1,7 @@
 ---
 
-- hosts: all
+- name: Test integration playbook
+  hosts: all
   vars:
     squid_splash_enable: true
     squid_testing: true
@@ -8,13 +9,13 @@
     squid_splash_timeout: 15
   pre_tasks:
     - name: RedHat8 | specific variables
-      set_fact:
+      ansible.builtin.set_fact:
         squid_urlfiltering_enable: false
         squid_urlfiltering_tool: squidguard
         squid_report_pkgs: []
       when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '8'
     - name: RedHat7 | specific variables
-      set_fact:
+      ansible.builtin.set_fact:
         squid_urlfiltering_enable: false
         squid_urlfiltering_tool: squidguard
         squid_report_pkgs:

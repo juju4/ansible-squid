@@ -81,7 +81,7 @@
       register: dpkgbuild
 
     - name: Squid openssl | check on async task for pkg building
-      ansible.builtin.async_status:
+      ansible.builtin.async_status:  # noqa no-handler
         jid: "{{ dpkgbuild.ansible_job_id }}"
       register: job_result
       until: job_result.finished or dpkgbuild.finished
