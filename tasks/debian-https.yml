@@ -72,7 +72,7 @@
       # command: dpkg-buildpackage -rfakeroot -b
       # command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
       ## without signing else set up a gpg key before
-      ansible.builtin.command: dpkg-buildpackage -rfakeroot -b -uc -us
+      ansible.builtin.command: dpkg-buildpackage -rfakeroot -b -uc -us -d
       args:
         chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
         creates: "{{ squidbuild_dir }}/squid_{{ squid_pkg }}_amd64.deb"
