@@ -45,6 +45,7 @@ squidbuild_pkgs:
   - debian-keyring
   - libsystemd-dev
   - libtdb-dev
+  - ed
 squidhttps_pkgs:
   - squid-langpack
 
