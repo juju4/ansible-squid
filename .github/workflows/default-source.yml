@@ -1,5 +1,5 @@
 ---
-name: default-https
+name: default-source
 
 on:
   push:
