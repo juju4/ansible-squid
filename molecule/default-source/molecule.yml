@@ -18,6 +18,6 @@ provisioner:
     defaults:
       verbosity: 2
 scenario:
-  name: default-https
+  name: default-source
 verifier:
   name: ansible
