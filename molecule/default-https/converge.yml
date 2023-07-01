@@ -9,6 +9,7 @@
   remote_user: root
   vars:
     squid_https: true
+    squid_https_build: true
     squid_jsonlog: true
     squid_testing: false
   pre_tasks:
