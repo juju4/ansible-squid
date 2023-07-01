@@ -1,0 +1,136 @@
+---
+
+- name: Verify
+  hosts: molecule
+  vars:
+    proxy_port: 3128
+  tasks:
+    - name: Ensure /etc/squid/squid.conf config file is present
+      ansible.builtin.stat:
+        path: /etc/squid/squid.conf
+      register: cfg
+    - name: Validate config present
+      ansible.builtin.assert:
+        that: cfg.stat.exists and cfg.stat.size != 0
+
+    - name: Ensure pgrep is present
+      ansible.builtin.package:
+        name: procps-ng
+        state: present
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
+    - name: Ensure process is running
+      ansible.builtin.command: pgrep -u root squid
+      register: ps
+      changed_when: false
+      ignore_errors: true
+    - name: Validate ps output
+      ansible.builtin.assert:
+        that: ps.stdout
+
+    - name: Check all processes
+      ansible.builtin.command: ps aux
+      changed_when: false
+      register: psa
+    - name: Debug | process output
+      ansible.builtin.debug:
+        var: psa
+        verbosity: 1
+
+    - name: Check logs
+      ansible.builtin.command: tail -n50 /var/log/squid.log /var/log/squid/cache.log /var/log/squid/access_json.log
+      changed_when: false
+      ignore_errors: true
+      register: logs
+    - name: Debug | logs output
+      ansible.builtin.debug:
+        var: logs
+        verbosity: 1
+    - name: Validate no ERROR or FATAL in logs
+      ansible.builtin.assert:
+        that: >
+          "'ERROR: ' not in logs.stdout and 'FATAL: ' in not logs.stdout"
+
+    - name: Ensure ports are listening
+      ansible.builtin.wait_for:
+        host: "{{ item.h }}"
+        port: "{{ item.p }}"
+        timeout: 10
+      with_items:
+        - { h: localhost, p: "{{ proxy_port }}" }
+
+    - name: Test curl www.google.com
+      ansible.builtin.uri:
+        url: http://www.google.com
+        return_content: yes
+      register: curl1
+      environment:
+        http_proxy: "http://localhost:{{ proxy_port }}"
+        https_proxy: "http://localhost:{{ proxy_port }}"
+      changed_when: false
+    - name: Validate curl1 output
+      ansible.builtin.assert:
+        that: >
+          "'<title>Google</title>' in curl1.content and curl1.status == 200"
+
+    - name: Test curl www.cnn.com
+      ansible.builtin.uri:
+        url: http://www.cnn.com
+      register: curl2
+      environment:
+        http_proxy: "http://localhost:{{ proxy_port }}"
+        https_proxy: "http://localhost:{{ proxy_port }}"
+      changed_when: false
+    - name: Validate curl2 output
+      ansible.builtin.assert:
+        that: >
+          "curl2.status == 301"
+
+    - name: Test curl www.badboys.com
+      ansible.builtin.uri:
+        url: http://www.badboys.com
+        follow_redirects: none
+        status_code: [200, 301]
+      register: curl3
+      environment:
+        http_proxy: "http://localhost:{{ proxy_port }}"
+        https_proxy: "http://localhost:{{ proxy_port }}"
+      changed_when: false
+    - name: Validate curl3 output
+      ansible.builtin.assert:
+        that: >
+          "curl3.status == 301"
+
+    - name: Test curl malware.wicar.org
+      ansible.builtin.uri:
+        url: http://malware.wicar.org/data/eicar.com
+      register: curl4
+      environment:
+        http_proxy: "http://localhost:{{ proxy_port }}"
+        https_proxy: "http://localhost:{{ proxy_port }}"
+      changed_when: false
+    - name: Validate curl4 output
+      ansible.builtin.assert:
+        that: >
+          "'EICAR-STANDARD-ANTIVIRUS-TEST-FILE!' in curl4.content"
+
+    - name: Fetch content of /var/log/squid/cache.log
+      ansible.builtin.slurp:
+        src: /var/log/squid/cache.log
+      register: cache
+    - name: Validate /var/log/squid/cache.log
+      ansible.builtin.assert:
+        that: >
+          "'Starting Squid Cache version ' in cache['content'] | b64decode and
+          'Accepting HTTP Socket connections at' in cache['content'] | b64decode and
+          'Completed Validation Procedure' in cache['content'] | b64decode and
+          'WARNING' not in cache['content'] | b64decode"
+
+    - name: Fetch content of /var/log/squid/access_json.log
+      ansible.builtin.slurp:
+        src: /var/log/squid/access_json.log
+      register: log
+    - name: Validate /var/log/squid/access_json.log
+      ansible.builtin.assert:
+        that: >
+          "'time_local' in loh['content'] | b64decode and
+          'method' in cache['content'] | b64decode"
