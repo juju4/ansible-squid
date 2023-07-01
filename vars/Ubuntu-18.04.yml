@@ -49,7 +49,7 @@ squidhttps_pkgs:
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
 squid_ver: '4.13'
-squid_pkg: '4.13-10+deb11u1'
+squid_pkg: '4.13-10+deb11u2'
 
 squid_testing_pkgs:
   - curl
