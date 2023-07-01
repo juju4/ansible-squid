@@ -62,6 +62,7 @@
         cmd: |
           ./configure \
             '--build=x86_64-linux-gnu' \
+            '--host=x86_64' \
             --prefix=/usr/local \
             --localstatedir=/var \
             '--includedir=${prefix}/include' \
