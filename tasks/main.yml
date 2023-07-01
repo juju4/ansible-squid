@@ -15,6 +15,7 @@
   when: >
     ((ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
       and not squid_https
+      and not squid_https_source
     )
 
 - name: Import debian-https
@@ -25,6 +26,15 @@
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18)
     )
     and squid_https_build|bool
+
+- name: Import debian-https-source
+  ansible.builtin.import_tasks: debian-https-source.yml
+  when: >
+    (
+      ansible_distribution == 'Debian' or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
+    )
+    and squid_https_source_build|bool
 
 - name: Import redhat
   ansible.builtin.import_tasks: redhat.yml
@@ -102,6 +112,10 @@
   ansible.builtin.import_tasks: splash.yml
   when: squid_splash_enable|bool
 
+- name: Import systemd
+  ansible.builtin.import_tasks: systemd.yml
+  when: squid_systemd_restriction_enable|bool
+
 - name: Enable and start squid service
   ansible.builtin.service:
     name: "{{ squid_svc }}"
@@ -147,10 +161,6 @@
 
 - name: Import rsyslog
   ansible.builtin.import_tasks: rsyslog.yml
-
-- name: Import systemd
-  ansible.builtin.import_tasks: systemd.yml
-  when: squid_systemd_restriction_enable|bool
 
 - name: Import calamaris
   ansible.builtin.import_tasks: calamaris.yml

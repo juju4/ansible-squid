@@ -15,3 +15,21 @@
   notify:
     - Reload systemd
     - Restart squid
+
+- name: Review squid systemd options - Source build squid
+  ansible.builtin.template:
+    src: systemd-override-source.conf.j2
+    dest: /etc/systemd/system/squid.service.d/source-build.conf
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - Restart squid
+  when: >
+    (
+      ansible_distribution == 'Debian' or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
+    )
+    and squid_https_source_build|bool
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

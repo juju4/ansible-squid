@@ -1,0 +1,119 @@
+---
+# compile with openssl to support https from source
+
+- name: Ubuntu | Enable universe repository
+  ansible.builtin.apt_repository:
+    repo: "{{ item }}"
+  loop:
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }} universe"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-updates universe"
+
+- name: Ubuntu | Enable universe security repository
+  ansible.builtin.lineinfile:
+    dest: /etc/apt/sources.list
+    mode: '0644'
+    owner: root
+    regexp: "^deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-security universe"
+    line: "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-security universe"
+
+- name: Ensure squid build dir exists
+  ansible.builtin.file:
+    dest: "{{ squidbuild_dir }}"
+    state: directory
+    mode: '0700'
+
+- name: Squid openssl source | Check if binary exists
+  ansible.builtin.stat:
+    path: "/usr/local/bin/squid"
+  register: localsquid
+
+- name: Squid openssl local from source
+  when: not localsquid.stat.exists
+  block:
+    - name: Squid openssl | Install build and report tools
+      ansible.builtin.apt:
+        pkg: "{{ squidbuild_pkgs + squidhttps_pkgs + squid_report_pkgs | default(omit) }}"
+        state: present
+        update_cache: yes
+        cache_valid_time: 3600
+      register: pkg_result
+      until: pkg_result is success
+
+    - name: Get squid source code
+      ansible.builtin.get_url:
+        url: http://www.squid-cache.org/Versions/v5/squid-{{ squid_ver }}.tar.gz
+        dest: "{{ squidbuild_dir }}/squid-{{ squid_ver }}.tar.gz"
+        mode: '0600'
+        checksum: "{{ squid_src_hash }}"
+      register: dl_result
+      until: dl_result is success
+
+    - name: Squid openssl | Unarchive source
+      ansible.builtin.unarchive:
+        src: "{{ squidbuild_dir }}/squid-{{ squid_ver }}.tar.gz"
+        dest: "{{ squidbuild_dir }}"
+        remote_src: true
+
+    # '--build=x86_64-linux-gnu' '--disable-arch-native'
+    # FIXME! fails in ansible but ok manual...
+    # configure: WARNING: you should use --build, --host, --target\nconfigure: WARNING: invalid host type: \n\nconfig.sub: missing argument\nTry `config.sub --help' for more information.\nconfigure: error: /bin/bash ./cfgaux/config.sub \n failed
+    - name: Squid openssl | Configure
+      ansible.builtin.command:
+        cmd: |
+          ./configure \
+            --prefix=/usr/local \
+            --localstatedir=/var \
+            '--includedir=${prefix}/include' \
+            '--mandir=${prefix}/share/man' \
+            '--infodir=${prefix}/share/info' \
+            --sysconfdir=/etc/squid \
+            --with-default-user=proxy \
+            --with-logdir=/var/log/squid \
+            --with-pidfile=/var/run/squid.pid \
+            '--enable-inline' \
+            '--enable-async-io=8' \
+            '--enable-storeio=ufs,aufs,diskd,rock' '--enable-removal-policies=lru,heap' \
+            '--enable-delay-pools' '--enable-cache-digests' '--enable-icap-client' \
+            '--enable-follow-x-forwarded-for' \
+            '--enable-auth-basic=DB,fake,getpwnam,LDAP,NCSA,PAM,POP3,RADIUS,SASL,SMB' \
+            '--enable-auth-digest=file,LDAP' '--enable-auth-negotiate=kerberos,wrapper' \
+            '--enable-auth-ntlm=fake,SMB_LM' \
+            '--enable-external-acl-helpers=file_userip,kerberos_ldap_group,LDAP_group,session,SQL_session,time_quota,unix_group,wbinfo_group' \
+            '--enable-security-cert-validators=fake' '--enable-storeid-rewrite-helpers=file' \
+            '--enable-url-rewrite-helpers=fake' '--enable-eui' '--enable-esi' \
+            '--enable-icmp' '--enable-zph-qos' '--enable-ecap' \
+            '--with-filedescriptors=65536' '--with-large-files' \
+            '--enable-linux-netfilter' '--with-systemd' '--with-gnutls' \
+            --enable-ssl-crtd --with-openssl
+      args:
+        chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
+        creates: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/Makefile"
+
+    - name: Squid openssl | Build binary - be patient...
+      ansible.builtin.command:
+        cmd: "make"
+      args:
+        chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
+        creates: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/src/squid"
+      async: 3600
+      poll: 0
+      register: srcbuild
+
+    - name: Squid openssl | Check on async task for binary building
+      ansible.builtin.async_status:  # noqa no-handler
+        jid: "{{ srcbuild.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished or srcbuild.finished
+      retries: 60
+      delay: 60
+      when: srcbuild is changed
+
+    - name: Squid openssl | Install
+      ansible.builtin.command:
+        cmd: "make install"
+      args:
+        chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
+        creates: /usr/local/bin/squid
+
+# FIXME!
+# run getting permission denied on all libexec and opening png files...

@@ -1,0 +1,5 @@
+{{ ansible_managed | comment }}
+
+[Service]
+ExecStartPre=/usr/local/sbin/squid --foreground -z
+ExecStart=/usr/local/sbin/squid --foreground -sYC

@@ -19,6 +19,8 @@ squid_cache_admin_email: squidadmin@localhost.local
 squid_customlog_path: /var/log/squid/access_custom.log
 squid_jsonlog: false
 squid_remotesyslog: false
+# http://www.squid-cache.org/Doc/config/forwarded_for/
+squid_forwarded_for: delete
 
 # source IP and subnets allowed to connect (outside of private networks)
 squid_allowed_clients: []
@@ -43,6 +45,8 @@ squid_testing_tsung_logdir: /tmp/tsung
 
 # require distribution where squid compiled with ssl (ok centos, nok ubuntu)
 squid_https_build: false
+squid_https_source: false
+squid_https_source_build: false
 squid_https: false
 squid_cert_orgname: 'Ansible for squid'
 # squid_cert_san:

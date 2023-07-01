@@ -34,7 +34,7 @@ squidbuild_pkgs:
   - libdb-dev
   - libnetfilter-conntrack-dev
   - libexpat1-dev
-  - libcap2-dev
+  - libcap-dev
   - libldap2-dev
   - libpam0g-dev
   - libgnutls28-dev
@@ -49,8 +49,11 @@ squidhttps_pkgs:
   - squid-langpack
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
-squid_ver: '5.6'
-squid_pkg: '5.6-1'
+# squid_ver: '5.7'
+# squid_pkg: '5.7-2'
+# http://www.squid-cache.org/Versions/
+squid_ver: '5.9'
+squid_src_hash: "sha256:460830a0a95815f42791efd97609c8f916e3e4ebf0ca445d0ec3babcbd86e86a"
 
 squid_testing_pkgs:
   - curl
