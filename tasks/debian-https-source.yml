@@ -61,6 +61,7 @@
       ansible.builtin.command:
         cmd: |
           ./configure \
+            '--build=x86_64-linux-gnu' \
             --prefix=/usr/local \
             --localstatedir=/var \
             '--includedir=${prefix}/include' \
