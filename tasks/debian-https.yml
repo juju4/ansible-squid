@@ -41,20 +41,19 @@
       register: pkg_result
       until: pkg_result is success
 
-    - name: Get diladele patches
+    - name: Get package deb src
       ansible.builtin.get_url:
         url: "{{ item }}"
         dest: "{{ squidbuild_dir }}/{{ item | basename }}"
         mode: '0600'
       with_items:
-        - https://raw.githubusercontent.com/diladele/squid-ubuntu/e4b640aad98b732147ba0fa9be0ccccbe4d8a87f/src/ubuntu18/rules.patch
         - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ squid_pkg }}.dsc"
         - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ squid_ver }}.orig.{{ squid_orig_ext }}"
         - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ squid_pkg }}.debian.tar.xz"
       register: dl_result
       until: dl_result is success
 
-    - name: Get diladele patches - asc
+    - name: Get package deb src - asc
       ansible.builtin.get_url:
         url: "{{ item }}"
         dest: "{{ squidbuild_dir }}/{{ item | basename }}"
@@ -71,13 +70,6 @@
       args:
         chdir: "{{ squidbuild_dir }}"
         creates: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/debian/rules"
-
-    - name: Squid openssl | patch rules
-      ansible.posix.patch:
-        src: "{{ squidbuild_dir }}/rules.patch"
-        dest: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/debian/rules"
-        remote_src: true
-      when: ansible_distribution_release == 'bionic'
 
     - name: Squid openssl | build package - be patient...
       # command: dpkg-buildpackage -rfakeroot -b
@@ -177,3 +169,8 @@
   ansible.builtin.dpkg_selections:
     name: squid
     selection: hold
+
+- name: Squid openssl | Validate package content
+  ansible.builtin.command:
+    cmd: dpkg -L squid
+  changed_when: false
