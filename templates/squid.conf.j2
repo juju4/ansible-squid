@@ -36,7 +36,7 @@ cache_mgr {{ squid_cache_admin_email }}
 cache_mem 100 MB
 # default is 512 KB
 # maximum_object_size_in_memory 1 MB
-{% if squid_dns_v4_first is undefined or squid_dns_v4_first %}
+{% if squid_dns_v4_first is undefined or squid_dns_v4_first and not ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22) and squid_https_source_build|bool)%}
 # https://serverfault.com/questions/644604/squid-https-tunnelling-using-connect-very-slow
 dns_v4_first on
 {% endif %}
@@ -81,9 +81,26 @@ http_access deny manager
 
 acl proto_http proto http https
 
+
+acl bad_tlds dstdomain .gdn .work .ltd .ooo .date .shop .racing .world .loan .tokyo .country .stream .gdn .mom .xin .kin .men .loan .download .racing
+http_access deny bad_tlds
+
+acl useragent_chrome browser Chrome
+acl useragent_firefox browser Firefox
+acl useragent_chrome browser Chrome/1[1-5][0-9]\.*
+acl useragent_firefox browser Firefox/1[1-5][0-9]\.*
+acl useragent_firefox_current browser Firefox\/114.*
+acl useragent_firefox_current_esr browser Firefox\/102.*
+acl useragent_msie browser MSIE
+acl useragent_opera browser Opera
+acl useragent_trident browser Trident
+acl useragent_chrome_old browser Chrome/[1-6]?
+http_access deny useragent_msie
+http_access deny useragent_chrome_old
+
 {% if squid_filter_ads is defined and squid_filter_ads %}
 ## disable ads ( http://pgl.yoyo.org/adservers/ )
-acl ads dstdom_regex "/var/spool/squid/ad_block.txt"
+acl ads dstdomain "/var/spool/squid/ad_block.txt"
 http_access deny ads
 #deny_info TCP_RESET ads
 
@@ -115,18 +132,6 @@ http_access allow allowed_clients
 #\.torrent(\?.*)?$
 #acl blockExtensions urlpath_regex -i "/etc/squid/blockExtensions.acl"
 #http_access deny blockExtensions
-
-acl bad_tlds dstdomain .gdn .work .ltd .ooo .date .shop .racing .world .loan .tokyo .country .stream .gdn .mom .xin .kin .men .loan .download .racing
-http_access deny bad_tlds
-
-acl useragent_chrome browser Chrome
-acl useragent_firefox browser Firefox
-acl useragent_msie browser MSIE
-acl useragent_opera browser Opera
-acl useragent_trident browser Trident
-acl useragent_chrome_old browser Chrome/[1-6]?
-http_access deny useragent_msie
-http_access deny useragent_chrome_old
 
 # acl for logs to exclude from logging if too noisy and not useful (and possibly blocked)
 #acl excludetrace dstdomain play.google.com
