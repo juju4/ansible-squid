@@ -42,7 +42,7 @@ dns_v4_first on
 {% endif %}
 
 # Suppress Squid version string info in HTTP headers and HTML error pages. = not valid/bungled(3.5.12)
-#httpd_suppress_version_string off
+httpd_suppress_version_string on
 # Limit the size of acceptable HTTP headers.
 request_header_max_size 64 KB
 ignore_unknown_nameservers on
