@@ -10,6 +10,11 @@
   with_items:
     - "{{ scriptsdir }}"
 
+- name: Remove conflicting curl-minimal
+  ansible.builtin.package:
+    name: curl-minimal
+    state: absent
+
 - name: Ensure curl is present
   ansible.builtin.package:
     name: curl
