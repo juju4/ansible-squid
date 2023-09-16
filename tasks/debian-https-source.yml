@@ -41,8 +41,8 @@
 
     - name: Get squid source code
       ansible.builtin.get_url:
-        url: http://www.squid-cache.org/Versions/v5/squid-{{ squid_ver }}.tar.gz
-        dest: "{{ squidbuild_dir }}/squid-{{ squid_ver }}.tar.gz"
+        url: http://www.squid-cache.org/Versions/v5/squid-{{ squid_src_ver }}.tar.gz
+        dest: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}.tar.gz"
         mode: '0600'
         checksum: "{{ squid_src_hash }}"
       register: dl_result
@@ -50,7 +50,7 @@
 
     - name: Squid openssl | Unarchive source
       ansible.builtin.unarchive:
-        src: "{{ squidbuild_dir }}/squid-{{ squid_ver }}.tar.gz"
+        src: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}.tar.gz"
         dest: "{{ squidbuild_dir }}"
         remote_src: true
 
@@ -88,15 +88,15 @@
             '--enable-linux-netfilter' '--with-systemd' '--with-gnutls' \
             --enable-ssl-crtd --with-openssl
       args:
-        chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
-        creates: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/Makefile"
+        chdir: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}"
+        creates: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}/Makefile"
 
     - name: Squid openssl | Build binary - be patient...
       ansible.builtin.command:
         cmd: "make"
       args:
-        chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
-        creates: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/src/squid"
+        chdir: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}"
+        creates: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}/src/squid"
       async: 3600
       poll: 0
       register: srcbuild
@@ -114,7 +114,7 @@
       ansible.builtin.command:
         cmd: "make install"
       args:
-        chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
+        chdir: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}"
         creates: /usr/local/bin/squid
 
 # FIXME!
