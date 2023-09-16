@@ -97,7 +97,8 @@ squid_e2guardian_template:
 # http://www.squid-cache.org/Misc/log-analysis.html
 squid_report_pkgs:
   - calamaris
-  - sarg
+  # not available on redhat9
+  # - sarg
 
 squid_calamaris_enable: true
 squid_calamaris_dirs:
