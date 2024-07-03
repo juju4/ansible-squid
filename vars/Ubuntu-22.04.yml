@@ -34,7 +34,7 @@ squidbuild_pkgs:
   - libdb-dev
   - libnetfilter-conntrack-dev
   - libexpat1-dev
-  - libcap-dev
+  - libcap2-dev
   - libldap2-dev
   - libpam0g-dev
   - libgnutls28-dev
@@ -45,12 +45,20 @@ squidbuild_pkgs:
   - debian-keyring
   - libsystemd-dev
   - libtdb-dev
+  - dpkg-dev
+  - ed
+  - logrotate
+  - libltdl-dev
+  - pkgconf
 squidhttps_pkgs:
   - squid-langpack
+squidhttps_patch:
+  - { url: "https://raw.githubusercontent.com/diladele/squid-ubuntu/082161d23c094ba91ee65bc3f6e7bbb5b8f56152/src/ubuntu22/BoolOps.cc.patch", dir: /src/acl }
+    # - { url: "https://raw.githubusercontent.com/diladele/squid-ubuntu/082161d23c094ba91ee65bc3f6e7bbb5b8f56152/src/ubuntu22/control.patch", dir: /debian }
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
-squid_ver: '5.7'
-squid_pkg: '5.7-2'
+squid_ver: '6.9'
+squid_pkg: '6.9-1'
 squid_orig_ext: tar.xz
 # http://www.squid-cache.org/Versions/
 squid_src_ver: '5.9'

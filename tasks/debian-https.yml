@@ -27,6 +27,7 @@
   ansible.builtin.stat:
     path: "{{ orchestrator_files_archives }}/squid_{{ squid_pkg }}_amd64.deb"
   register: squiddeb
+  become: false
   delegate_to: localhost
 
 - name: Squid openssl deb
@@ -71,6 +72,41 @@
         chdir: "{{ squidbuild_dir }}"
         creates: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/debian/rules"
 
+    - name: Ensure patches directories exist
+      ansible.builtin.file:
+        path: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ squidhttps_patch }}"
+      when:
+        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
+
+    - name: Get patches
+      ansible.builtin.get_url:
+        url: "{{ item.url }}"
+        dest: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}/{{ item.url | basename }}"
+        mode: '0600'
+      loop: "{{ squidhttps_patch }}"
+      register: dl_result
+      until: dl_result is success
+      when:
+        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
+
+    - name: Squid openssl | Patch
+      ansible.posix.patch:
+        src: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}/{{ item.url | basename }}"
+        basedir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}"
+        remote_src: true
+      loop: "{{ squidhttps_patch }}"
+      when:
+        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
+
+    - name: Squid openssl | Check debian rules
+      ansible.builtin.command: cat rules
+      args:
+        chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/debian"
+      changed_when: false
+
     - name: Squid openssl | build package - be patient...
       # command: dpkg-buildpackage -rfakeroot -b
       # command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
@@ -79,7 +115,7 @@
       args:
         chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
         creates: "{{ squidbuild_dir }}/squid_{{ squid_pkg }}_amd64.deb"
-      async: 3600
+      async: 5400
       poll: 0
       register: dpkgbuild
 
@@ -88,9 +124,22 @@
         jid: "{{ dpkgbuild.ansible_job_id }}"
       register: job_result
       until: job_result.finished or dpkgbuild.finished
-      retries: 60
+      retries: 90
       delay: 60
       when: dpkgbuild is changed
+
+    - name: Squid openssl | Get built binary info
+      ansible.builtin.command: ./squid -v
+      args:
+        chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/src"
+      register: squidbuilt
+      changed_when: false
+
+    - name: Squid openssl | Validate built binary info
+      ansible.builtin.fail:
+        msg: Missing openssl in newly built binary version info
+      when:
+        - "'openssl' not in squidbuilt.stdout"
 
     - name: Squid openssl | Recover file on orchestrator
       ansible.builtin.fetch:
