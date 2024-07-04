@@ -1,7 +1,7 @@
 ---
 
 - name: Redhat | install squid and dependencies
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: "{{ squid_pkgs }}"
     state: present
   register: pkg_result
