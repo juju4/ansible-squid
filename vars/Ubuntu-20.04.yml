@@ -53,7 +53,6 @@ squidhttps_pkgs:
 squid_ver: '5.7'
 squid_pkg: '5.7-2+deb12u1'
 squid_orig_ext: tar.xz
-squid_build_cpp_flags: '-std=c++17'
 
 squid_testing_pkgs:
   - curl

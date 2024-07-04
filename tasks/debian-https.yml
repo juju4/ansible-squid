@@ -132,9 +132,6 @@
       args:
         chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
         creates: "{{ squidbuild_dir }}/squid_{{ squid_pkg }}_amd64.deb"
-      environment:
-        CPPFLAGS: "{{ squid_build_cpp_flags | default(omit) }}"
-        CXXFLAGS: "{{ squid_build_cpp_flags | default(omit) }}"
       async: 5400
       poll: 0
       register: dpkgbuild
