@@ -30,6 +30,8 @@
   become: false
   delegate_to: localhost
 
+# To force deb build, move/delete squid*.deb files both on orchestrator
+# (files/) and target system (/var/cache/build/squid/)
 - name: Squid openssl deb
   when: not squiddeb.stat.exists
   block:
@@ -81,7 +83,7 @@
       when:
         - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
 
-    - name: Get patches
+    - name: Get patches from Internet
       ansible.builtin.get_url:
         url: "{{ item.url }}"
         dest: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}/{{ item.url | basename }}"
@@ -92,20 +94,35 @@
       when:
         - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
 
+    - name: Get patches from Orchestrator
+      ansible.builtin.copy:
+        src: "{{ item.url }}"
+        dest: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}/{{ item.url | basename }}"
+        mode: '0600'
+      loop: "{{ squidhttps_localpatch }}"
+      register: dl_result
+      until: dl_result is success
+      when:
+        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
+
     - name: Squid openssl | Patch
       ansible.posix.patch:
         src: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}/{{ item.url | basename }}"
         basedir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}"
-        remote_src: true
-      loop: "{{ squidhttps_patch }}"
+        remote_src: "{{ item.remote | default(true) }}"
+      loop: "{{ squidhttps_patch + squidhttps_localpatch }}"
       when:
         - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
 
     - name: Squid openssl | Check debian rules
-      ansible.builtin.command: cat rules
+      ansible.builtin.command: grep ssl rules
       args:
         chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}/debian"
       changed_when: false
+      register: rulescheck
+    - name: Squid openssl | debian rules and ssl
+      ansible.builtin.debug:
+        var: rulescheck
 
     - name: Squid openssl | build package - be patient...
       # command: dpkg-buildpackage -rfakeroot -b

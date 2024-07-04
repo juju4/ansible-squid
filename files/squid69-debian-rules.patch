@@ -1,0 +1,12 @@
+--- rules.orig	2024-07-04 03:14:25.297969555 +0000
++++ rules	2024-07-04 03:14:30.873967210 +0000
+@@ -36,6 +36,9 @@
+ 		--enable-delay-pools \
+ 		--enable-cache-digests \
+ 		--enable-icap-client \
++		--enable-ssl \
++		--enable-ssl-crtd \
++		--with-openssl \
+ 		--enable-follow-x-forwarded-for \
+ 		--enable-auth-basic="DB,fake,getpwnam,LDAP,NCSA,PAM,POP3,RADIUS,SASL,SMB" \
+ 		--enable-auth-digest="file,LDAP" \
