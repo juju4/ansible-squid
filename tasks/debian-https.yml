@@ -8,6 +8,8 @@
   loop:
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }} universe"
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-updates universe"
+  when:
+    - ansible_distribution == 'Ubuntu'
 
 - name: Ubuntu | Enable universe security repository
   ansible.builtin.lineinfile:
@@ -16,6 +18,8 @@
     owner: root
     regexp: "^deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-security universe"
     line: "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-security universe"
+  when:
+    - ansible_distribution == 'Ubuntu'
 
 - name: Ensure squid build dir exists
   ansible.builtin.file:
