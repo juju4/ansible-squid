@@ -71,7 +71,7 @@
       until: dl_result is success
       failed_when: "{{ squid_debsrc_asc | default(omit) }}"
       when:
-        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 20)
+        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
 
     - name: Squid openssl | unpack source
       ansible.builtin.command: "dpkg-source -x squid_{{ squid_pkg }}.dsc"
