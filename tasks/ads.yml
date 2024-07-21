@@ -33,7 +33,7 @@
     hour: "2"
     day: "*/3"
     user: "root"
-    job: "{{ scriptsdir }}/ad_servers_newlist.sh > /dev/null"
+    job: "{{ scriptsdir }}/ad_servers_newlist.sh 2>/tmp/ad_servers_newlist.err >/dev/null"
     cron_file: ansible_adslist_refresh
 
 - name: Ensure ads servers list exists
