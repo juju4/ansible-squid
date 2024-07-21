@@ -65,6 +65,7 @@
         - "http://http.debian.net/debian/pool/main/s/squid/squid_{{ squid_ver }}.orig.tar.xz.asc"
       register: dl_result
       until: dl_result is success
+      failed_when: "{{ squid_debsrc_asc | default(omit) }}"
       when:
         - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 20)
 
