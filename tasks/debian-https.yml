@@ -129,27 +129,38 @@
       ansible.builtin.debug:
         var: rulescheck
 
-    - name: Squid openssl | build package - be patient...
-      # command: dpkg-buildpackage -rfakeroot -b
-      # command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
-      ## without signing else set up a gpg key before
-      ansible.builtin.command: dpkg-buildpackage -rfakeroot -b -uc -us -d
-      args:
-        chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
-        creates: "{{ squidbuild_dir }}/squid_{{ squid_pkg }}_amd64.deb"
-      environment: "{{ squid_build_env | default(omit) }}"
-      async: "{{ squid_debbuild_max | default(5400) }}"
-      poll: 0
-      register: dpkgbuild
+    - name: Build and debug
+      block:
+        - name: Squid openssl | build package - be patient...
+          # command: dpkg-buildpackage -rfakeroot -b
+          # command: dpkg-buildpackage -rfakeroot -b -k{{ debsign_gpg_user_email }}
+          ## without signing else set up a gpg key before
+          ansible.builtin.command: dpkg-buildpackage -rfakeroot -b -uc -us -d
+          args:
+            chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
+            creates: "{{ squidbuild_dir }}/squid_{{ squid_pkg }}_amd64.deb"
+          environment: "{{ squid_build_env | default(omit) }}"
+          async: "{{ squid_debbuild_max | default(5400) }}"
+          poll: 0
+          register: dpkgbuild
 
-    - name: Squid openssl | check on async task for pkg building
-      ansible.builtin.async_status:  # noqa no-handler
-        jid: "{{ dpkgbuild.ansible_job_id }}"
-      register: job_result
-      until: job_result.finished or dpkgbuild.finished
-      retries: 90
-      delay: 60
-      when: dpkgbuild is changed
+        - name: Squid openssl | check on async task for pkg building
+          ansible.builtin.async_status:  # noqa no-handler
+            jid: "{{ dpkgbuild.ansible_job_id }}"
+          register: job_result
+          until: job_result.finished or dpkgbuild.finished
+          retries: 90
+          delay: 60
+          when: dpkgbuild is changed
+      rescue:
+        # try again without async should give a more readable error
+        - name: Squid openssl | build package 2 - be patient...
+          ansible.builtin.command: dpkg-buildpackage -rfakeroot -b -uc -us -d -nc
+          args:
+            chdir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}"
+            creates: "{{ squidbuild_dir }}/squid_{{ squid_pkg }}_amd64.deb"
+          environment: "{{ squid_build_env | default(omit) }}"
+          register: dpkgbuild2
 
     - name: Squid openssl | Get built binary info
       ansible.builtin.command: ./squid -v
