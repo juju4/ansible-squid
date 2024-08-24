@@ -1,0 +1,75 @@
+From d5e7535473ecf2060116f9e1e7da0eecd9a6aa08 Mon Sep 17 00:00:00 2001
+From: Sergio Durigan Junior <sergiodj@sergiodj.net>
+Date: Tue, 9 Aug 2022 21:38:27 -0400
+Subject: [PATCH] Fix FTBFS due to -Werror=alloc-size-larger-than on GCC 12
+
+GCC 12 emits an error when compiling squid due to
+-Werror=alloc-size-larger-than.  The error looks like this:
+
+store/Disks.cc:690:64: error: argument 1 value '18446744073709551615' exceeds maximum object size 9223372036854775807 [-Werror=alloc-size-larger-than=]
+  690 |         const auto tmp = new SwapDir::Pointer[swap->n_allocated];
+      |                                                                ^
+
+Arguably, this is likely a compiler bug and not squid's fault.  Either
+way, I believe it's worth having more type safety in this code.
+
+Signed-off-by: Sergio Durigan Junior <sergiodj@sergiodj.net>
+---
+ src/SquidConfig.h  | 2 +-
+ src/pconn.cc       | 2 +-
+ src/pconn.h        | 2 +-
+ src/store/Disks.cc | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/SquidConfig.h b/src/SquidConfig.h
+index d80f6a7e852..fbb99e751df 100644
+--- a/src/SquidConfig.h
++++ b/src/SquidConfig.h
+@@ -64,7 +64,7 @@ class DiskConfig {
+     ~DiskConfig() { delete[] swapDirs; }
+
+     RefCount<SwapDir> *swapDirs = nullptr;
+-    int n_allocated = 0;
++    unsigned int n_allocated = 0;
+     int n_configured = 0;
+     /// number of disk processes required to support all cache_dirs
+     int n_strands = 0;
+diff --git a/src/pconn.cc b/src/pconn.cc
+index cc17acd49a2..1244e0b8653 100644
+--- a/src/pconn.cc
++++ b/src/pconn.cc
+@@ -167,7 +167,7 @@ IdleConnList::clearHandlers(const Comm::ConnectionPointer &conn)
+ void
+ IdleConnList::push(const Comm::ConnectionPointer &conn)
+ {
+-    if (size_ == capacity_) {
++    if ((unsigned int) size_ == capacity_) {
+         debugs(48, 3, "growing idle Connection array");
+         capacity_ <<= 1;
+         const Comm::ConnectionPointer *oldList = theList_;
+diff --git a/src/pconn.h b/src/pconn.h
+index 85e44e50bf9..b8f07d9c53a 100644
+--- a/src/pconn.h
++++ b/src/pconn.h
+@@ -80,7 +80,7 @@ class IdleConnList: public hash_link, private IndependentRunner
+     Comm::ConnectionPointer *theList_;
+
+     /// Number of entries theList can currently hold without re-allocating (capacity).
+-    int capacity_;
++    unsigned int capacity_;
+     ///< Number of in-use entries in theList
+     int size_;
+
+diff --git a/src/store/Disks.cc b/src/store/Disks.cc
+index cc65f1b4c13..f5009cac835 100644
+--- a/src/store/Disks.cc
++++ b/src/store/Disks.cc
+@@ -787,7 +787,7 @@ allocate_new_swapdir(Store::DiskConfig &swap)
+         swap.swapDirs = new SwapDir::Pointer[swap.n_allocated];
+     }
+
+-    if (swap.n_allocated == swap.n_configured) {
++    if (swap.n_allocated == (unsigned int) swap.n_configured) {
+         swap.n_allocated <<= 1;
+         const auto tmp = new SwapDir::Pointer[swap.n_allocated];
+         for (int i = 0; i < swap.n_configured; ++i) {
