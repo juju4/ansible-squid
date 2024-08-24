@@ -115,6 +115,7 @@
         src: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}/{{ item.url | basename }}"
         basedir: "{{ squidbuild_dir }}/squid-{{ squid_ver }}{{ item.dir }}"
         remote_src: "{{ item.remote | default(true) }}"
+        strip: "{{ item.strip | default(0) }}"
       loop: "{{ squidhttps_patch + squidhttps_localpatch }}"
       when:
         - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)

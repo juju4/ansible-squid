@@ -58,7 +58,7 @@ squidhttps_patch:
 squidhttps_localpatch:
   - { url: files/squid69-debian-rules.patch, dir: /debian }
   # https://github.com/squid-cache/squid/pull/1118
-  - { url: files/1118.patch, dir: / }
+  - { url: files/1118.patch, dir: /, strip: 1 }
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
 squid_ver: '6.10'
