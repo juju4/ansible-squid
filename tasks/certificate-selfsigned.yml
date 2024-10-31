@@ -20,6 +20,9 @@
   register: pkg_result
   until: pkg_result is success
 
+- name: Python externally managed
+  ansible.builtin.import_tasks: python-externally-managed.yml
+
 - name: Ensure python cryptography is present
   ansible.builtin.pip:
     name: cryptography
