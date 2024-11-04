@@ -12,6 +12,12 @@
     squid_https_build: true
     squid_jsonlog: true
     squid_testing: false
+    # https://wiki.gentoo.org/wiki/LTO#Disable_LTO_per_Package
+    squid_build_env:
+      CFLAGS: "-Wno-error=odr -Wno-error=lto-type-mismatch -Wno-error=strict-aliasing -fno-lto"
+      CXXFLAGS: "-Wno-error=odr -Wno-error=lto-type-mismatch -Wno-error=strict-aliasing -fno-lto"
+      FCFLAGS: "-Wno-error=odr -Wno-error=lto-type-mismatch -Wno-error=strict-aliasing -fno-lto"
+      FFLAGS: "-Wno-error=odr -Wno-error=lto-type-mismatch -Wno-error=strict-aliasing -fno-lto"
   pre_tasks:
     - name: Ubuntu | Install python3
       ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
