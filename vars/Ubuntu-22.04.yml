@@ -59,8 +59,9 @@ squidhttps_localpatch:
   - { url: files/squid69-debian-rules.patch, dir: /debian }
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
-squid_ver: '6.10'
-squid_pkg: '6.10-1'
+# 6.12-1: Dependency is not satisfiable: libc6 (>= 2.38)
+squid_ver: '5.7'
+squid_pkg: '5.7-2+deb12u2'
 squid_orig_ext: tar.xz
 squid_debsrc_asc: false
 # http://www.squid-cache.org/Versions/

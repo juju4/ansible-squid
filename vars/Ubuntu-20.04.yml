@@ -51,7 +51,7 @@ squidhttps_pkgs:
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
 squid_ver: '5.7'
-squid_pkg: '5.7-2+deb12u1'
+squid_pkg: '5.7-2+deb12u2'
 squid_orig_ext: tar.xz
 
 squid_testing_pkgs:
