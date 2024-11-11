@@ -94,7 +94,7 @@
   ansible.builtin.copy:
     src: transparent-user.sh
     dest: /usr/local/bin/transparent-user.sh
-    mode: 0755
+    mode: '0755'
 
 - name: Import dansguardian
   ansible.builtin.import_tasks: dansguardian.yml
