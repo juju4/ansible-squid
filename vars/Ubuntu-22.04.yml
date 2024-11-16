@@ -58,12 +58,16 @@ squidhttps_patch:
 squidhttps_localpatch:
   - { url: files/squid69-debian-rules.patch, dir: /debian }
 
-# http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
-# 6.12-1: Dependency is not satisfiable: libc6 (>= 2.38)
+squid_deb_src_dir_url: http://archive.ubuntu.com/ubuntu/pool/main/s/squid
 squid_ver: '5.7'
 squid_pkg: '5.7-2+deb12u2'
 squid_orig_ext: tar.xz
 squid_debsrc_asc: false
+# 5.7-2+deb12u2: error: array subscript ‘struct icmpEchoData[0]’ is partly outside array bounds of ‘char[282]’ [-Werror=array-bounds]
+squid_build_env:
+  CFLAGS: ' -Wno-array-bounds'
+  CXXFLAGS: ' -Wno-array-bounds'
+  LDFLAGS: ' -Wno-array-bounds'
 # http://www.squid-cache.org/Versions/
 squid_src_ver: '5.9'
 squid_src_hash: "sha256:460830a0a95815f42791efd97609c8f916e3e4ebf0ca445d0ec3babcbd86e86a"

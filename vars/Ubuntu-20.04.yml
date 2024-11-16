@@ -50,9 +50,15 @@ squidhttps_pkgs:
   - squid-langpack
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
+squid_deb_src_dir_url: http://archive.ubuntu.com/ubuntu/pool/main/s/squid
 squid_ver: '5.7'
-squid_pkg: '5.7-2+deb12u2'
+squid_pkg: '5.7-1ubuntu3.2'
 squid_orig_ext: tar.xz
+# 5.7.2+deb12u2: ../../src/http.h:118:10: error: ‘optional’ in namespace ‘std’ does not name a template type
+squid_build_env:
+  CFLAGS: '-std=c++17'
+  CXXFLAGS: '-std=c++17'
+  LDFLAGS: '-std=c++17'
 
 squid_testing_pkgs:
   - curl
