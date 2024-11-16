@@ -56,7 +56,7 @@ squid_pkg: '5.7-1ubuntu3.2'
 squid_orig_ext: tar.xz
 # 5.7.2+deb12u2: ../../src/http.h:118:10: error: ‘optional’ in namespace ‘std’ does not name a template type
 squid_build_env:
-  CFLAGS: '-std=c++17'
+  CFLAGS: ''
   CXXFLAGS: '-std=c++17'
   LDFLAGS: '-std=c++17'
 
