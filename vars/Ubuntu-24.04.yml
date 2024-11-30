@@ -57,9 +57,6 @@ squidhttps_patch:
   # - { url: "https://raw.githubusercontent.com/diladele/squid-ubuntu/082161d23c094ba91ee65bc3f6e7bbb5b8f56152/src/ubuntu22/control.patch", dir: /debian }
 squidhttps_localpatch:
   - { url: files/squid69-debian-rules.patch, dir: /debian }
-  # https://github.com/squid-cache/squid/pull/1118
-  # https://github.com/squid-cache/squid/pull/1929
-  - { url: files/squid-pr1118u.patch, dir: /, strip: 1 }
 
 squid_deb_src_dir_url: http://archive.ubuntu.com/ubuntu/pool/main/s/squid
 squid_ver: '6.10'

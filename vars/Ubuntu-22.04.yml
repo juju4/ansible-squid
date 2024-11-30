@@ -52,9 +52,7 @@ squidbuild_pkgs:
   - pkgconf
 squidhttps_pkgs:
   - squid-langpack
-squidhttps_patch:
-  - { url: "https://raw.githubusercontent.com/diladele/squid-ubuntu/082161d23c094ba91ee65bc3f6e7bbb5b8f56152/src/ubuntu22/BoolOps.cc.patch", dir: /src/acl }
-  # - { url: "https://raw.githubusercontent.com/diladele/squid-ubuntu/082161d23c094ba91ee65bc3f6e7bbb5b8f56152/src/ubuntu22/control.patch", dir: /debian }
+squidhttps_patch: []
 squidhttps_localpatch:
   - { url: files/squid69-debian-rules.patch, dir: /debian }
 
