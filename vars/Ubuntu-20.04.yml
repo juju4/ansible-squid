@@ -48,6 +48,8 @@ squidbuild_pkgs:
   - ed
 squidhttps_pkgs:
   - squid-langpack
+squidhttps_patch: []
+squidhttps_localpatch: []
 
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
 squid_deb_src_dir_url: http://archive.ubuntu.com/ubuntu/pool/main/s/squid

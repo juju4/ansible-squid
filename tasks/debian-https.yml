@@ -70,8 +70,6 @@
       register: dl_result
       until: dl_result is success
       failed_when: "{{ squid_debsrc_asc | default(omit) }}"
-      when:
-        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
 
     - name: Squid openssl | unpack source
       ansible.builtin.command: "dpkg-source -x squid_{{ squid_pkg }}.dsc"
@@ -85,8 +83,6 @@
         state: directory
         mode: '0755'
       loop: "{{ squidhttps_patch }}"
-      when:
-        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
 
     - name: Get patches from Internet
       ansible.builtin.get_url:
@@ -96,8 +92,6 @@
       loop: "{{ squidhttps_patch }}"
       register: dl_result
       until: dl_result is success
-      when:
-        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
 
     - name: Get patches from Orchestrator
       ansible.builtin.copy:
@@ -107,8 +101,6 @@
       loop: "{{ squidhttps_localpatch }}"
       register: dl_result
       until: dl_result is success
-      when:
-        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
 
     - name: Squid openssl | Patch
       ansible.posix.patch:
@@ -117,8 +109,6 @@
         remote_src: "{{ item.remote | default(true) }}"
         strip: "{{ item.strip | default(0) }}"
       loop: "{{ squidhttps_patch + squidhttps_localpatch }}"
-      when:
-        - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
 
     - name: Squid openssl | Check debian rules
       ansible.builtin.command: grep ssl rules
