@@ -48,8 +48,7 @@ squidbuild_pkgs:
 squidhttps_pkgs:
   - squid-langpack
 # FIXME! validate patch
-squidhttps_patch:
-  - { url: "https://raw.githubusercontent.com/diladele/squid-ubuntu/082161d23c094ba91ee65bc3f6e7bbb5b8f56152/src/ubuntu22/BoolOps.cc.patch", dir: /src/acl }
+squidhttps_patch: []
 squidhttps_localpatch:
   - { url: files/squid69-debian-rules.patch, dir: /debian }
 
