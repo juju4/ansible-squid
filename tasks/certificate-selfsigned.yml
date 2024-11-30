@@ -20,14 +20,20 @@
   register: pkg_result
   until: pkg_result is success
 
-- name: Python externally managed
-  ansible.builtin.import_tasks: python-externally-managed.yml
-
-- name: Ensure python cryptography is present
-  ansible.builtin.pip:
-    name: cryptography
-    state: present
-    executable: "{{ squid_cryptography | default('pip3') }}"
+- name: Ensure recent cryptography - older distributions
+  when: >
+    (
+      (ansible_distribution == "Debian" and ansible_distribution_major_version|int <= 11) or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int <= 22)
+    )
+  block:
+    - name: Python externally managed
+      ansible.builtin.import_tasks: python-externally-managed.yml
+    - name: Ensure python cryptography is present
+      ansible.builtin.pip:
+        name: cryptography
+        state: present
+        executable: "{{ squid_cryptography | default('pip3') }}"
 
 - name: Check if OpenSSL private key exists
   ansible.builtin.stat:

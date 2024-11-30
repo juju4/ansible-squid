@@ -73,3 +73,10 @@ squid_testing_pkgs:
   - netcat
   - jq
   - tsung
+
+openssl_pkgs:
+  - openssl
+  - python3-pip
+  - python3-setuptools
+  - python3-openssl
+  - python3-cryptography
