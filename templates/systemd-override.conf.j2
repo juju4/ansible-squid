@@ -33,9 +33,9 @@ SystemCallErrorNumber=EPERM
 {% endif %}
 {% endif %}
 {% if squid_cgroups_restriction_enable|bool %}
-CPUShares={{ squid_cgroups_cpushares | default('1024') }}
+CPUWeight={{ squid_cgroups_cpushares | default('1024') }}
 CPUQuota={{ squid_cgroups_cpuquota | default('80%') }}
-MemoryLimit={{ squid_cgroups_memorylimit | default('4G') }}
+MemoryMax={{ squid_cgroups_memorylimit | default('4G') }}
 {% endif %}
 
 #Restart=on-failure
