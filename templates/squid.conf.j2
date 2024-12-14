@@ -384,13 +384,13 @@ refresh_all_ims on
 access_log stdio:/var/log/squid/access.log squid
 ## Customize logging
 ## http://www.squid-cache.org/Doc/config/logformat/
-logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh
+logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh %tr
 access_log stdio:{{ squid_customlog_path }} customlogformat
 {% else %}
 access_log /var/log/squid/access.log squid
 ## Customize logging
 ## http://www.squid-cache.org/Doc/config/logformat/
-logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh
+logformat customlogformat %tl %>a "%rm %ru HTTP/%rv" %>Hs %<st "%{Referer}>h" "%{User-Agent}>h" %Ss:Sh %tr
 access_log {{ squid_customlog_path }} customlogformat
 {% endif %}
 # human-readable time?
@@ -409,7 +409,8 @@ logformat jsonExtended {\
     "ua":"%{User-Agent}>h","referer":"%{Referer}>h","cookie":"%{Cookie}>h",\
     "accLang":"%{Accept-Language}>h","accEnc":"%{Accept-Encoding}>h",\
     "host":"%{Host}>h","origin":"%{Origin}>h","accept":"%{Accept}>h",\
-    "xReqWith":"%{X-Requested-With}>h"\
+    "xReqWith":"%{X-Requested-With}>h",\
+    "XFF":"%{X-Forwarded-For}>h"\
   },\
   "resp":{\
     "bytes":%<st,"headerBytes":%<sh,\
@@ -423,6 +424,8 @@ logformat jsonExtended {\
     "contentEncoding":"%{Content-Encoding}<h",\
     "server":"%{Server}<h"\
   },\
+  "Ss": "%Ss",\
+  "Sh": "%Sh",\
   "bytes":{"body":"%<bs","total":%st}{% if squid_https %},\
   "ssl":{\
     "subject_c":"%ssl::>cert_subject","issuer_c":"%ssl::>cert_issuer",\
