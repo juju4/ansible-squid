@@ -315,13 +315,18 @@ request_header_access Cookie allow all
 request_header_access Server deny all
 request_header_access X-Forwarded-For deny all
 request_header_access All deny all
-{% if squid_urlfiltering_tool == 'dansguardian' or squid_urlfiltering_tool == 'e2guardian' %}
+{% if squid_urlfiltering_tool == 'dansguardian' or squid_urlfiltering_tool == 'e2guardian' or squid_proxy_chain_enable | bool %}
 {# http://squid.sourceforge.net/follow_xff/ #}
 {# https://gist.github.com/alvarow/fa409edc70aeb4cf89bbc83c1c78f392 #}
 follow_x_forwarded_for allow localhost
+follow_x_forwarded_for allow localnet
+# acl parentproxy dst {{ squid_chain_parentproxy_host }}
+# follow_x_forwarded_for allow parentproxy
 acl_uses_indirect_client on
 delay_pool_uses_indirect_client on
+# https://www.squid-cache.org/Doc/config/log_uses_indirect_client/ XFF NOK
 log_uses_indirect_client on
+tproxy_uses_indirect_client off
 {% else %}
 follow_x_forwarded_for deny all
 {% endif %}
@@ -462,6 +467,26 @@ url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf
 
 # https://www.edv-huber.com/index.php/problemloesungen/22-squid-proxy-server-filter-urls-by-virustotal-com
 # https://blog.rootshell.be/2014/12/15/automatic-mime-parts-scanning-with-virustotal/
+
+{% if squid_chain_child|bool and squid_chain_parentproxy_host|string and squid_chain_parentproxy_port|int %}
+# proxy chain
+# how to configure dns resolution to happen only at parent or children? seems all for acl match
+# https://access.redhat.com/solutions/31883
+acl local-external dstdomain external.foo.net
+acl local-servers dstdomain  .foo.net
+cache_peer {{ squid_chain_parentproxy_host }} parent {{ squid_chain_parentproxy_port }} 0 no-query default
+# cache_peer_domain {{ squid_chain_parentproxy_host }} !.internal.example.com !localnet  # OBSOLETE
+cache_peer_access {{ squid_chain_parentproxy_host }} deny local-servers
+# cache_peer_access {{ squid_chain_parentproxy_host }} deny localnet
+cache_peer_access {{ squid_chain_parentproxy_host }} allow all
+always_direct deny local-external
+always_direct allow local-servers
+# pay attention to not overlap localnet and squid_chain_parentproxy_host
+# always_direct allow localnet
+# https://www.sbarjatiya.com/notes_wiki/index.php/Cache_peer_configuration_for_squid always send traffic to parent?
+prefer_direct off
+never_direct allow all
+{% endif %}
 
 # debug
 # https://wiki.squid-cache.org/KnowledgeBase/DebugSections
