@@ -335,6 +335,8 @@ follow_x_forwarded_for deny all
 ## maximum_object_size should be before cache_dir
 ## http://squid-web-proxy-cache.1019090.n4.nabble.com/Problem-with-caching-larger-files-td4666004.html#a4666006
 ## https://tails.boum.org/contribute/build/squid-deb-proxy/squid-deb-proxy.conf
+## http://www.squid-cache.org/Doc/config/cache_dir/
+## https://wiki.squid-cache.org/SquidFaq/ClearingTheCache
 maximum_object_size 1 GB
 #cache_dir ufs {{ squid_spool }} 100 16 256
 cache_dir ufs {{ squid_spool }} 70000 16 256
