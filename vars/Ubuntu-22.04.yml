@@ -50,6 +50,7 @@ squidbuild_pkgs:
   - logrotate
   - libltdl-dev
   - pkgconf
+  - libatomic1
 squidhttps_pkgs:
   - squid-langpack
 squidhttps_patch: []
@@ -67,8 +68,8 @@ squid_build_env:
   CXXFLAGS: ' -Wno-array-bounds'
   LDFLAGS: ' -Wno-array-bounds'
 # http://www.squid-cache.org/Versions/
-squid_src_ver: '5.9'
-squid_src_hash: "sha256:460830a0a95815f42791efd97609c8f916e3e4ebf0ca445d0ec3babcbd86e86a"
+squid_src_ver: '6.12'
+squid_src_hash: "sha256:20d6c79214f75b5f889952ed79e1ab8b8c3f909b079671d77bb558a6f0b28625"
 
 squid_testing_pkgs:
   - curl
@@ -76,3 +77,10 @@ squid_testing_pkgs:
   - netcat
   - jq
   - tsung
+
+openssl_pkgs:
+  - openssl
+  - python3-pip
+  - python3-setuptools
+  - python3-openssl
+  - python3-cryptography
