@@ -16,7 +16,7 @@ acl Safe_ports port 443         # https
 #acl Safe_ports port 70         # gopher
 acl Safe_ports port 1025-65535  # unregistered ports
 acl CONNECT method CONNECT
-{% if not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) and not (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
+{% if not (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10) and not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) and not (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
 {# built-in since squid 3.2 #}
 acl localhost src 127.0.0.1/32
 {% endif %}
@@ -36,7 +36,10 @@ cache_mgr {{ squid_cache_admin_email }}
 cache_mem 100 MB
 # default is 512 KB
 # maximum_object_size_in_memory 1 MB
-{% if squid_dns_v4_first is undefined or squid_dns_v4_first and not ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22) and squid_https_source_build|bool)%}
+{% if (squid_dns_v4_first | bool) and not (
+  ((ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10) or
+   (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
+  ) and squid_https_source_build|bool)%}
 # https://serverfault.com/questions/644604/squid-https-tunnelling-using-connect-very-slow
 dns_v4_first on
 {% endif %}
@@ -252,7 +255,12 @@ refresh_pattern ^ftp:           1440    20%     10080
 refresh_pattern ^gopher:        1440    0%      1440
 refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
 # Images
+{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22) %}
+{# squid 6.9: other options create warning "use of ... in 'refresh_pattern' violates HTTP" #}
+refresh_pattern -i \.(gif|png|jpeg|jpg|bmp|tif|tiff|ico)(\?.*|$) 10080 50% 43200 ignore-no-cache ignore-auth
+{% else %}
 refresh_pattern -i \.(gif|png|jpeg|jpg|bmp|tif|tiff|ico)(\?.*|$) 10080 50% 43200 override-expire override-lastmod reload-into-ims ignore-reload ignore-no-cache ignore-auth ignore-private
+{% endif %}
 #refresh_pattern (Release|Packages(.gz)*)$      0       20%     2880
 # example lin deb packages
 #refresh_pattern (\.deb|\.udeb)$   129600 100% 129600
@@ -364,7 +372,9 @@ refresh_all_ims on
 # http://squid-web-proxy-cache.1019090.n4.nabble.com/ACL-is-used-in-context-without-an-HTTP-response-Assuming-mismatch-td4677540.html
 #access_log none excludetrace proto_http
 
-{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
+{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or
+      (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10) or
+      (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
 access_log stdio:/var/log/squid/access.log squid
 ## Customize logging
 ## http://www.squid-cache.org/Doc/config/logformat/
@@ -422,7 +432,9 @@ logformat jsonExtended {\
 {% endif %}
  \
 }
-{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
+{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or
+      (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10) or
+      (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
 access_log stdio:/var/log/squid/access_json.log jsonExtended
 {% else %}
 access_log /var/log/squid/access_json.log jsonExtended
