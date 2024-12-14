@@ -25,6 +25,7 @@ squid_forwarded_for: delete
 # source IP and subnets allowed to connect (outside of private networks)
 squid_allowed_clients: []
 
+squid_dns_v4_first: false
 squid_filter_ads: true
 
 squid_splash_enable: false
