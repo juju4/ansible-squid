@@ -51,6 +51,7 @@ squidbuild_pkgs:
   - libltdl-dev
   - pkgconf
   - libatomic1
+  - libatomic-ops-dev
 squidhttps_pkgs:
   - squid-langpack
 squidhttps_patch: []
