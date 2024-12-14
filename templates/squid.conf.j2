@@ -140,6 +140,12 @@ http_access allow allowed_clients
 #acl excludetrace dstdomain play.google.com
 #acl excludetrace_mozilla dstdomain detectportal.firefox.com content-signature-2.cdn.mozilla.net push.services.mozilla.com firefox.settings.services.mozilla.com ocsp.comodoca.com
 
+# restrict response size/download
+# http://www.squid-cache.org/Doc/config/reply_body_max_size/
+# Probably want to exclude some domains google takeout, iso downloads and similar
+reply_body_max_size 1024 MB
+reply_body_max_size none localhost
+
 {% if squid_splash_enable is defined and squid_splash_enable %}
 # https://wiki.squid-cache.org/ConfigExamples/Portal/Splash
 # https://thejimmahknows.com/squid-proxy-splash-page-2/
