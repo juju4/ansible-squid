@@ -141,7 +141,7 @@
   register: marker1
 
 - name: Container start
-  when: >
+  when:
     - not marker1.stat.exists
     - is_container
   block:
