@@ -4,6 +4,12 @@
   hosts: molecule
   vars:
     proxy_port: 3128
+  pre_tasks:
+    - name: RedHat | Ensure pgrep is present
+      ansible.builtin.package:
+        name: procps-ng
+        state: present
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
   tasks:
     - name: Ensure /etc/squid/squid.conf config file is present
       ansible.builtin.stat:
@@ -13,11 +19,18 @@
       ansible.builtin.assert:
         that: cfg.stat.exists and cfg.stat.size != 0
 
-    - name: Ensure pgrep is present
-      ansible.builtin.package:
-        name: procps-ng
-        state: present
-      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
+    - name: Get squid version
+      ansible.builtin.command:
+        cmd: squid --version
+      register: version
+      changed_when: false
+      ignore_errors: true
+    - name: Validate squid version
+      ansible.builtin.assert:
+        that:
+          - "'Squid Cache: Version' in version.stdout"
+          - "'configure options: ' in version.stdout"
+
     - name: Ensure process is running
       ansible.builtin.command: pgrep -u root squid
       register: ps
