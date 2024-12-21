@@ -34,7 +34,7 @@
   block:
     - name: Squid openssl | Install build and report tools
       ansible.builtin.apt:
-        pkg: "{{ squidbuild_pkgs + squidhttps_pkgs + squid_report_pkgs | default(omit) }}"
+        pkg: "{{ ['cron'] + squidbuild_pkgs + squidhttps_pkgs + squid_report_pkgs | default(omit) }}"
         state: present
         update_cache: yes
         cache_valid_time: 3600
