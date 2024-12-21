@@ -7,6 +7,7 @@
   loop:
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }} universe"
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-updates universe"
+  when: ansible_distribution == 'Ubuntu'
 
 - name: Ubuntu | Enable universe security repository
   ansible.builtin.lineinfile:
@@ -15,6 +16,7 @@
     owner: root
     regexp: "^deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-security universe"
     line: "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-security universe"
+  when: ansible_distribution == 'Ubuntu'
 
 - name: Ensure squid build dir exists
   ansible.builtin.file:
@@ -41,7 +43,7 @@
 
     - name: Get squid source code
       ansible.builtin.get_url:
-        url: http://www.squid-cache.org/Versions/v5/squid-{{ squid_src_ver }}.tar.gz
+        url: http://www.squid-cache.org/Versions/v6/squid-{{ squid_src_ver }}.tar.gz
         dest: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}.tar.gz"
         mode: '0600'
         checksum: "{{ squid_src_hash }}"
@@ -86,21 +88,36 @@
             '--build=x86_64-linux-gnu' \
             '--host=x86_64' \
             --prefix=/usr/local \
-            --localstatedir=/var \
             '--includedir=${prefix}/include' \
             '--mandir=${prefix}/share/man' \
             '--infodir=${prefix}/share/info' \
-            --sysconfdir=/etc/squid \
-            --with-default-user=proxy \
-            --with-logdir=/var/log/squid \
-            --with-pidfile=/var/run/squid.pid \
+            --sysconfdir=/etc \
+            --localstatedir=/var \
+            '--disable-option-checking' \
+            '--disable-silent-rules' \
+            '--libdir=${prefix}/lib/x86_64-linux-gnu' \
+            '--runstatedir=/run' \
+            '--disable-maintainer-mode' \
+            '--disable-dependency-tracking' \
+            '--datadir=/usr/share/squid' \
+            '--sysconfdir=/etc/squid' \
+            '--libexecdir=/usr/lib/squid' \
+            '--mandir=/usr/share/man' \
             '--enable-inline' \
+            '--disable-arch-native' \
             '--enable-async-io=8' \
-            '--enable-storeio=ufs,aufs,diskd,rock' '--enable-removal-policies=lru,heap' \
-            '--enable-delay-pools' '--enable-cache-digests' '--enable-icap-client' \
+            '--enable-storeio=ufs,aufs,diskd,rock' \
+            '--enable-removal-policies=lru,heap' \
+            '--enable-delay-pools' \
+            '--enable-cache-digests' \
+            '--enable-icap-client' \
+            '--enable-ssl' \
+            '--enable-ssl-crtd' \
+            '--with-openssl' \
             '--enable-follow-x-forwarded-for' \
             '--enable-auth-basic=DB,fake,getpwnam,LDAP,NCSA,PAM,POP3,RADIUS,SASL,SMB' \
-            '--enable-auth-digest=file,LDAP' '--enable-auth-negotiate=kerberos,wrapper' \
+            '--enable-auth-digest=file,LDAP' \
+            '--enable-auth-negotiate=kerberos,wrapper' \
             '--enable-auth-ntlm=fake,SMB_LM' \
             '--enable-external-acl-helpers=file_userip,kerberos_ldap_group,LDAP_group,session,SQL_session,time_quota,unix_group,wbinfo_group' \
             '--enable-security-cert-validators=fake' \
