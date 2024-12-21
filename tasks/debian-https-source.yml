@@ -137,6 +137,11 @@
       args:
         chdir: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}"
         creates: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}/Makefile"
+      environment:
+        CFLAGS: "-g -O2 -ffile-prefix-map={{ squidbuild_dir }}/squid-{{ squid_src_ver }}=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=deprecated-declarations"
+        LDFLAGS: -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now
+        CPPFLAGS: -Wdate-time -D_FORTIFY_SOURCE=2
+        CXXFLAGS: "-g -O2 -ffile-prefix-map={{ squidbuild_dir }}/squid-{{ squid_src_ver }}=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=deprecated-declarations"
 
     - name: Pause
       ansible.builtin.pause:
@@ -148,6 +153,11 @@
       args:
         chdir: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}"
         creates: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}/src/squid"
+      environment:
+        CFLAGS: "-g -O2 -ffile-prefix-map={{ squidbuild_dir }}/squid-{{ squid_src_ver }}=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=deprecated-declarations"
+        LDFLAGS: -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now
+        CPPFLAGS: -Wdate-time -D_FORTIFY_SOURCE=2
+        CXXFLAGS: "-g -O2 -ffile-prefix-map={{ squidbuild_dir }}/squid-{{ squid_src_ver }}=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -Wno-error=deprecated-declarations"
       async: 3600
       poll: 0
       register: srcbuild
