@@ -19,6 +19,18 @@
       ansible.builtin.assert:
         that: cfg.stat.exists and cfg.stat.size != 0
 
+    - name: Get squid version
+      ansible.builtin.command:
+        cmd: squid --version
+      register: version
+      changed_when: false
+      ignore_errors: true
+    - name: Validate squid version
+      ansible.builtin.assert:
+        that:
+          - "'Squid Cache: Version' in version.stdout"
+          - "'configure options: ' in version.stdout"
+
     - name: Ensure process is running
       ansible.builtin.command: pgrep -u root squid
       register: ps
