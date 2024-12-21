@@ -3,45 +3,41 @@
 - name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: yes
+  when:
+    - not is_container
 
 - name: Restart squid
   ansible.builtin.service:
     name: "{{ squid_svc }}"
     state: restarted
-  when: >
-    not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
-        )
+  when:
+    - not is_container
 
 - name: Restart dansguardian
   ansible.builtin.service:
     name: dansguardian
     state: restarted
-  when: >
-    not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type ==  "containerd")
-        )
+  when:
+    - not is_container
 
 - name: Restart e2guardian
   ansible.builtin.service:
     name: e2guardian
     state: restarted
-  when: >
-    not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type ==  "containerd")
-        )
+  when:
+    - not is_container
 
 - name: Restart e2guardian - docker
   ansible.builtin.command:  # noqa no-changed-when
     cmd: /usr/sbin/e2guardian -Q
-  when: >
-    (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
-    )
+  when:
+    - not is_container
 
 - name: E2guardian reload
   ansible.builtin.command:  # noqa no-changed-when
     cmd: e2guardian -r
+  when:
+    - not is_container
 
 - name: Restart clamd
   ansible.builtin.service:
@@ -56,7 +52,5 @@
   ansible.builtin.service:
     name: rsyslog
     state: restarted
-  when: >
-    not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type ==  "containerd")
-        )
+  when:
+    - not is_container

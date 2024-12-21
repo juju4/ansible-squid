@@ -10,6 +10,17 @@
   ansible.builtin.include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
   when: ansible_os_family == "RedHat"
 
+- name: Set fact is_container
+  ansible.builtin.set_fact:
+    is_container: true
+  when: >
+    (ansible_virtualization_type is defined and
+      (ansible_virtualization_type == "docker"
+       or ansible_virtualization_type == "containerd"
+       or ansible_virtualization_type == "container"
+      )
+    )
+
 - name: Import debian
   ansible.builtin.import_tasks: debian.yml
   when: >
@@ -121,10 +132,8 @@
     name: "{{ squid_svc }}"
     state: started
     enabled: yes
-  when: >
-    not (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
-        )
+  when:
+    - not is_container
 
 - name: Docker | check start marker
   ansible.builtin.stat:
@@ -132,11 +141,9 @@
   register: marker1
 
 - name: Container start
-  when: >
-    not marker1.stat.exists and
-    (ansible_virtualization_type is defined and
-          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd")
-    )
+  when:
+    - not marker1.stat.exists
+    - is_container
   block:
     - name: Docker | create swap directories
       ansible.builtin.command: squid -z

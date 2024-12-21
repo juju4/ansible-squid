@@ -54,11 +54,33 @@
         dest: "{{ squidbuild_dir }}"
         remote_src: true
 
-    # '--build=x86_64-linux-gnu' '--disable-arch-native'
-    # FIXME! fails in ansible but ok manual...
-    # configure: WARNING: you should use --build, --host, --target\nconfigure: WARNING: invalid host type: \n\nconfig.sub: missing argument\nTry `config.sub --help' for more information.\nconfigure: error: /bin/bash ./cfgaux/config.sub \n failed
+    - name: Get patches from Orchestrator
+      ansible.builtin.copy:
+        src: "{{ item.url }}"
+        dest: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}{{ item.dir }}/{{ item.url | basename }}"
+        mode: '0600'
+      loop: "{{ squidhttps_src_localpatch }}"
+      register: dl_result
+      until: dl_result is success
+
+    - name: Squid openssl | Patch
+      ansible.posix.patch:
+        src: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}{{ item.dir }}/{{ item.url | basename }}"
+        basedir: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}{{ item.dir }}"
+        remote_src: "{{ item.remote | default(true) }}"
+        strip: "{{ item.strip | default(0) }}"
+      loop: "{{ squidhttps_src_localpatch }}"
+
+    - name: Debug | var ansible_env
+      ansible.builtin.debug:
+        var: ansible_env
+        verbosity: 1
+
+    # "configure: error: eCAP support requires loadable modules. Please do not use --disable-shared with --enable-ecap."
+    #         '--enable-ecap' \
+
     - name: Squid openssl | Configure
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: |
           ./configure \
             '--build=x86_64-linux-gnu' \
@@ -81,15 +103,27 @@
             '--enable-auth-digest=file,LDAP' '--enable-auth-negotiate=kerberos,wrapper' \
             '--enable-auth-ntlm=fake,SMB_LM' \
             '--enable-external-acl-helpers=file_userip,kerberos_ldap_group,LDAP_group,session,SQL_session,time_quota,unix_group,wbinfo_group' \
-            '--enable-security-cert-validators=fake' '--enable-storeid-rewrite-helpers=file' \
-            '--enable-url-rewrite-helpers=fake' '--enable-eui' '--enable-esi' \
-            '--enable-icmp' '--enable-zph-qos' '--enable-ecap' \
-            '--with-filedescriptors=65536' '--with-large-files' \
-            '--enable-linux-netfilter' '--with-systemd' '--with-gnutls' \
-            --enable-ssl-crtd --with-openssl
+            '--enable-security-cert-validators=fake' \
+            '--enable-storeid-rewrite-helpers=file' \
+            '--enable-url-rewrite-helpers=fake' \
+            '--enable-eui' '--enable-esi' \
+            '--enable-icmp' '--enable-zph-qos' \
+            '--disable-translation' \
+            '--with-swapdir=/var/spool/squid' \
+            '--with-logdir=/var/log/squid' \
+            '--with-pidfile=/run/squid.pid' \
+            '--with-filedescriptors=65536' \
+            '--with-large-files' \
+            --with-default-user=proxy \
+            '--enable-linux-netfilter' \
+            '--with-systemd'
       args:
         chdir: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}"
         creates: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}/Makefile"
+
+    - name: Pause
+      ansible.builtin.pause:
+      when: false
 
     - name: Squid openssl | Build binary - be patient...
       ansible.builtin.command:
@@ -110,12 +144,45 @@
       delay: 60
       when: srcbuild is changed
 
+    - name: Squid openssl | Make check
+      ansible.builtin.command:
+        cmd: "make check"
+      args:
+        chdir: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}"
+        creates: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}/test-suite/VirtualDeleteOperator"
+
     - name: Squid openssl | Install
       ansible.builtin.command:
         cmd: "make install"
       args:
         chdir: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}"
-        creates: /usr/local/bin/squid
+        creates: /usr/local/sbin/squid
 
-# FIXME!
-# run getting permission denied on all libexec and opening png files...
+    - name: Symlink squid bin for systemd unit
+      ansible.builtin.file:
+        src: /usr/local/sbin/squid
+        dest: /usr/sbin/squid
+        mode: '0755'
+        owner: root
+        state: link
+
+    - name: Set squid systemd unit
+      ansible.builtin.copy:
+        src: "{{ squidbuild_dir }}/squid-{{ squid_src_ver }}/tools/systemd/squid.service"
+        dest: /etc/systemd/system/squid.service
+        mode: '0644'
+        owner: root
+        remote_src: true
+      notify:
+        - Reload systemd
+        - Restart squid
+
+    - name: Ensure correct ownership
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: '0755'
+        owner: proxy
+        state: directory
+      loop:
+        - /var/log/squid
+        - /var/spool/squid

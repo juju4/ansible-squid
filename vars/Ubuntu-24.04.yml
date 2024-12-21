@@ -64,13 +64,14 @@ squid_pkg: '6.10-1ubuntu1'
 squid_orig_ext: tar.xz
 squid_debsrc_asc: false
 # http://www.squid-cache.org/Versions/
-squid_src_ver: '5.9'
-squid_src_hash: "sha256:460830a0a95815f42791efd97609c8f916e3e4ebf0ca445d0ec3babcbd86e86a"
+squid_src_ver: '6.12'
+squid_src_hash: "sha256:20d6c79214f75b5f889952ed79e1ab8b8c3f909b079671d77bb558a6f0b28625"
+squidhttps_src_localpatch: []
 
 squid_testing_pkgs:
   - curl
   - db-util
-  - netcat
+  - netcat-traditional
   - jq
   - tsung
 

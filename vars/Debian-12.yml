@@ -59,6 +59,10 @@ squid_ver: '5.7'
 squid_pkg: '5.7-2+deb12u2'
 squid_orig_ext: tar.xz
 squid_debsrc_asc: false
+# http://www.squid-cache.org/Versions/
+squid_src_ver: '6.12'
+squid_src_hash: "sha256:20d6c79214f75b5f889952ed79e1ab8b8c3f909b079671d77bb558a6f0b28625"
+squidhttps_src_localpatch: []
 
 squid_testing_pkgs:
   - curl
