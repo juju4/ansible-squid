@@ -122,3 +122,4 @@ squid_cgroups_restriction_enable: true
 squid_systemd_restriction_enable: false
 
 orchestrator_files_archives: files
+is_container: false
