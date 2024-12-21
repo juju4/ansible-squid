@@ -20,5 +20,16 @@ provisioner:
       verbosity: 2
 scenario:
   name: default-source
+  test_sequence:
+    - dependency
+    # - lint
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    # - idempotence
+    - verify
 verifier:
   name: ansible
