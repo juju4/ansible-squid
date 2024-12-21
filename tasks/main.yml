@@ -142,7 +142,7 @@
 
 - name: Container start
   when: >
-    - not marker1.stat.exists and
+    - not marker1.stat.exists
     - is_container
   block:
     - name: Docker | create swap directories
