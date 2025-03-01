@@ -99,7 +99,7 @@ acl useragent_opera browser Opera
 acl useragent_trident browser Trident
 acl useragent_chrome_old browser Chrome/[1-6]?
 http_access deny useragent_msie
-http_access deny useragent_chrome_old
+# http_access deny useragent_chrome_old
 
 {% if squid_filter_ads is defined and squid_filter_ads %}
 ## disable ads ( http://pgl.yoyo.org/adservers/ )
