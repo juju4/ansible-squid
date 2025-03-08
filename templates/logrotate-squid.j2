@@ -4,13 +4,13 @@
 /var/log/squid/*.log {
     rotate {{ syslogclient_logrotate_rotate | default(7) | int }}
     {{ syslogclient_logrotate_period | default('daily') }}
-{% if syslogclient_logrotate_datext %}
+{% if syslogclient_logrotate_datext is defined %}
     dateext
     dateformat {{ syslogclient_logrotate_datformat }}
 {% endif %}
     missingok
     notifempty
-{% if syslogclient_logrotate_compress %}
+{% if syslogclient_logrotate_compress is defined and syslogclient_logrotate_compress | bool %}
     compress
     delaycompress
 {% endif %}
