@@ -2,7 +2,7 @@
 
 ## /etc/logrotate.d/squid
 /var/log/squid/*.log {
-    rotate {{ syslogclient_logrotate_rotate | int | default(7) }}
+    rotate {{ syslogclient_logrotate_rotate | default(7) | int }}
     {{ syslogclient_logrotate_period | default('daily') }}
 {% if syslogclient_logrotate_datext %}
     dateext
