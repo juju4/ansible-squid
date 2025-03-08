@@ -1,0 +1,35 @@
+{{ ansible_managed | comment }}
+
+## /etc/logrotate.d/squid
+/var/log/squid/*.log {
+    rotate {{ syslogclient_logrotate_rotate|int | default(7) }}
+    {{ syslogclient_logrotate_period | default('daily') }}
+{% if syslogclient_logrotate_datext %}
+    dateext
+    dateformat {{ syslogclient_logrotate_datformat }}
+{% endif%}
+    missingok
+    notifempty
+{% if syslogclient_logrotate_compress %}
+    compress
+    delaycompress
+{% endif %}
+    nocreate
+    sharedscripts
+{% if squid_reporting | bool and not squid_https_source_build | bool %}
+    prerotate
+        test ! -x /usr/local/scripts/squid_report_custom.sh || sudo -u proxy /usr/local/scripts/squid_report_custom.sh 2>&1 >/dev/null
+{% if 'sarg' in squid_report_pkgs %}
+        test ! -x /usr/sbin/sarg-reports || /usr/sbin/sarg-reports daily
+{% endif %}
+    endscript
+{% endif %}
+    postrotate
+        test ! -e /var/run/squid.pid || test ! -x /usr/sbin/squid || /usr/sbin/squid -k rotate
+{% if syslog_postrotate_extras_cmd is defined and syslog_postrotate_extras_cmd %}
+{% for cmd in syslog_postrotate_extras_cmd %}
+        {{ cmd }}
+{% endfor %}
+{% endif %}
+    endscript
+}

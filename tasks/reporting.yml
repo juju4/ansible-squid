@@ -13,11 +13,7 @@
     mode: '0755'
 
 - name: Add squid report in logrotate
-  ansible.builtin.lineinfile:  # noqa no-tabs
+  ansible.builtin.template:
+    src: logrotate-squid.j2
     dest: /etc/logrotate.d/squid
-    line: "\t\ttest ! -x /usr/local/scripts/{{ squid_reporting_template | basename }} || sudo -u proxy /usr/local/scripts/{{ squid_reporting_template | basename }} 2>&1 >/dev/null"
-    insertafter: '^\tprerotate$'
     mode: '0644'
-  when:
-    # Above file does not exist in source install
-    - not squid_https_source_build | bool
