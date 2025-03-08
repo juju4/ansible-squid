@@ -1,4 +1,5 @@
 {{ ansible_managed | comment }}
+{# j2lint: disable=jinja-statements-single-space #}
 
 # Example rule allowing access from your local networks.
 # Adapt to list your (internal) IP networks from where browsing
@@ -16,7 +17,7 @@ acl Safe_ports port 443         # https
 #acl Safe_ports port 70         # gopher
 acl Safe_ports port 1025-65535  # unregistered ports
 acl CONNECT method CONNECT
-{% if not (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10) and not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) and not (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
+{% if not (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 10) and not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 18) and not (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 7) %}
 {# built-in since squid 3.2 #}
 acl localhost src 127.0.0.1/32
 {% endif %}
@@ -37,9 +38,9 @@ cache_mem 100 MB
 # default is 512 KB
 # maximum_object_size_in_memory 1 MB
 {% if (squid_dns_v4_first | bool) and not (
-  ((ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10) or
-   (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22)
-  ) and squid_https_source_build|bool)%}
+  ((ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 10) or
+   (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+  ) and squid_https_source_build | bool) %}
 # https://serverfault.com/questions/644604/squid-https-tunnelling-using-connect-very-slow
 dns_v4_first on
 {% endif %}
@@ -152,11 +153,11 @@ reply_body_max_size none localhost
 # https://github.com/tombatossals/squid_guifi_splash
 # -t <idle_timeout>
 # -T <fixed_timeout>
-{% if ansible_os_family == "RedHat" %}
+{%     if ansible_os_family == "RedHat" %}
 external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib64/squid/ext_session_acl -t {{ squid_splash_timeout }} -b /var/lib/squid/session.db
-{% else %}
+{%     else %}
 external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib/squid/ext_session_acl -t {{ squid_splash_timeout }} -b /var/lib/squid/session.db
-{% endif %}
+{%     endif %}
 
 acl existing_users external splash_page
 
@@ -178,7 +179,7 @@ http_port {{ squid_http_port_listen }}
 # https://wiki.squid-cache.org/KnowledgeBase/HostHeaderForgery
 http_port {{ squid_http_port_intercept_listen }} intercept
 {# Only redhat with openssl support, latest debian/ubuntu with gnutls but missing cert generators #}
-{% if ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 8 %}
+{%     if ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 8 %}
 # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
 http_port {{ squid_http_port_ssl_listen }} ssl-bump \
   cert={{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt \
@@ -200,7 +201,7 @@ sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+EC
 sslproxy_cert_error allow all
 sslproxy_flags DONT_VERIFY_PEER
 
-{% elif (ansible_distribution == "Ubuntu" and squid_https) or (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8) %}
+{%     elif (ansible_distribution == "Ubuntu" and squid_https) or (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8) %}
 #
 # squid-4 only
 #
@@ -209,7 +210,7 @@ sslcrtd_program /usr/lib/squid/security_file_certgen -s /var/lib/squid/ssl_db -M
 
 tls_outgoing_options options=NO_SSLv3
 
-{% endif %}
+{%     endif %}
 
 # https://wiki.squid-cache.org/Features/SslPeekAndSplice
 acl step1 at_step SslBump1
@@ -261,7 +262,7 @@ refresh_pattern ^ftp:           1440    20%     10080
 refresh_pattern ^gopher:        1440    0%      1440
 refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
 # Images
-{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 22) %}
+{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22) %}
 {# squid 6.9: other options create warning "use of ... in 'refresh_pattern' violates HTTP" #}
 refresh_pattern -i \.(gif|png|jpeg|jpg|bmp|tif|tiff|ico)(\?.*|$) 10080 50% 43200 ignore-no-cache ignore-auth
 {% else %}
@@ -298,7 +299,7 @@ request_header_access Last-Modified allow all
 request_header_access Location allow all
 request_header_access Pragma allow all
 #request_header_access Accept allow all
-header_replace 	      Accept */*
+header_replace        Accept */*
 request_header_access Accept-Charset allow all
 #request_header_access Accept-Encoding allow all
 header_replace        Accept-Encoding         *
@@ -363,10 +364,10 @@ refresh_pattern Translation-fr\.bzip2$ 0       20%     4320 refresh-ims
 refresh_pattern Translation-fr\.bz2$   0       20%     4320 refresh-ims
 refresh_pattern Translation-fr\.gz$    0       20%     4320 refresh-ims
 refresh_pattern Translation-fr\.lzma$  0       20%     4320 refresh-ims
-#refresh_pattern -i .rpm$ 	129600 	100%	129600 refresh-ims override-expire
-#refresh_pattern -i .iso$ 	129600 	100% 	129600 refresh-ims override-expire
-refresh_pattern -i .rpm$ 	129600 	100%	129600 refresh-ims
-refresh_pattern -i .iso$ 	129600 	100% 	129600 refresh-ims
+#refresh_pattern -i .rpm$     129600     100%    129600 refresh-ims override-expire
+#refresh_pattern -i .iso$     129600     100%     129600 refresh-ims override-expire
+refresh_pattern -i .rpm$     129600     100%    129600 refresh-ims
+refresh_pattern -i .iso$     129600     100%     129600 refresh-ims
 refresh_pattern .               0       20%     4320
 
 # handle meta-release and changelogs.ubuntu.com special
@@ -436,12 +437,12 @@ logformat jsonExtended {\
   "bytes":{"body":"%<bs","total":%st}{% if squid_https %},\
   "ssl":{\
     "subject_c":"%ssl::>cert_subject","issuer_c":"%ssl::>cert_issuer",\
-{% if not (ansible_os_family == "RedHat" and ansible_distribution_major_version|int == 7) %}
+{%     if not (ansible_os_family == "RedHat" and ansible_distribution_major_version | int == 7) %}
 {# squid 3.5 - http://www.squid-cache.org/Versions/v3/3.5/cfgman/logformat.html #}
     "subject_s":"%ssl::<cert_subject","issuer_s":"%ssl::<cert_issuer",\
     "errors_s":"%ssl::<cert_errors",\
     "ssl_nego_c":"%ssl::>negotiated_version","ssl_nego_s":"%ssl::<negotiated_version",\
-{% endif %}
+{%     endif %}
     "sni_c":"%ssl::>sni"\
   }\
 {% else %} \
@@ -470,7 +471,7 @@ url_rewrite_program /usr/bin/squidGuard -c /etc/squid/squidGuard.conf
 # https://www.edv-huber.com/index.php/problemloesungen/22-squid-proxy-server-filter-urls-by-virustotal-com
 # https://blog.rootshell.be/2014/12/15/automatic-mime-parts-scanning-with-virustotal/
 
-{% if squid_chain_child|bool and squid_chain_parentproxy_host|string and squid_chain_parentproxy_port|int %}
+{% if squid_chain_child | bool and squid_chain_parentproxy_host | string and squid_chain_parentproxy_port | int %}
 # proxy chain
 # how to configure dns resolution to happen only at parent or children? seems all for acl match
 # https://access.redhat.com/solutions/31883

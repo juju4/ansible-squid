@@ -6,7 +6,7 @@ PrivateTmp=true
 PrivateDevices=yes
 ProtectHome=yes
 ProtectSystem=full
-{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int > 7) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) %}
+{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int > 7) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 18) %}
 InaccessiblePaths=/proc
 ProtectKernelTunables=true
 ProtectKernelModules=yes
@@ -20,19 +20,19 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
           ansible_virtualization_type == "docker"
         )
 %}
-{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 16) %}
+{%     if (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16) %}
 
 #SystemCallFilter=mprotect mmap read brk setresuid fstat prctl close futex capset write setgid setgroups munmap socket socketpair lseek getpid setsockopt sysinfo poll flock capget rt_sigaction rt_sigprocmask kill umask getuid arch_prctl set_robust_list prlimit64 geteuid set_tid_address stat execve access openat connect setgroups setsid sendto dup2 ftruncate fsync statfs clone unlink wait4 alarm fcntl chdir epoll_create bind getsockname epoll_ctl pipe setuid select dup recvfrom rename listen epoll_wait accept fchmod ioctl getsockopt getdents getrusage uname getrandom sendmmsg{% if squid_splash_enable is defined and squid_splash_enable %} pread64 pwrite64 fdatasync{% endif %}
 
-{% if (ansible_os_family == 'RedHat' and ansible_distribution_major_version|int >= 8) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) %}
+{%         if (ansible_os_family == 'RedHat' and ansible_distribution_major_version | int >= 8) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 18) %}
 #SystemCallFilter=~@debug @mount @cpu-emulation @obsolete @privileged
 SystemCallFilter=~@debug @mount @cpu-emulation @obsolete
-{% endif %}
+{%         endif %}
 # When system call is disallowed, return error code instead of killing process
 SystemCallErrorNumber=EPERM
+{%     endif %}
 {% endif %}
-{% endif %}
-{% if squid_cgroups_restriction_enable|bool %}
+{% if squid_cgroups_restriction_enable | bool %}
 CPUWeight={{ squid_cgroups_cpushares | default('1024') }}
 CPUQuota={{ squid_cgroups_cpuquota | default('80%') }}
 MemoryMax={{ squid_cgroups_memorylimit | default('4G') }}

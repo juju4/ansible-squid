@@ -2,8 +2,8 @@
 
 if (!empty($_POST['url']) and parse_url($_POST['url']) and !empty($_POST['email']) and filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
 
-	header("Location: ".$_POST['url']);
-	die();
+    header("Location: ".$_POST['url']);
+    die();
 
 } else {
 
@@ -40,8 +40,8 @@ allow_url_fopen = True
 (cli) disable following option in snuffleupagus:
 sp.readonly_exec.enable();
 */
- 	$enable_domaintools = false;
-	$enable_iptoasn = true;
+    $enable_domaintools = false;
+    $enable_iptoasn = true;
 
         error_reporting(E_ALL | E_STRICT);
 #        ini_set('display_errors', 'Off');
@@ -60,7 +60,7 @@ sp.readonly_exec.enable();
     <strong>URL: <?php echo htmlentities($url); ?></strong><br />
 <br />
 <?php
-	if ($enable_domaintools === true) {
+    if ($enable_domaintools === true) {
 ?>
 <h2>Domain information</h2>
 <?php
@@ -135,7 +135,7 @@ sp.readonly_exec.enable();
             var_dump($ex);
 
         }
-	} # enable_domaintools
+    } # enable_domaintools
 
 /*
         # https://secure.php.net/manual/en/ref.geoip.php
@@ -149,7 +149,7 @@ sp.readonly_exec.enable();
         }
 */
 
-	if ($enable_iptoasn === true) {
+    if ($enable_iptoasn === true) {
 
         $ipaddr = gethostbyname((string)$domain);
         # https://iptoasn.com/
@@ -162,8 +162,8 @@ sp.readonly_exec.enable();
             #print_r($json2);
 
             $country = $json2->{'as_country_code'};
-	    $asn = $json2->{'as_number'};
-	    $desc = $json2->{'as_description'};
+        $asn = $json2->{'as_number'};
+        $desc = $json2->{'as_description'};
             $source = 'iptoasn.com'
 
 ?>
@@ -187,7 +187,7 @@ sp.readonly_exec.enable();
 </code>
 <?php
         }
-	} # enable_iptoasn
+    } # enable_iptoasn
 
 ?>
 <br /><br />
