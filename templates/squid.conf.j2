@@ -93,8 +93,8 @@ acl useragent_chrome browser Chrome
 acl useragent_firefox browser Firefox
 acl useragent_chrome browser Chrome/1[1-5][0-9]\.*
 acl useragent_firefox browser Firefox/1[1-5][0-9]\.*
-acl useragent_firefox_current browser Firefox\/114.*
-acl useragent_firefox_current_esr browser Firefox\/102.*
+acl useragent_firefox_current browser Firefox\/{{ squid_firefox_current_v }}.*
+acl useragent_firefox_current_esr browser Firefox\/{{ squid_firefox_current_esr_v }}.*
 acl useragent_msie browser MSIE
 acl useragent_opera browser Opera
 acl useragent_trident browser Trident

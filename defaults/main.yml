@@ -21,6 +21,8 @@ squid_jsonlog: false
 squid_remotesyslog: false
 # http://www.squid-cache.org/Doc/config/forwarded_for/
 squid_forwarded_for: delete
+squid_firefox_current_v: 137
+squid_firefox_current_esr_v: 128
 
 # source IP and subnets allowed to connect (outside of private networks)
 squid_allowed_clients: []
