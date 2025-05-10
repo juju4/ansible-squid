@@ -10,6 +10,11 @@
         name: procps-ng
         state: present
       when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
+    - name: Debian | Ensure pgrep is present
+      ansible.builtin.package:
+        name: procps
+        state: present
+      when: ansible_os_family == "Debian"
   tasks:
     - name: Ensure /etc/squid/squid.conf config file is present
       ansible.builtin.stat:
@@ -132,6 +137,10 @@
         src: /var/log/squid/cache.log
       become: yes
       register: cache
+    - name: Debug | cache log
+      ansible.builtin.debug:
+        msg: "{{ cache['content'] | b64decode }}"
+        verbosity: 1
     - name: Validate /var/log/squid/cache.log
       ansible.builtin.assert:
         that: >
@@ -145,8 +154,12 @@
         src: /var/log/squid/access_json.log
       become: yes
       register: log
+    - name: Debug | access json log
+      ansible.builtin.debug:
+        msg: "{{ log['content'] | b64decode }}"
+        verbosity: 1
     - name: Validate /var/log/squid/access_json.log
       ansible.builtin.assert:
         that: >
-          "'time_local' in loh['content'] | b64decode and
-          'method' in cache['content'] | b64decode"
+          "'time_local' in log['content'] | b64decode and
+          'method' in log['content'] | b64decode"
