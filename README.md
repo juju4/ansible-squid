@@ -26,6 +26,8 @@ It was tested on the following versions:
 
 Tested Ubuntu 16.04, 18.04, 20.04 and centos7-8
 
+On RedHat family, EPEL is required. You can use juju4.redhat_epel role.
+
 ## Example Playbook
 
 Just include this role in your list.

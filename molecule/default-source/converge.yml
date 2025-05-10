@@ -52,6 +52,7 @@
         squid_urlfiltering_tool: e2guardian
       when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int > 18
   roles:
+    - { role: juju4.redhat_epel, when: ansible_os_family == "RedHat" }
     - juju4.squid
   tasks:
     - name: Banned few websites for testing
