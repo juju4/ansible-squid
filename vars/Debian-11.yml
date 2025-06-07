@@ -66,3 +66,6 @@ squid_testing_pkgs:
   - netcat
   - jq
   - tsung
+
+squid_auth_basic_pkgs:
+  - apache2-utils

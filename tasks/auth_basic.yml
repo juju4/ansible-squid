@@ -1,0 +1,39 @@
+---
+
+- name: Ensure htpasswd is present
+  ansible.builtin.package:
+    name: "{{ squid_auth_basic_pkgs }}"
+    state: present
+
+- name: Ensure target file exists
+  ansible.builtin.file:
+    path: /etc/squid/passwords
+    mode: '0640'
+    owner: root
+    group: proxy
+    state: touch
+
+- name: Check if Vault password file exists
+  ansible.builtin.stat:
+    path: "{{ squid_auth_password_file }}"
+  delegate_to: localhost
+  register: pw_file
+
+- name: Load existing Vault file if it exists
+  ansible.builtin.include_vars:
+    file: "{{ squid_auth_password_file }}"
+    name: squid_auth_passwords_file
+  when: pw_file.stat.exists
+  delegate_to: localhost
+
+- name: Set squid_auth_passwords fact
+  ansible.builtin.set_fact:
+    squid_auth_passwords: "{{ squid_auth_passwords_file.user_passwords | default({}) }}"
+  when: pw_file.stat.exists
+  no_log: true
+
+- name: Setup squid basic users accounts
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "htpasswd -bB /etc/squid/passwords {{ item.key }} {{ item.value }}"
+  loop: "{{ squid_auth_passwords | default({}) | dict2items }}"
+  no_log: "{{ squid_no_log | default(true) }}"

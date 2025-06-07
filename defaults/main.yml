@@ -30,6 +30,15 @@ squid_allowed_clients: []
 squid_dns_v4_first: false
 squid_filter_ads: true
 
+squid_auth_basic_enable: false
+squid_auth_password_file: "./files/vault_squid_user_passwords.yml"
+
+squid_auth_ldap_enable: false
+squid_auth_ldap_realm: "dc=example,dc=com"
+squid_auth_ldap_host: "ldaps://dc.example.com:636"
+squid_auth_ldap_bind_user: "CN=squidserver,CN=Users,dc=example,dc=com"
+squid_auth_ldap_bind_password: ''
+
 squid_splash_enable: false
 squid_splash_template: splash.php.j2
 squid_splash_url: http://localhost/splash.php

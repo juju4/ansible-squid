@@ -1,0 +1,16 @@
+---
+
+# No newline!!!
+- name: LDAP Binding password file
+  ansible.builtin.shell:
+    cmd: "echo -n '{{ squid_auth_ldap_bind_password }}' > /etc/squid/ldap.secret"
+  args:
+    # FIXME! idempotence vs not refreshing if new password
+    creates: /etc/squid/ldap.secret
+  no_log: true
+
+- name: Ensure right permissions for password file
+  ansible.builtin.file:
+    path: /etc/squid/ldap.secret
+    mode: '0400'
+    owner: proxy

@@ -83,8 +83,32 @@ http_access deny manager
 # https://wiki.squid-cache.org/SquidFaq/SquidAcl
 #
 
-acl proto_http proto http https
+{% if squid_auth_basic_enable is defined and squid_auth_basic_enable | bool %}
+# passwords file with htpasswd
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwords
+auth_param basic realm proxy
+acl authenticated proxy_auth REQUIRED
 
+{% endif %}
+{% if squid_auth_ldap_enable is defined and squid_auth_ldap_enable | bool %}
+# Use the basic_ldap_auth helper with LDAPS
+auth_param basic program /usr/lib/squid/basic_ldap_auth \
+    -v 3 \
+    -R \
+    -b "{{ squid_auth_ldap_realm }}" \
+    -D "{{ squid_auth_ldap_bind_user }}" \
+    -W /etc/squid/ldap.secret \
+    -f sAMAccountName=%s \
+    -H {{ squid_auth_ldap_host }}
+
+auth_param basic realm Squid Proxy AD Login
+auth_param basic children 10
+auth_param basic credentialsttl 12 hours
+auth_param basic casesensitive on
+acl authenticated proxy_auth REQUIRED
+
+{% endif %}
+acl proto_http proto http https
 
 acl bad_tlds dstdomain .gdn .work .ltd .ooo .date .shop .racing .world .loan .tokyo .country .stream .gdn .mom .xin .kin .men .loan .download .racing
 http_access deny bad_tlds
@@ -418,7 +442,8 @@ logformat jsonExtended {\
     "accLang":"%{Accept-Language}>h","accEnc":"%{Accept-Encoding}>h",\
     "host":"%{Host}>h","origin":"%{Origin}>h","accept":"%{Accept}>h",\
     "xReqWith":"%{X-Requested-With}>h",\
-    "XFF":"%{X-Forwarded-For}>h"\
+    "XFF":"%{X-Forwarded-For}>h",\
+    "user":"%un"\
   },\
   "resp":{\
     "bytes":%<st,"headerBytes":%<sh,\

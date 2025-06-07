@@ -1,0 +1,82 @@
+---
+
+- name: Create users with persistent random passwords
+  hosts: localhost
+  become: false
+  vars:
+    users:
+      - name: user1
+      - name: user2
+    password_length: 64
+    password_file: "./files/vault_squid_user_passwords.yml"
+
+  tasks:
+
+    - name: Check if Vault password file exists
+      ansible.builtin.stat:
+        path: "{{ password_file }}"
+      delegate_to: localhost
+      register: pw_file
+
+    - name: Load existing Vault file if it exists
+      ansible.builtin.include_vars:
+        file: "{{ password_file }}"
+        name: existing_passwords_file
+      when: pw_file.stat.exists
+      delegate_to: localhost
+
+    - name: Set existing_passwords fact
+      ansible.builtin.set_fact:
+        existing_passwords: "{{ existing_passwords_file.user_passwords | default({}) }}"
+      when: pw_file.stat.exists
+      no_log: true
+
+    - name: Set empty existing_passwords if vault file is missing
+      ansible.builtin.set_fact:
+        existing_passwords: {}
+      when: not pw_file.stat.exists
+
+    - name: Generate or reuse passwords for users
+      ansible.builtin.set_fact:
+        user_passwords: "{{ user_passwords | default({}) | combine({item.name: (existing_passwords[item.name] if item.name in existing_passwords else lookup('ansible.builtin.password', '/dev/null', length=password_length, chars=['ascii_lowercase', 'digits']))}) }}"
+      loop: "{{ users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      no_log: true
+
+    - name: Create users with passwords
+      ansible.builtin.command:
+        cmd: "echo User {{ item.key }} {{ item.value }}"
+      loop: "{{ user_passwords | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      no_log: true
+      changed_when: false
+
+    - name: Determine if password file needs updating
+      ansible.builtin.set_fact:
+        passwords_changed: "{{ user_passwords != existing_passwords }}"
+
+    - name: Save updated passwords in a temp unencrypted YAML file
+      ansible.builtin.copy:
+        content: "{{ {'user_passwords': user_passwords} | to_nice_yaml }}"
+        dest: "/tmp/user_passwords_temp.yml"
+        mode: '0600'
+      delegate_to: localhost
+      when: passwords_changed
+
+    - name: Encrypt password file with Ansible Vault
+      ansible.builtin.command:  # noqa no-changed-when
+        cmd: >
+          ansible-vault encrypt /tmp/user_passwords_temp.yml
+          --output {{ password_file }}
+          {% if vault_id is defined %} --vault-id {{ vault_id }} {% endif %}
+      delegate_to: localhost
+      when: passwords_changed
+
+    - name: Clean up temporary unencrypted file
+      ansible.builtin.file:
+        path: "/tmp/user_passwords_temp.yml"
+        state: absent
+      delegate_to: localhost
+      when: passwords_changed

@@ -82,3 +82,6 @@ openssl_pkgs:
   - python3-setuptools
   - python3-openssl
   - python3-cryptography
+
+squid_auth_basic_pkgs:
+  - apache2-utils
