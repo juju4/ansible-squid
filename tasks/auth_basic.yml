@@ -17,6 +17,7 @@
   ansible.builtin.stat:
     path: "{{ squid_auth_password_file }}"
   delegate_to: localhost
+  become: false
   register: pw_file
 
 - name: Load existing Vault file if it exists
@@ -25,6 +26,7 @@
     name: squid_auth_passwords_file
   when: pw_file.stat.exists
   delegate_to: localhost
+  become: false
 
 - name: Set squid_auth_passwords fact
   ansible.builtin.set_fact:
