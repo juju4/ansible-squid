@@ -9,6 +9,12 @@
 - name: Include version-specific variables for RedHat
   ansible.builtin.include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
   when: ansible_os_family == "RedHat"
+- name: Debian | Include variables for https port listen
+  ansible.builtin.include_vars: "Debian-https_port_listen.yml"
+  when:
+    - ansible_os_family == "Debian"
+    - squid_http_port_ssl_listen is defined
+    - squid_http_port_ssl_listen | int > 0
 
 - name: Set fact is_container
   ansible.builtin.set_fact:

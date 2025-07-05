@@ -1,0 +1,10 @@
+---
+
+squid_pkgs: "{{ ['squid-openssl', 'cron'] + squid_report_pkgs | default(omit) }}"
+
+site_server_name: "squid-{{ ansible_fqdn }}"
+ssl_privatedir: "/etc/squid"
+ssl_dir: "/etc/squid"
+ssl_privkey: "/etc/squid/{{ site_server_name }}.key"
+ssl_crt: "/etc/squid/{{ site_server_name }}.crt"
+ssl_fullchain: "/etc/squid/{{ site_server_name }}.crt"

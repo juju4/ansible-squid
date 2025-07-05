@@ -4,7 +4,23 @@ scriptsdir: /usr/local/scripts
 squidconf_template: squid.conf.j2
 squid_http_port_listen: 3128
 squid_http_port_intercept_listen: 3127
-squid_http_port_ssl_listen: 3129
+
+# tls interception port if defined
+squid_http_port_ssl_listen:
+# squid_http_port_ssl_listen: 3129
+squid_http_port_ssl_type: selfsigned
+# squid_http_port_ssl_type: stepca
+# stepca
+squid_stepca_host:
+squid_stepca_force_issue: false
+squid_stepcarenew_args: '--ca-url=https://localhost:8443 --root=/var/lib/step/.step/certs/root_ca.crt'
+squid_stepcarenew_debug: false
+tmp_ssl_dir: /root
+squid_target_host_cn: "{{ ansible_fqdn }}"
+squid_cert_san:
+  - "{{ ansible_fqdn }}"
+  - "{{ ansible_hostname }}"
+  - "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
 
 squid_allow_localhost: true
 # Do you want to keep query strings? have privacy consequence.

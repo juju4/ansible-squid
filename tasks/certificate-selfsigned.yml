@@ -1,8 +1,5 @@
 ---
 
-- name: Include travis
-  ansible.builtin.include_tasks: travis.yml
-
 - name: Ensure openssl is present
   ansible.builtin.package:
     name: "{{ openssl_pkgs | default(['openssl', 'python3-pip', 'python3-setuptools', 'python3-openssl']) }}"
@@ -20,38 +17,37 @@
   register: pkg_result
   until: pkg_result is success
 
-- name: Ensure recent cryptography - older distributions
-  when: >
-    (
-      (ansible_distribution == "Debian" and ansible_distribution_major_version|int <= 11) or
-      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int <= 22)
-    )
-  block:
-    - name: Python externally managed
-      ansible.builtin.import_tasks: python-externally-managed.yml
-    - name: Ensure python cryptography is present
-      ansible.builtin.pip:
-        name: cryptography
-        state: present
-        executable: "{{ squid_cryptography | default('pip3') }}"
+- name: Ensure python cryptography is present
+  ansible.builtin.pip:
+    name: cryptography
+    state: present
+    executable: "{{ hardenwebserver_nginx_cryptography | default('pip3') }}"
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int < 24
+
+- name: Ensure target directory exists
+  ansible.builtin.file:
+    dest: "{{ ssl_privatedir | dirname }}"
+    state: directory
+    mode: '0755'
 
 - name: Check if OpenSSL private key exists
   ansible.builtin.stat:
-    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    path: "{{ ssl_privatedir }}/{{ site_server_name }}.key"
   register: private_key
 
 - name: Generate an OpenSSL private key
   community.crypto.openssl_privatekey:
-    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    path: "{{ ssl_privatedir }}/{{ site_server_name }}.key"
   when: not private_key.stat.exists
 
 - name: Generate an OpenSSL Certificate Signing Request
   community.crypto.openssl_csr:
-    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
-    privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    path: "{{ ssl_privatedir }}/{{ site_server_name }}.csr"
+    privatekey_path: "{{ ssl_privatedir }}/{{ site_server_name }}.key"
     organization_name: "{{ squid_cert_orgname | default('Ansible') }}"
-    common_name: "{{ certificate_cn }}"
+    common_name: "{{ squid_target_host_cn }}"
     subject_alt_name: "{{ squid_cert_san | default(omit) }}"
+    use_common_name_for_san: "{{ squid_cert_use_cn_san | default(omit) }}"
     email_address: "{{ squid_cert_email | default(omit) }}"
     basic_constraints:
       # - 'critical'
@@ -59,25 +55,30 @@
 
 - name: Generate SSL self-signed certificate
   community.crypto.x509_certificate:
-    path: "{{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt"
-    privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
-    csr_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
+    path: "{{ ssl_dir }}/{{ site_server_name }}.crt"
+    privatekey_path: "{{ ssl_privatedir }}/{{ site_server_name }}.key"
+    csr_path: "{{ ssl_privatedir }}/{{ site_server_name }}.csr"
     ownca_not_after: "{{ squid_certduration | default('+365d') }}"
     provider: selfsigned
   notify:
     - Restart squid
+    # Add certificate to server trust root
+    - Add to ca-certificates tree
+    - Add to /etc/ca-certificates.conf
+    - Update-ca-certificates
+    - Update-ca-trust
 
 - name: Validate private key file permissions
   ansible.builtin.file:
-    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    path: "{{ ssl_privatedir }}/{{ site_server_name }}.key"
     owner: "root"
     group: "{% if ansible_os_family == 'Debian' %}ssl-cert{% else %}root{% endif %}"
     mode: '0440'
 
 - name: Ensure CA file available in der format
   ansible.builtin.command: >
-    openssl x509 -in {{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt
+    openssl x509 -in {{ ssl_dir }}/{{ site_server_name }}.crt
         -outform DER
-        -out {{ ssl_dir }}/squid-{{ ansible_fqdn }}.der
+        -out {{ ssl_dir }}/{{ site_server_name }}.der
   args:
-    creates: "{{ ssl_dir }}/squid-{{ ansible_fqdn }}.der"
+    creates: "{{ ssl_dir }}/{{ site_server_name }}.der"

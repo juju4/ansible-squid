@@ -12,6 +12,8 @@
     squid_https_build: true
     squid_jsonlog: true
     squid_testing: false
+    squid_http_port_ssl_listen: 3129
+    squid_http_port_ssl_type: selfsigned
   pre_tasks:
     - name: Ubuntu | Install python3
       ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)

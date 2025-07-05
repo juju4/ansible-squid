@@ -202,15 +202,26 @@ http_port {{ squid_http_port_listen }}
 # Transparent, https://wiki.squid-cache.org/ConfigExamples/Intercept/LinuxRedirect
 # https://wiki.squid-cache.org/KnowledgeBase/HostHeaderForgery
 http_port {{ squid_http_port_intercept_listen }} intercept
-{# Only redhat with openssl support, latest debian/ubuntu with gnutls but missing cert generators #}
-{%     if ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 8 %}
+{# Only redhat with openssl support, latest debian/ubuntu with openssl #}
+{%     if ((ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 8)
+          or (ansible_os_family == "Debian" and ansible_distribution_major_version | int >= 12)
+          or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
+          )
+%}
 # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
 http_port {{ squid_http_port_ssl_listen }} ssl-bump \
   cert={{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt \
   key={{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key \
   generate-host-certificates=on dynamic_cert_mem_cache_size=4MB
 
+{%         if (ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 8) %}
 sslcrtd_program /usr/lib64/squid/ssl_crtd \
+{%         elif ((ansible_os_family == "Debian" and ansible_distribution_major_version | int >= 12)
+             or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
+            )
+%}
+sslcrtd_program /usr/lib/squid/security_file_certgen \
+{%         endif %}
   -s /var/lib/squid/ssl_db -M 4MB
 sslcrtd_children 8 startup=1 idle=1
 

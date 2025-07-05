@@ -10,6 +10,17 @@
 
 - name: Include certificate-selfsigned
   ansible.builtin.include_tasks: certificate-selfsigned.yml
+  when:
+    - squid_http_port_ssl_listen is defined
+    - squid_http_port_ssl_listen | int > 0
+    - squid_http_port_ssl_type == 'selfsigned'
+
+- name: Include https port listen certificate stepca
+  ansible.builtin.include_tasks: certificate-stepca.yml
+  when:
+    - squid_http_port_ssl_listen is defined
+    - squid_http_port_ssl_listen | int > 0
+    - squid_http_port_ssl_type == 'stepca'
 
 - name: Ensure /var/lib/squid exists
   ansible.builtin.file:

@@ -54,3 +54,27 @@
     state: restarted
   when:
     - not is_container
+
+- name: Add to ca-certificates tree
+  ansible.builtin.copy:
+    src: "{{ ssl_dir }}/{{ site_server_name }}.crt"
+    dest: "{% if ansible_os_family == 'RedHat' %}/usr/share/pki/ca-trust-source/anchors{% else %}/usr/share/ca-certificates{% endif %}"
+    mode: '0644'
+    remote_src: true
+- name: Add to /etc/ca-certificates.conf
+  ansible.builtin.lineinfile:
+    path: /etc/ca-certificates.conf
+    line: "{{ site_server_name }}.crt"
+    mode: '0644'
+    owner: root
+  when: ansible_os_family == 'Debian'
+- name: Update-ca-certificates
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: update-ca-certificates
+  become: yes
+  when: ansible_os_family == 'Debian'
+- name: Update-ca-trust
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: update-ca-trust
+  become: yes
+  when: ansible_os_family == 'RedHat'
