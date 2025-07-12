@@ -17,10 +17,12 @@ squid_stepcarenew_args: '--ca-url=https://localhost:8443 --root=/var/lib/step/.s
 squid_stepcarenew_debug: false
 tmp_ssl_dir: /root
 squid_target_host_cn: "{{ ansible_fqdn }}"
+# if selfsigned/openssl, must prefix with DNS: or IP:
+# if stepca, no prefix
 squid_cert_san:
-  - "{{ ansible_fqdn }}"
-  - "{{ ansible_hostname }}"
-  - "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
+  - "DNS:{{ ansible_fqdn }}"
+  - "DNS:{{ ansible_hostname }}"
+  - "IP:{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
 
 squid_allow_localhost: true
 # Do you want to keep query strings? have privacy consequence.
