@@ -31,7 +31,7 @@
   ansible.builtin.import_tasks: debian.yml
   when: >
     ((ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
-      and not squid_https
+      and not squid_https_build
       and not squid_https_source
     )
 

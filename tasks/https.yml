@@ -4,8 +4,7 @@
   ansible.builtin.command: squid -v
   register: squidv
   failed_when: >
-    ('with-openssl' not in squidv.stdout and '--enable-ssl-crtd ' not in squidv.stdout) and
-    '--with-gnutls' not in squidv.stdout
+    not ('with-openssl' in squidv.stdout and '--enable-ssl-crtd' in squidv.stdout)
   changed_when: false
 
 - name: Include certificate-selfsigned
