@@ -1,0 +1,70 @@
+---
+
+- name: Converge
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+  remote_user: root
+  vars:
+    squid_https: true
+    squid_jsonlog: true
+    squid_testing: false
+    squid_http_port_ssl_listen: 3129
+    squid_http_port_ssl_type: stepca
+    squid_stepca_host: localhost
+  pre_tasks:
+    - name: Ubuntu | Install python3
+      ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
+      register: python3
+      changed_when: "'installed' in python3.stdout"
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+    - name: RedHat | Install python3
+      ansible.builtin.raw: test -e /usr/bin/python3 || (yum install -y python3)
+      register: python3
+      changed_when: "'installed' in python3.stdout"
+      when: (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    - name: Gather Facts
+      ansible.builtin.setup:
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+    - name: Ubuntu Bionic+, Redhat 8+ | Enforce python3 for ansible
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+      when: >
+        (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16) or
+        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    - name: RedHat8 | specific variables
+      ansible.builtin.set_fact:
+        squid_urlfiltering_enable: false
+        squid_urlfiltering_tool: squidguard
+        squid_report_pkgs: []
+      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '8'
+    - name: RedHat7 | specific variables
+      ansible.builtin.set_fact:
+        squid_urlfiltering_enable: false
+        squid_urlfiltering_tool: squidguard
+        squid_report_pkgs:
+          - calamaris
+      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
+    - name: Ubuntu20.04+ | specific variables
+      ansible.builtin.set_fact:
+        squid_urlfiltering_enable: true
+        squid_urlfiltering_tool: e2guardian
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int > 18
+  roles:
+    - { role: juju4.redhat_epel, when: ansible_os_family == "RedHat" }
+    - imntreal.smallstep_ca
+    - juju4.squid
+  tasks:
+    - name: Banned few websites for testing
+      ansible.builtin.lineinfile:
+        dest: /etc/e2guardian/lists/bannedsitelist
+        line: "{{ item }}"
+        mode: '0644'
+      with_items:
+        - adblockanalytics.com
+        - badboys.com
+      notify:
+        - E2guardian reload
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int > 18
