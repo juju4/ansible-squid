@@ -43,60 +43,83 @@
 
 - name: Check if certificate exists
   ansible.builtin.stat:
-    path: "/root/{{ site_server_name }}.crt"
+    path: "/etc/squid/{{ site_server_name }}.crt"
   register: has_stepca_cert
 
-# FIXME! to be fully operational and validated, it must be a CA or Intermediate CA
-# step-ca does not allow such creation with token in default config
 - name: Step-ca token
   when:
     - squid_stepca_host is defined
     - squid_stepca_host | length > 0
     - not has_stepca_cert.stat.exists or squid_stepca_force_issue | bool
   block:
-    - name: Create token on step-ca certificate server
-      ansible.builtin.command:  # noqa no-changed-when
-        cmd: "step ca token --provisioner-password-file={{ stepca_host_provisioner_passfile }} {{ stepca_args }} {{ squid_target_host_cn }}{% if squid_cert_san %}{% for item in squid_cert_san %} --san {{ item }}{% endfor %}{% endif %}"
+    # https://smallstep.com/docs/tutorials/intermediate-ca-new-ca/
+    - name: Create new intermediate CA csr with step-ca
+      ansible.builtin.command:
+        cmd: |
+          step certificate create "Squid Intermediate CA Name" intermediate.csr {{ site_server_name }}.key  --csr --no-password --insecure
+      args:
+        chdir: /tmp
+        creates: /tmp/intermediate.csr
+
+    - name: Retrieve intermediate CA csr to orchestrator
+      ansible.builtin.fetch:
+        src: intermediate.csr
+        dest: files
+        mode: '0400'
+
+    - name: Push intermediate CA csr to stepca server
+      ansible.builtin.copy:
+        src: "{{ inventory_hostname }}/intermediate.csr"
+        dest: /tmp/intermediate.csr
+        mode: '0600'
       delegate_to: "{{ squid_stepca_host }}"
       become: yes
       become_user: "{{ squid_stepca_user | default('step') }}"
-      register: stepca_token
-    - name: Create new certificate for requested domain with step-ca and token
-      ansible.builtin.command:
-        cmd: "step ca certificate --token={{ stepca_token.stdout }} {{ stepca_args }} {{ squid_target_host_cn }} {{ site_server_name }}.crt {{ site_server_name }}.key{% if squid_stepca_force_issue | bool %} --force {% endif %}"
-      args:
-        chdir: /root
-        # if want to renew certificate, skip on file existence and add '--force' above (else overwrite question)
-        creates: "{% if squid_stepca_force_issue | bool %}{{ omit }}{% else %}/root/{{ site_server_name }}.crt{% endif %}"
-      environment:
-        STEPDEBUG: '1'
-      register: stepca_cert
-      until: stepca_cert is success
 
-- name: Step-ca provisioner password file
-  when: >
-    squid_stepca_host is not defined or
-    squid_stepca_host | length == 0
-  block:
-    - name: Create new certificate for requested domain with step-ca
-      ansible.builtin.command:
-        cmd: "step ca certificate --password-file={{ stepca_pass_file }} {{ stepca_args }} {{ squid_target_host_cn }} {{ site_server_name }}.crt {{ site_server_name }}.key"
+    - name: Step-ca server | Sign new intermediate CA csr with step-ca
+      ansible.builtin.command:  # noqa no-changed-when
+        cmd: |
+          step certificate sign --profile intermediate-ca /tmp/intermediate.csr ~/.step/certs/root_ca.crt ~/.step/secrets/root_ca_key --password-file=$HOME/.password
       args:
-        chdir: /root
-        # if want to renew certificate, can't skip on file existence
-        creates: "/root/{{ site_server_name }}.crt"
+        chdir: /tmp
+      delegate_to: "{{ squid_stepca_host }}"
+      become: yes
+      become_user: "{{ squid_stepca_user | default('step') }}"
+      register: intermediate_ca
 
-- name: Copy certificate files to needed locations
-  ansible.builtin.copy:
-    src: "{{ item.s }}"
-    dest: "{{ item.d }}"
-    mode: "{{ item.m }}"
-    remote_src: true
-  loop:
-    - { s: "/root/{{ site_server_name }}.crt", d: "{{ ssl_fullchain }}", m: '0644' }
-    - { s: "/root/{{ site_server_name }}.key", d: "{{ ssl_privkey }}", m: '0600' }
-  notify:
-    - Restart squid
-  when:
-    # Else can overwrite current certificate with an expired one
-    - not has_stepca_cert.stat.exists or squid_stepca_force_issue | bool
+    - name: Save intermediate CA on squid server
+      ansible.builtin.copy:
+        content: "{{ intermediate_ca.stdout }}"
+        dest: "/tmp/{{ site_server_name }}.crt"
+        mode: '0600'
+        owner: root
+
+    - name: Retrieve intermediate CA files to orchestrator
+      ansible.builtin.fetch:
+        src: "{{ item }}"
+        dest: files
+        mode: '0400'
+      loop:
+        - "/tmp/{{ site_server_name }}.crt"
+        - "/tmp/{{ site_server_name }}.key"
+
+    - name: Push intermediate CA files to squid server
+      ansible.builtin.copy:
+        src: "{{ inventory_hostname }}/tmp/{{ item | basename }}"
+        dest: "/etc/squid/{{ item | basename }}"
+        mode: '0600'
+      loop:
+        - "{{ tmp_ssl_dir }}/{{ site_server_name }}.crt"
+        - "{{ tmp_ssl_dir }}/{{ site_server_name }}.key"
+      notify:
+        - Restart squid
+
+- name: Check squid cert is CA
+  ansible.builtin.command:
+    cmd: |
+      openssl x509 -in /etc/squid/{{ site_server_name }}.crt -text
+  become: true
+  register: cert
+  changed_when: false
+  failed_when:
+    - "'CA:TRUE' not in cert.stdout"
