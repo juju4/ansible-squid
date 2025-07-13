@@ -63,7 +63,7 @@
 
     - name: Retrieve intermediate CA csr to orchestrator
       ansible.builtin.fetch:
-        src: intermediate.csr
+        src: /tmp/intermediate.csr
         dest: files
         mode: '0400'
 
