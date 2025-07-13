@@ -69,7 +69,7 @@
 
     - name: Push intermediate CA csr to stepca server
       ansible.builtin.copy:
-        src: "{{ inventory_hostname }}/intermediate.csr"
+        src: "{{ inventory_hostname }}/tmp/intermediate.csr"
         dest: /tmp/intermediate.csr
         mode: '0600'
       delegate_to: "{{ squid_stepca_host }}"
