@@ -1,6 +1,7 @@
 ---
 
-- src: https://github.com/juju4/ansible-redhat-epel/
-  version: master
-  name: juju4.redhat_epel
-- name: imntreal.smallstep_ca
+roles:
+  - src: https://github.com/juju4/ansible-redhat-epel/
+    version: main
+    name: juju4.redhat_epel
+  - name: imntreal.smallstep_ca
