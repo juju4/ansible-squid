@@ -206,7 +206,7 @@ http_port {{ squid_http_port_intercept_listen }} intercept
 {%     if ((ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 8)
           or (ansible_os_family == "Debian" and ansible_distribution_major_version | int >= 12)
           or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 24)
-          )
+          ) and squid_http_port_ssl_listen is defined and squid_http_port_ssl_listen | int > 0
 %}
 # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
 http_port {{ squid_http_port_ssl_listen }} ssl-bump \
