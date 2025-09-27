@@ -45,7 +45,7 @@
       ignore_errors: true
     - name: Validate ps output
       ansible.builtin.assert:
-        that: ps.stdout
+        that: ps.stdout | length > 0
 
     - name: Check all processes
       ansible.builtin.command: ps aux
