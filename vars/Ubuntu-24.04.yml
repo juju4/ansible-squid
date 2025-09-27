@@ -59,8 +59,8 @@ squidhttps_localpatch:
   - { url: files/squid69-debian-rules.patch, dir: /debian }
 
 squid_deb_src_dir_url: http://archive.ubuntu.com/ubuntu/pool/main/s/squid
-squid_ver: '6.10'
-squid_pkg: '6.10-1ubuntu1'
+squid_ver: '6.13'
+squid_pkg: '6.13-1ubuntu3'
 squid_orig_ext: tar.xz
 squid_debsrc_asc: false
 # http://www.squid-cache.org/Versions/
