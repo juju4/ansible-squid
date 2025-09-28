@@ -87,7 +87,7 @@
     state: directory
     mode: '0755'
     owner: "{{ squid_user }}"
-  when: squid_customlog_path is defined and squid_customlog_path
+  when: squid_customlog_path is defined and squid_customlog_path | length > 0
 
 ## http://wiki.squid-cache.org/Features/CustomErrors
 - name: Remove squid signature from templates
@@ -155,7 +155,7 @@
 - name: Container start
   when:
     - not marker1.stat.exists
-    - is_container
+    - is_container | bool
   block:
     - name: Docker | create swap directories
       ansible.builtin.command: squid -z
@@ -191,7 +191,7 @@
 
 - name: Import reporting
   ansible.builtin.import_tasks: reporting.yml
-  when: squid_reporting
+  when: squid_reporting | bool
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
