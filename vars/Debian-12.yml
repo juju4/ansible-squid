@@ -56,7 +56,7 @@ squidhttps_localpatch:
 # http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
 squid_deb_src_dir_url: http://http.debian.net/debian/pool/main/s/squid
 squid_ver: '5.7'
-squid_pkg: '5.7-2+deb12u2'
+squid_pkg: '5.7-2+deb12u3'
 squid_orig_ext: tar.xz
 squid_debsrc_asc: false
 # http://www.squid-cache.org/Versions/
