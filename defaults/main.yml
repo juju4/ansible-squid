@@ -30,6 +30,8 @@ squid_allowed_clients: []
 squid_dns_v4_first: false
 squid_filter_ads: true
 
+squid_proxy_group_users: []
+
 squid_auth_basic_enable: false
 squid_auth_password_file: "./files/vault_squid_user_passwords.yml"
 

@@ -193,6 +193,13 @@
   ansible.builtin.import_tasks: reporting.yml
   when: squid_reporting | bool
 
+- name: Logs access | Add users to proxy group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: proxy
+    append: yes
+  loop: "{{ squid_proxy_group_users }}"
+
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
 
