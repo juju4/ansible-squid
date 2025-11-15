@@ -225,15 +225,27 @@ sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+EC
 sslproxy_cert_error allow all
 sslproxy_flags DONT_VERIFY_PEER
 
-{%     elif (ansible_distribution == "Ubuntu" and squid_https) or (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8) %}
+{%     elif (ansible_distribution == "Ubuntu" and squid_https) or
+        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8) or
+        (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22 and squid_https_source_build | bool)
+%}
 #
-# squid-4 only
+# squid-4+ only
 #
+{%         if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22) and squid_https_source_build | bool %}
+sslcrtd_program /usr/local/libexec/security_file_certgen -s /var/lib/squid/ssl_db -M 4MB
+{%         else %}
 sslcrtd_program /usr/lib/squid/security_file_certgen -s /var/lib/squid/ssl_db -M 4MB
+{%         endif %}
 #tls_outgoing_options cafile=/usr/local/openssl/cabundle.file
 
-tls_outgoing_options options=NO_SSLv3
-
+#tls_outgoing_options options=NO_SSLv3,SINGLE_DH_USE,SINGLE_ECDH_USE
+# 4.11: ERROR: Unknown TLS option SINGLE_DH_USE; ERROR: Unknown TLS option SINGLE_ECDH_USE
+# http://www.squid-cache.org/Doc/config/tls_outgoing_options/
+# https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit#Hardening
+# for 6.9
+#tls_outgoing_options cipher=HIGH:MEDIUM:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS options=NO_SSLv3
+tls_outgoing_options cipher=HIGH:MEDIUM:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS
 {%     endif %}
 
 # https://wiki.squid-cache.org/Features/SslPeekAndSplice
