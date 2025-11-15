@@ -99,6 +99,9 @@ Icmp6.cc:122:23: note: while referencing ‘Icmp6::SendEcho(Ip::Address&, int, c
 ```
 It seems a compiler issue from https://gitlab.gnome.org/GNOME/gtk/-/issues/3776
 
+* Limitations:
+  * can't ssl bump and authenticate user. [[squid-users] Squid ACL, SSL-BUMP and authentication questions, 2014](https://squid-users.squid-cache.narkive.com/LxvIKTZV/squid-acl-ssl-bump-and-authentication-questions#post4), [Re: ssl_bump + ldap authentication problem, 2011](https://www.spinics.net/lists/squid/msg55885.html)
+
 ## License
 
 BSD 2-clause
