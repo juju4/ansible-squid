@@ -1,7 +1,7 @@
 ---
 
 - name: Verify
-  hosts: molecule
+  hosts: "{{ playbook_hosts | default('molecule') }}"
   vars:
     proxy_port: 3128
   pre_tasks:
@@ -66,8 +66,9 @@
         verbosity: 1
     - name: Validate no ERROR or FATAL in logs
       ansible.builtin.assert:
-        that: >
-          "'ERROR: ' not in logs.stdout and 'FATAL: ' in not logs.stdout"
+        that:
+          - "'ERROR: ' not in logs.stdout"
+          - "'FATAL: ' not in logs.stdout"
 
     - name: Ensure ports are listening
       ansible.builtin.wait_for:
@@ -88,8 +89,9 @@
       changed_when: false
     - name: Validate curl1 output
       ansible.builtin.assert:
-        that: >
-          "'<title>Google</title>' in curl1.content and curl1.status == 200"
+        that:
+          - "'<title>Google</title>' in curl1.content"
+          - curl1.status == 200
 
     - name: Test curl www.cnn.com
       ansible.builtin.uri:
@@ -101,8 +103,8 @@
       changed_when: false
     - name: Validate curl2 output
       ansible.builtin.assert:
-        that: >
-          "curl2.status == 301"
+        that:
+          - curl2.status == 200
 
     - name: Test curl www.badboys.com
       ansible.builtin.uri:
@@ -116,12 +118,13 @@
       changed_when: false
     - name: Validate curl3 output
       ansible.builtin.assert:
-        that: >
-          "curl3.status == 301"
+        that:
+          - curl3.status == 301
 
     - name: Test curl malware.wicar.org
       ansible.builtin.uri:
         url: http://malware.wicar.org/data/eicar.com
+        return_content: true
       register: curl4
       environment:
         http_proxy: "http://localhost:{{ proxy_port }}"
@@ -129,8 +132,8 @@
       changed_when: false
     - name: Validate curl4 output
       ansible.builtin.assert:
-        that: >
-          "'EICAR-STANDARD-ANTIVIRUS-TEST-FILE!' in curl4.content"
+        that:
+          - "'EICAR-STANDARD-ANTIVIRUS-TEST-FILE!' in curl4.content"
 
     - name: Fetch content of /var/log/squid/cache.log
       ansible.builtin.slurp:
@@ -143,11 +146,11 @@
         verbosity: 1
     - name: Validate /var/log/squid/cache.log
       ansible.builtin.assert:
-        that: >
-          "'Starting Squid Cache version ' in cache['content'] | b64decode and
-          'Accepting HTTP Socket connections at' in cache['content'] | b64decode and
-          'Completed Validation Procedure' in cache['content'] | b64decode and
-          'WARNING' not in cache['content'] | b64decode"
+        that:
+          - "'Starting Squid Cache version ' in cache['content'] | b64decode"
+          - "'Accepting HTTP Socket connections at' in cache['content'] | b64decode"
+          - "'Completed Validation Procedure' in cache['content'] | b64decode"
+          - "'WARNING' not in cache['content'] | b64decode"
 
     - name: Fetch content of /var/log/squid/access_json.log
       ansible.builtin.slurp:
@@ -160,6 +163,6 @@
         verbosity: 1
     - name: Validate /var/log/squid/access_json.log
       ansible.builtin.assert:
-        that: >
-          "'time_local' in log['content'] | b64decode and
-          'method' in log['content'] | b64decode"
+        that:
+          - "'time_local' in log['content'] | b64decode"
+          - "'method' in log['content'] | b64decode"
