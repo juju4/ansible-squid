@@ -124,6 +124,7 @@
     - name: Test curl malware.wicar.org
       ansible.builtin.uri:
         url: http://malware.wicar.org/data/eicar.com
+        return_content: true
       register: curl4
       environment:
         http_proxy: "http://localhost:{{ proxy_port }}"
