@@ -104,7 +104,7 @@
     - name: Validate curl2 output
       ansible.builtin.assert:
         that:
-          - curl2.status == 301
+          - curl2.status == 200
 
     - name: Test curl www.badboys.com
       ansible.builtin.uri:
