@@ -213,3 +213,10 @@
       loop:
         - /var/log/squid
         - /var/spool/squid
+
+    - name: Ensure correct permissions for pinger
+      ansible.builtin.file:
+        path: "/usr/lib/squid/pinger"
+        mode: '4750'
+        owner: root
+        group: proxy
