@@ -299,7 +299,8 @@ refresh_pattern ^gopher:        1440    0%      1440
 refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
 # Images
 {% if ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22) or
-       (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 13)
+       (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 13) or
+       (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 10)
       ) %}
 {# squid 6.9: other options create warning "use of ... in 'refresh_pattern' violates HTTP" #}
 refresh_pattern -i \.(gif|png|jpeg|jpg|bmp|tif|tiff|ico)(\?.*|$) 10080 50% 43200 ignore-no-cache ignore-auth
