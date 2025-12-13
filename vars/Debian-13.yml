@@ -1,0 +1,83 @@
+---
+
+squid_pkgs: "{{ ['squid', 'cron'] + squid_report_pkgs | default(omit) }}"
+
+squid_confdir: /etc/squid
+squid_svc: squid
+squid_spool: /var/spool/squid
+squid_user: proxy
+squid_errors_template: /usr/share/squid/errors/
+squid_libexec: /usr/lib/squid
+
+ssl_user: ssl-cert
+ssl_dir: /etc/ssl/certs
+ssl_privatedir: /etc/ssl/private
+
+clamd_pkgs:
+  - clamav-daemon
+  - apparmor
+  - apparmor-utils
+
+squidbuild_dir: /var/cache/build/squid
+squidbuild_pkgs:
+  - devscripts
+  - build-essential
+  - fakeroot
+  - debhelper
+  - dh-autoreconf
+  - dh-apparmor
+  - cdbs
+  - libcppunit-dev
+  - libsasl2-dev
+  - libxml2-dev
+  - libkrb5-dev
+  - libdb-dev
+  - libnetfilter-conntrack-dev
+  - libexpat1-dev
+  - libcap2-dev
+  - libldap2-dev
+  - libpam0g-dev
+  - libgnutls28-dev
+  - libssl-dev
+  - libdbi-perl
+  - libecap3
+  - libecap3-dev
+  - debian-keyring
+  - libsystemd-dev
+  - libtdb-dev
+squidhttps_pkgs:
+  - squid-langpack
+# FIXME! validate patch
+squidhttps_patch: []
+squidhttps_localpatch:
+  - { url: files/squid69-debian-rules.patch, dir: /debian }
+
+
+# http://cdn-fastly.deb.debian.org/debian/pool/main/s/squid/
+squid_deb_src_dir_url: http://http.debian.net/debian/pool/main/s/squid
+squid_ver: '6.13'
+squid_pkg: '6.13-2+deb13u1'
+squid_orig_ext: tar.xz
+squid_debsrc_asc: false
+# http://www.squid-cache.org/Versions/
+squid_src_ver: '6.12'
+squid_src_hash: "sha256:20d6c79214f75b5f889952ed79e1ab8b8c3f909b079671d77bb558a6f0b28625"
+squidhttps_src_localpatch:
+  - { url: files/1929.patch, dir: /, strip: 1 }
+
+squid_testing_pkgs:
+  - curl
+  - db-util
+  - netcat
+  - jq
+  - tsung
+
+openssl_pkgs:
+  - openssl
+  - python3-pip
+  - python3-setuptools
+  - python3-openssl
+  - python3-cryptography
+
+squid_auth_basic_pkgs:
+  - apache2-utils
