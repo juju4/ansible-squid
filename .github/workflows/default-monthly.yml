@@ -3,8 +3,8 @@ name: AnsibleCI-monthly
 
 on:
   workflow_dispatch:
-  schedule:  # run on the 11th of the month at 01:00 UTC
-    - cron: '0 1 11 * *'
+  schedule:  # run on the 10th of the month at 01:00 UTC
+    - cron: '0 1 10 * *'
   merge_group:
 
 concurrency:
@@ -41,7 +41,10 @@ jobs:
             experimental: false
             suite: default
           - molecule_distro: 'debian:12'
-            experimental: false
+            experimental: true
+            suite: default
+          - molecule_distro: 'debian:11'
+            experimental: true
             suite: default
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks

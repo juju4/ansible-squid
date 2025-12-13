@@ -1,12 +1,10 @@
 ---
-name: default-source
+name: default-https-monthly
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
-  schedule:  # run weekly, every monday 02:30
-    - cron: '30 2 * * 1'
+  schedule:  # run on the 10th of the month at 01:00 UTC
+    - cron: '0 1 10 * *'
   merge_group:
 
 concurrency:
@@ -24,18 +22,28 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 2
       matrix:
         include:
+          - molecule_distro: 'almalinux:10-kitten'
+            experimental: false
+            suite: default-https
+          - molecule_distro: 'rockylinux:9'
+            experimental: false
+            suite: default-https
           - molecule_distro: 'ubuntu:24.04'
             experimental: false
-            suite: default-source
+            suite: default-https
           - molecule_distro: 'ubuntu:22.04'
             experimental: false
-            suite: default-source
+            suite: default-https
           - molecule_distro: 'debian:13'
             experimental: true
-            suite: default-source
+            suite: default-https
+          - molecule_distro: 'debian:12'
+            experimental: true
+            suite: default-https
+
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       MOLECULE_NO_LOG: "false"
