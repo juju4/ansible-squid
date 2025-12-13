@@ -14,6 +14,8 @@
   ansible.builtin.package:
     name: curl-minimal
     state: absent
+  when:
+    - not (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 10)
 
 - name: Ensure curl is present
   ansible.builtin.package:
