@@ -16,15 +16,15 @@
     state: present
     update_cache: yes
     cache_valid_time: 3600
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Ubuntu'
   register: pkg_result
   until: pkg_result is success
 
 - name: Ensure recent cryptography - older distributions
   when: >
     (
-      (ansible_distribution == "Debian" and ansible_distribution_major_version|int <= 11) or
-      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int <= 22)
+      (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version']|int <= 11) or
+      (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version']|int <= 22)
     )
   block:
     - name: Python externally managed
@@ -37,18 +37,18 @@
 
 - name: Check if OpenSSL private key exists
   ansible.builtin.stat:
-    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    path: "{{ ssl_privatedir }}/squid-{{ ansible_facts['fqdn'] }}.key"
   register: private_key
 
 - name: Generate an OpenSSL private key
   community.crypto.openssl_privatekey:
-    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    path: "{{ ssl_privatedir }}/squid-{{ ansible_facts['fqdn'] }}.key"
   when: not private_key.stat.exists
 
 - name: Generate an OpenSSL Certificate Signing Request
   community.crypto.openssl_csr:
-    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
-    privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    path: "{{ ssl_privatedir }}/squid-{{ ansible_facts['fqdn'] }}.csr"
+    privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_facts['fqdn'] }}.key"
     organization_name: "{{ squid_cert_orgname | default('Ansible') }}"
     common_name: "{{ certificate_cn }}"
     subject_alt_name: "{{ squid_cert_san | default(omit) }}"
@@ -59,9 +59,9 @@
 
 - name: Generate SSL self-signed certificate
   community.crypto.x509_certificate:
-    path: "{{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt"
-    privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
-    csr_path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.csr"
+    path: "{{ ssl_dir }}/squid-{{ ansible_facts['fqdn'] }}.crt"
+    privatekey_path: "{{ ssl_privatedir }}/squid-{{ ansible_facts['fqdn'] }}.key"
+    csr_path: "{{ ssl_privatedir }}/squid-{{ ansible_facts['fqdn'] }}.csr"
     ownca_not_after: "{{ squid_certduration | default('+365d') }}"
     provider: selfsigned
   notify:
@@ -69,15 +69,15 @@
 
 - name: Validate private key file permissions
   ansible.builtin.file:
-    path: "{{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key"
+    path: "{{ ssl_privatedir }}/squid-{{ ansible_facts['fqdn'] }}.key"
     owner: "root"
-    group: "{% if ansible_os_family == 'Debian' %}ssl-cert{% else %}root{% endif %}"
+    group: "{% if ansible_facts['os_family'] == 'Debian' %}ssl-cert{% else %}root{% endif %}"
     mode: '0440'
 
 - name: Ensure CA file available in der format
   ansible.builtin.command: >
-    openssl x509 -in {{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt
+    openssl x509 -in {{ ssl_dir }}/squid-{{ ansible_facts['fqdn'] }}.crt
         -outform DER
-        -out {{ ssl_dir }}/squid-{{ ansible_fqdn }}.der
+        -out {{ ssl_dir }}/squid-{{ ansible_facts['fqdn'] }}.der
   args:
-    creates: "{{ ssl_dir }}/squid-{{ ansible_fqdn }}.der"
+    creates: "{{ ssl_dir }}/squid-{{ ansible_facts['fqdn'] }}.der"

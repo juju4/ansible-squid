@@ -17,41 +17,41 @@
       ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
       register: python3
       changed_when: "'installed' in python3.stdout"
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+      when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 16)
     - name: RedHat | Install python3
       ansible.builtin.raw: test -e /usr/bin/python3 || (yum install -y python3)
       register: python3
       changed_when: "'installed' in python3.stdout"
-      when: (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+      when: (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8)
     - name: Gather Facts
       ansible.builtin.setup:
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+      when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 16)
     - name: Ubuntu Bionic+, Redhat 8+ | Enforce python3 for ansible
       ansible.builtin.set_fact:
         ansible_python_interpreter: /usr/bin/python3
       when: >
-        (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16) or
-        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+        (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 16) or
+        (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8)
     - name: RedHat8 | specific variables
       ansible.builtin.set_fact:
         squid_urlfiltering_enable: false
         squid_urlfiltering_tool: squidguard
         squid_report_pkgs: []
-      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '8'
+      when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == '8'
     - name: RedHat7 | specific variables
       ansible.builtin.set_fact:
         squid_urlfiltering_enable: false
         squid_urlfiltering_tool: squidguard
         squid_report_pkgs:
           - calamaris
-      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
+      when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == '7'
     - name: Ubuntu20.04+ | specific variables
       ansible.builtin.set_fact:
         squid_urlfiltering_enable: true
         squid_urlfiltering_tool: e2guardian
-      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int > 18
+      when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int > 18
   roles:
-    - { role: juju4.redhat_epel, when: ansible_os_family == "RedHat" }
+    - { role: juju4.redhat_epel, when: ansible_facts.os_family == "RedHat" }
     - juju4.squid
   tasks:
     - name: Banned few websites for testing
@@ -64,4 +64,4 @@
         - badboys.com
       notify:
         - E2guardian reload
-      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int > 18
+      when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int > 18

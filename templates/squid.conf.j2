@@ -17,7 +17,7 @@ acl Safe_ports port 443         # https
 #acl Safe_ports port 70         # gopher
 acl Safe_ports port 1025-65535  # unregistered ports
 acl CONNECT method CONNECT
-{% if not (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 10) and not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 18) and not (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 7) %}
+{% if not (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] | int >= 10) and not (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 18) and not (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 7) %}
 {# built-in since squid 3.2 #}
 acl localhost src 127.0.0.1/32
 {% endif %}
@@ -38,8 +38,8 @@ cache_mem 100 MB
 # default is 512 KB
 # maximum_object_size_in_memory 1 MB
 {% if (squid_dns_v4_first | bool) and not (
-  ((ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 10) or
-   (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+  ((ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] | int >= 10) or
+   (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 22)
   ) and squid_https_source_build | bool) %}
 # https://serverfault.com/questions/644604/squid-https-tunnelling-using-connect-very-slow
 dns_v4_first on
@@ -67,7 +67,7 @@ shutdown_lifetime 5 second
 #		 http://blog.squidblacklist.org/?p=707
 #error_directory /path/to
 
-{% if not (ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '6') %}
+{% if not (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == '6') %}
 # Only allow cachemgr access from localhost
 http_access allow localhost manager
 http_access deny manager
@@ -177,7 +177,7 @@ reply_body_max_size none localhost
 # https://github.com/tombatossals/squid_guifi_splash
 # -t <idle_timeout>
 # -T <fixed_timeout>
-{%     if ansible_os_family == "RedHat" %}
+{%     if ansible_facts['os_family'] == "RedHat" %}
 external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib64/squid/ext_session_acl -t {{ squid_splash_timeout }} -b /var/lib/squid/session.db
 {%     else %}
 external_acl_type splash_page ttl=60 concurrency=100 %DST /usr/lib/squid/ext_session_acl -t {{ squid_splash_timeout }} -b /var/lib/squid/session.db
@@ -203,11 +203,11 @@ http_port {{ squid_http_port_listen }}
 # https://wiki.squid-cache.org/KnowledgeBase/HostHeaderForgery
 http_port {{ squid_http_port_intercept_listen }} intercept
 {# Only redhat with openssl support, latest debian/ubuntu with gnutls but missing cert generators #}
-{%     if ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 8 %}
+{%     if ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int < 8 %}
 # https://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit
 http_port {{ squid_http_port_ssl_listen }} ssl-bump \
-  cert={{ ssl_dir }}/squid-{{ ansible_fqdn }}.crt \
-  key={{ ssl_privatedir }}/squid-{{ ansible_fqdn }}.key \
+  cert={{ ssl_dir }}/squid-{{ ansible_facts['fqdn'] }}.crt \
+  key={{ ssl_privatedir }}/squid-{{ ansible_facts['fqdn'] }}.key \
   generate-host-certificates=on dynamic_cert_mem_cache_size=4MB
 
 sslcrtd_program /usr/lib64/squid/ssl_crtd \
@@ -225,14 +225,14 @@ sslproxy_cipher EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+EC
 sslproxy_cert_error allow all
 sslproxy_flags DONT_VERIFY_PEER
 
-{%     elif (ansible_distribution == "Ubuntu" and squid_https) or
-        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8) or
-        (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22 and squid_https_source_build | bool)
+{%     elif (ansible_facts['distribution'] == "Ubuntu" and squid_https) or
+        (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8) or
+        (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 22 and squid_https_source_build | bool)
 %}
 #
 # squid-4+ only
 #
-{%         if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22) and squid_https_source_build | bool %}
+{%         if (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 22) and squid_https_source_build | bool %}
 sslcrtd_program /usr/local/libexec/security_file_certgen -s /var/lib/squid/ssl_db -M 4MB
 {%         else %}
 sslcrtd_program /usr/lib/squid/security_file_certgen -s /var/lib/squid/ssl_db -M 4MB
@@ -298,9 +298,9 @@ refresh_pattern ^ftp:           1440    20%     10080
 refresh_pattern ^gopher:        1440    0%      1440
 refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
 # Images
-{% if ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22) or
-       (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 13) or
-       (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 10)
+{% if ((ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 22) or
+       (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] | int >= 13) or
+       (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 10)
       ) %}
 {# squid 6.9: other options create warning "use of ... in 'refresh_pattern' violates HTTP" #}
 refresh_pattern -i \.(gif|png|jpeg|jpg|bmp|tif|tiff|ico)(\?.*|$) 10080 50% 43200 ignore-no-cache ignore-auth
@@ -425,9 +425,9 @@ refresh_all_ims on
 # http://squid-web-proxy-cache.1019090.n4.nabble.com/ACL-is-used-in-context-without-an-HTTP-response-Assuming-mismatch-td4677540.html
 #access_log none excludetrace proto_http
 
-{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or
-      (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10) or
-      (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
+{% if (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version']|int >= 18) or
+      (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version']|int >= 10) or
+      (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version']|int >= 7) %}
 access_log stdio:/var/log/squid/access.log squid
 ## Customize logging
 ## http://www.squid-cache.org/Doc/config/logformat/
@@ -477,7 +477,7 @@ logformat jsonExtended {\
   "bytes":{"body":"%<bs","total":%st}{% if squid_https %},\
   "ssl":{\
     "subject_c":"%ssl::>cert_subject","issuer_c":"%ssl::>cert_issuer",\
-{%     if not (ansible_os_family == "RedHat" and ansible_distribution_major_version | int == 7) %}
+{%     if not (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int == 7) %}
 {# squid 3.5 - http://www.squid-cache.org/Versions/v3/3.5/cfgman/logformat.html #}
     "subject_s":"%ssl::<cert_subject","issuer_s":"%ssl::<cert_issuer",\
     "errors_s":"%ssl::<cert_errors",\
@@ -489,9 +489,9 @@ logformat jsonExtended {\
 {% endif %}
  \
 }
-{% if (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or
-      (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10) or
-      (ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7) %}
+{% if (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version']|int >= 18) or
+      (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version']|int >= 10) or
+      (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version']|int >= 7) %}
 access_log stdio:/var/log/squid/access_json.log jsonExtended
 {% else %}
 access_log /var/log/squid/access_json.log jsonExtended

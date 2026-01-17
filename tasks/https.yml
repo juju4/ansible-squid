@@ -35,7 +35,7 @@
     creates: /var/lib/squid/ssl_db/index.txt
   become: yes
   become_user: "{{ squid_user }}"
-  when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int < 8
+  when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int < 8
 
 - name: Debian+Redhat>=8 | Initialize SSL database
   ansible.builtin.command: "{{ squid_libexec }}/security_file_certgen -c -s /var/lib/squid/ssl_db -M 4MB"
@@ -44,5 +44,5 @@
   become: yes
   become_user: "{{ squid_user }}"
   when: >
-    ansible_os_family == "Debian" or
-    (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    ansible_facts['os_family'] == "Debian" or
+    (ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8)

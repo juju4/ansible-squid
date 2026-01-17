@@ -5,18 +5,18 @@
   ansible.builtin.apt_repository:
     repo: "{{ item }}"
   loop:
-    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }} universe"
-    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-updates universe"
-  when: ansible_distribution == 'Ubuntu'
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_facts['distribution_release'] | lower }} universe"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_facts['distribution_release'] | lower }}-updates universe"
+  when: ansible_facts['distribution'] == 'Ubuntu'
 
 - name: Ubuntu | Enable universe security repository
   ansible.builtin.lineinfile:
     dest: /etc/apt/sources.list
     mode: '0644'
     owner: root
-    regexp: "^deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-security universe"
-    line: "deb http://security.ubuntu.com/ubuntu/ {{ ansible_distribution_release | lower }}-security universe"
-  when: ansible_distribution == 'Ubuntu'
+    regexp: "^deb http://security.ubuntu.com/ubuntu/ {{ ansible_facts['distribution_release'] | lower }}-security universe"
+    line: "deb http://security.ubuntu.com/ubuntu/ {{ ansible_facts['distribution_release'] | lower }}-security universe"
+  when: ansible_facts['distribution'] == 'Ubuntu'
 
 - name: Ensure squid build dir exists
   ansible.builtin.file:
@@ -73,9 +73,9 @@
         strip: "{{ item.strip | default(0) }}"
       loop: "{{ squidhttps_src_localpatch }}"
 
-    - name: Debug | var ansible_env
+    - name: Debug | var ansible_facts['env']
       ansible.builtin.debug:
-        var: ansible_env
+        var: ansible_facts['env']
         verbosity: 1
 
     # "configure: error: eCAP support requires loadable modules. Please do not use --disable-shared with --enable-ecap."

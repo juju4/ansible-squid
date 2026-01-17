@@ -9,12 +9,12 @@
       ansible.builtin.package:
         name: procps-ng
         state: present
-      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
+      when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 8
     - name: Debian | Ensure pgrep is present
       ansible.builtin.package:
         name: procps
         state: present
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
   tasks:
     - name: Ensure /etc/squid/squid.conf config file is present
       ansible.builtin.stat:

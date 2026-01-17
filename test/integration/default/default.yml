@@ -11,19 +11,19 @@
         squid_urlfiltering_enable: false
         squid_urlfiltering_tool: squidguard
         squid_report_pkgs: []
-      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '8'
+      when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == '8'
     - name: RedHat7 | specific variables
       ansible.builtin.set_fact:
         squid_urlfiltering_enable: false
         squid_urlfiltering_tool: squidguard
         squid_report_pkgs:
           - calamaris
-      when: ansible_os_family == "RedHat" and ansible_distribution_version.split('.')[0] == '7'
+      when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] == '7'
     - name: Ubuntu20.04+ | specific variables
       ansible.builtin.set_fact:
         squid_urlfiltering_enable: true
         squid_urlfiltering_tool: e2guardian
-      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int > 18
+      when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int > 18
   roles:
     - juju4.squid
   tasks:
@@ -37,4 +37,4 @@
         - badboys.com
       notify:
         - E2guardian reload
-      when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int > 18
+      when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int > 18
