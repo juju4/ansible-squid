@@ -31,19 +31,16 @@ jobs:
           - molecule_distro: 'rockylinux:9'
             experimental: false
             suite: default
-          - molecule_distro: 'ubuntu:24.04'
+          - molecule_distro: 'ubuntu:26.04'
             experimental: false
             suite: default
-          - molecule_distro: 'ubuntu:22.04'
+          - molecule_distro: 'ubuntu:24.04'
             experimental: false
             suite: default
           - molecule_distro: 'debian:13'
             experimental: false
             suite: default
           - molecule_distro: 'debian:12'
-            experimental: true
-            suite: default
-          - molecule_distro: 'debian:11'
             experimental: true
             suite: default
     env:
