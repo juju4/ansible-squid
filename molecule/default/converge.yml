@@ -10,6 +10,7 @@
   vars:
     squid_jsonlog: true
     squid_testing: false
+    e2guardian_banned: /etc/e2guardian/lists/bannedsitelist
   pre_tasks:
     - name: Ubuntu | Install python3
       ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
@@ -48,15 +49,20 @@
         squid_urlfiltering_enable: true
         squid_urlfiltering_tool: e2guardian
       when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int > 18
+    - name: Ubuntu26.04+ | specific variables
+      ansible.builtin.set_fact:
+        e2guardian_banned: /etc/e2guardian/lists/common/bannedsitelist
+      when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] | int >= 26
   roles:
     - { role: juju4.redhat_epel, when: ansible_facts.os_family == "RedHat" }
     - juju4.squid
   tasks:
     - name: Banned few websites for testing
       ansible.builtin.lineinfile:
-        dest: /etc/e2guardian/lists/bannedsitelist
+        dest: "{{ e2guardian_banned }}"
         line: "{{ item }}"
         mode: '0644'
+        create: true
       with_items:
         - adblockanalytics.com
         - badboys.com
