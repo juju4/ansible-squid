@@ -110,7 +110,7 @@ acl authenticated proxy_auth REQUIRED
 {% endif %}
 acl proto_http proto http https
 
-acl bad_tlds dstdomain .gdn .work .ltd .ooo .date .shop .racing .world .loan .tokyo .country .stream .gdn .mom .xin .kin .men .loan .download .racing
+acl bad_tlds dstdomain .gdn .work .ltd .ooo .date .shop .racing .world .loan .tokyo .country .stream .gdn .mom .xin .kin .men .download
 http_access deny bad_tlds
 
 acl useragent_chrome browser Chrome
