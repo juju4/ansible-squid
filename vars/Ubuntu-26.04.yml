@@ -53,6 +53,7 @@ squidbuild_pkgs:
 squidhttps_pkgs:
   - squid-langpack
 squidhttps_patch: []
+squidhttps_localpatch: []
 
 squid_deb_src_dir_url: http://archive.ubuntu.com/ubuntu/pool/main/s/squid
 squid_ver: '7.2'
