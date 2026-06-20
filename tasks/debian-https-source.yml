@@ -2,12 +2,16 @@
 # compile with openssl to support https from source
 
 - name: Ubuntu | Enable universe repository
-  ansible.builtin.apt_repository:
-    repo: "{{ item }}"
-  loop:
-    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_facts['distribution_release'] | lower }} universe"
-    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_facts['distribution_release'] | lower }}-updates universe"
-  when: ansible_facts['distribution'] == 'Ubuntu'
+  ansible.builtin.deb822_repository:
+    name: universe
+    types: deb
+    uris: "http://archive.ubuntu.com/ubuntu/"
+    suites:
+      - "{{ ansible_facts['distribution_release'] | lower }}"
+      - "{{ ansible_facts['distribution_release'] | lower }}-updates"
+    components: universe
+  when:
+    - ansible_facts['distribution'] == 'Ubuntu'
 
 - name: Ubuntu | Enable universe security repository
   ansible.builtin.lineinfile:
