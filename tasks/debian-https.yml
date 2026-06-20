@@ -17,6 +17,7 @@
       - "{{ ansible_facts['distribution_release'] | lower }}"
       - "{{ ansible_facts['distribution_release'] | lower }}-updates"
     components: universe
+    signed_by: /usr/share/keyrings/ubuntu-archive-keyring.gpg
   when:
     - ansible_facts['distribution'] == 'Ubuntu'
 
