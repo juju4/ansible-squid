@@ -2,6 +2,11 @@
 # compile with openssl to support https
 # https://docs.diladele.com/howtos/build_squid_4_on_ubuntu/index.html
 
+- name: Squid openssl | Ensure python3-debian
+  ansible.builtin.apt:
+    pkg: python3-debian
+    state: present
+
 - name: Ubuntu | Enable universe repository
   ansible.builtin.deb822_repository:
     name: universe
