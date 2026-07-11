@@ -110,7 +110,10 @@ acl authenticated proxy_auth REQUIRED
 {% endif %}
 acl proto_http proto http https
 
-acl bad_tlds dstdomain .gdn .work .ltd .ooo .date .shop .racing .world .loan .tokyo .country .stream .mom .xin .kin .men .download
+# https://www.spamhaus.org/reputation-statistics/gtlds/domains/
+# https://www.spamhaus.org/reputation-statistics/cctlds/domains/
+# https://discourse.ifin.network/t/garden-tlds-change-to-a-bad-neighborhood/627
+acl bad_tlds dstdomain .gdn .work .ltd .ooo .date .shop .racing .world .loan .tokyo .country .stream .mom .xin .kin .men .download .gardens .wiki .cfd .qpon .top .villas .icu .bid .voyage .loan .vip
 http_access deny bad_tlds
 
 acl useragent_chrome browser Chrome
