@@ -38,5 +38,5 @@ CPUQuota={{ squid_cgroups_cpuquota | default('80%') }}
 MemoryMax={{ squid_cgroups_memorylimit | default('4G') }}
 {% endif %}
 
-#Restart=on-failure
-#RestartSec=5s
+Restart=on-failure
+RestartSec=5s
