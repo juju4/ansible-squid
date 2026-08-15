@@ -12,7 +12,7 @@
   block:
     ## Ansible 2.3+ for get_attributes
     - name: Check target_dir attributes {{ target_dir }}
-      # stat:
+      # ansible.builtin.stat:
       #   path: "{{ target_dir }}"
       #   get_attributes: yes
       ansible.builtin.command:  # noqa no-changed-when
@@ -31,7 +31,7 @@
 - name: Reestablish immutable attribute
   ansible.builtin.command:  # noqa no-changed-when
     cmd: "chattr +i '{{ target_dir }}'"
-  # file:
+  # ansible.builtin.file:
   #   dest: "{{ target_dir }}"
   #   attributes: '----i-----I--e--'
   when: state == 'post'
