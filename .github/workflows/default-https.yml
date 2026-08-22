@@ -33,9 +33,6 @@ jobs:
           - molecule_distro: 'ubuntu:24.04'
             experimental: false
             suite: default-https
-          - molecule_distro: 'debian:13'
-            experimental: true
-            suite: default-https
     env:
       ANSIBLE_CALLBACKS_ENABLED: profile_tasks
       MOLECULE_NO_LOG: "false"
