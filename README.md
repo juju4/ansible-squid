@@ -1,7 +1,7 @@
+# Squid ansible role
+
 [![Actions Status - Main](https://github.com/juju4/ansible-squid/workflows/AnsibleCI/badge.svg)](https://github.com/juju4/ansible-squid/actions?query=branch%3Amain)
 [![Actions Status - Devel](https://github.com/juju4/ansible-squid/workflows/AnsibleCI/badge.svg?branch=devel)](https://github.com/juju4/ansible-squid/actions?query=branch%3Adevel)
-
-# Squid ansible role
 
 Ansible role to setup a secure and clean Squid proxy with
 * Dansguardian for url filtering (port 8080)
