@@ -42,5 +42,8 @@
   ansible.builtin.command: "sh -x {{ scriptsdir }}/ad_servers_newlist.sh"
   args:
     creates: "/var/spool/squid/ad_block.txt"
+  register: newlist
+  failed_when:
+    - "'TLS connect error' in newlist.stderr"
   notify:
     - Restart squid
